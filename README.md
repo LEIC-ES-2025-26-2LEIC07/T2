@@ -124,10 +124,14 @@ So, what are you waiting for? Sign up today!
 
 ## User Stories
 
+
 ### Story #1
 As a user I want to be able to rate a talk so that other users can evaluate the talk's quality
 
 ### User interface mock-up
+<p align="center">
+  <img src="img/login.png" width="250">
+</p>
 
 ##### Button to leave a rating
 ![leave_rating](./docs/leave_rating_mockup.png)
