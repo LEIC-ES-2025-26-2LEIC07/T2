@@ -10,9 +10,6 @@ You can find here detailed about 4U , hereby mentioned as module, from a high-le
   * [User stories](#User-stories)
 * Architecture and Design
 
-
-So far, contributions are exclusively made by the initial team, but we hope to open them to the community, in all areas and topics: requirements, technologies, development, experimentation, testing, etc.
-
 Please contact us!
 
 Thank you!
