@@ -66,6 +66,9 @@ Scenario: Rate a talk.
 As a user I want to be able to leave a comment about the talk so that I can give feedback to the speakers and organizers
 
 ### User interface mock-up
+<p align="center">
+  <img src="img/menu.png" width="250">
+</p>
 
 ##### Button to leave a comment
 ![leave_comment](./docs/leave_comment_mockup.png)
