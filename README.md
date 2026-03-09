@@ -35,7 +35,9 @@ To pioneer a future where health is never a second thought, by turning daily hab
 
 
 ### Story #1
-As a user I want to be able to rate a talk so that other users can evaluate the talk's quality
+As an app user,
+I want to log into my account using my email and password,
+So that I can access my personalized profile, settings, and private data.
 
 ### User interface mock-up
 <p align="center">
@@ -50,12 +52,13 @@ As a user I want to be able to rate a talk so that other users can evaluate the 
 
 ### Acceptance tests
 ```Gherkin
-Scenario: Rate a talk.
-  Given The post of a talk that I have attended
-  When I tap "Rate talk"
-  And I insert a rate
-  And I tap "OK",
-  Then the talk's post appears
+Scenario: Successful Login
+  Given the user is on the login screen
+  When the user enters a valid email but an incorrect password
+  And the user taps the "Log In" button
+  Then the system should deny access
+  And the system should display an error message stating "Invalid credentials"
+  And the system should empty the password input field for a retry.
 ```
 
 ### Value and effort
@@ -63,7 +66,10 @@ Scenario: Rate a talk.
 * Effort: XL
 
 ### Story #2
-As a user I want to be able to leave a comment about the talk so that I can give feedback to the speakers and organizers
+As an app user,
+I want to use a bottom navigation bar,
+So that I can easily switch between the core sections of the 4U app without
+losing my place or context.
 
 ### User interface mock-up
 <p align="center">
@@ -78,14 +84,11 @@ As a user I want to be able to leave a comment about the talk so that I can give
 
 ### Acceptance tests
 ```Gherkin
-Scenario: Leave a comment about a talk
-  Given A talk's post that I have attended and rated
-  When I tap "Leave a comment"
-  And I tap "Comment"
-  And I write "Hey that was great!"
-  And I tap "Leave Comment"
-  And I tap "See all comments"
-  Then my comment appears
+Scenario: Switching between primary tabs
+  Given the user is viewing the "Home" screen
+  When the user taps the "Me" (Profile) icon in the navigation bar
+  Then the system should display the Profile screen
+  And the system should visually update the navigation bar to show "Me" as the active tab.
 ```
 ### Value and effort
 * Value: Must have
