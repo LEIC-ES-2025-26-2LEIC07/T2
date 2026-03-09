@@ -41,14 +41,8 @@ So that I can access my personalized profile, settings, and private data.
 
 ### User interface mock-up
 <p align="center">
-  <img src="img/login.png" width="250">
+  <img src="docs/img/login.png" width="250">
 </p>
-
-##### Button to leave a rating
-![leave_rating](./docs/leave_rating_mockup.png)
-
-##### Screen where the user can actually leave the rating
-![actually_leave_rating](./docs/actually_leave_rating_mockup.png)
 
 ### Acceptance tests
 ```Gherkin
@@ -73,14 +67,9 @@ losing my place or context.
 
 ### User interface mock-up
 <p align="center">
-  <img src="img/menu.png" width="250">
+  <img src="docs/img/menu.png" width="250">
 </p>
 
-##### Button to leave a comment
-![leave_comment](./docs/leave_comment_mockup.png)
-
-##### Screen where the user can actually leave the comment
-![actually_leave_comment](./docs/actually_leave_comment_mockup.png)
 
 ### Acceptance tests
 ```Gherkin
