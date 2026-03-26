@@ -9,6 +9,8 @@ You can find here detailed about 4U , hereby mentioned as module, from a high-le
 * Requirements
   * [User stories](#User-stories)
 * Architecture and Design
+* DevOps
+  * [GitHub Actions Automation](#GitHub-Actions-Automation)
 
 Please contact us!
 
@@ -102,4 +104,18 @@ Scenario: See rating of a talk
 * Value: Must have
 * Effort: M
 
+----
+## GitHub Actions Automation
+
+The repository now includes automated workflows under `.github/workflows/`:
+
+* `CI` runs on every push and pull request.
+* It checks Dart formatting, runs `flutter analyze`, executes widget tests with coverage, publishes a coverage summary to the workflow run, and smoke-tests the web build.
+* `Deploy` runs on pushes to `main`.
+* It deploys the Flutter web app to GitHub Pages and uploads a release APK as a workflow artifact.
+
+### One-time GitHub setup
+
+* In the repository settings, open `Pages` and set the source to `GitHub Actions`.
+* If the production branch is not `main`, update `.github/workflows/deploy.yml` to match the branch used for releases.
 
