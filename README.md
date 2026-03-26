@@ -272,3 +272,6 @@ You can find below information and references related with the project managemen
 
 ### Final Release
 
+* In the repository settings, open `Pages` and set the source to `GitHub Actions`.
+* If the production branch is not `main`, update `.github/workflows/deploy.yml` to match the branch used for releases.
+* For a production Android release, replace the debug signing setup in `android/app/build.gradle.kts` with your real keystore configuration before publishing outside internal testing.
