@@ -66,11 +66,8 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: ignore
 
-      - name: Run integration tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          script: flutter test integration_test
+      - name: Run app smoke test
+        run: flutter test test/integration_test/app_test.dart
 
   web-smoke-build:
     name: Web Smoke Build
