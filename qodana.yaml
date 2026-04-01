@@ -23,7 +23,6 @@ profile:
 #    paths:
 #      - <path/where/not/run/inspection>
 
-projectJDK: "17" #(Matches the Android/Gradle toolchain used by this project)
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
 #bootstrap: sh ./prepare-qodana.sh
@@ -46,4 +45,4 @@ projectJDK: "17" #(Matches the Android/Gradle toolchain used by this project)
   
 #Qodana supports other languages, for example, Python, JavaScript, TypeScript, Go, C#, PHP
 #For all supported languages see https://www.jetbrains.com/help/qodana/linters.html
-linter: jetbrains/qodana-jvm-community:2025.3
+linter: jetbrains/qodana-flutter:2025.3
