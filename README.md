@@ -127,11 +127,26 @@ So that I can access my personalized profile, settings, and private data.
 ```Gherkin
 Scenario: Successful Login
   Given the user is on the login screen
+  When the user enters a valid email and a valid password
+  And the user taps the "Log In" button
+  Then the system should authenticate the user
+  And the system should open the main area of the application
+
+Scenario: Login fails with invalid credentials
+  Given the user is on the login screen
   When the user enters a valid email but an incorrect password
   And the user taps the "Log In" button
   Then the system should deny access
   And the system should display an error message stating "Invalid credentials"
-  And the system should empty the password input field for a retry.
+  And the system should keep the user on the login screen
+  And the system should empty the password input field for a retry
+
+Scenario: Login fails with missing fields
+  Given the user is on the login screen
+  When the user leaves the email or password field empty
+  And the user taps the "Log In" button
+  Then the system should not attempt authentication
+  And the system should highlight the missing required field or fields
 ```
 
 ### Value and effort
@@ -156,29 +171,57 @@ Scenario: Switching between primary tabs
   Given the user is viewing the "Home" screen
   When the user taps the "Me" (Profile) icon in the navigation bar
   Then the system should display the Profile screen
-  And the system should visually update the navigation bar to show "Me" as the active tab.
+  And the system should visually update the navigation bar to show "Me" as the active tab
+
+Scenario: Returning to the home screen from another tab
+  Given the user is viewing the "Calendar" screen
+  When the user taps the "Home" icon in the navigation bar
+  Then the system should display the Home screen
+  And the system should visually update the navigation bar to show "Home" as the active tab
+
+Scenario: Navigation bar remains visible across core sections
+  Given the user is viewing any primary section of the app
+  When the screen finishes loading
+  Then the bottom navigation bar should remain visible
+  And the user should be able to access every primary section with a single tap
 ```
 ### Value and effort
 * Value: Must have
 * Effort: XL
 
 
-### Story -- Example
-As a user I want to be able to see the current rating of a talk so that I can make the decision if I want to attend it
+### Story #3
+As an app user,
+I want to use the search bar on the home screen,
+So that I can quickly look for the content, service, or feature I need.
 
 ### User interface mock-up
 
 ### Acceptance tests
 ```Gherkin
-Scenario: See rating of a talk
-  Given A talk's post that is presented in the feed
-  When I am in the talk's post
-  Then the current rating appears
+Scenario: Search with a valid query
+  Given the user is on the home screen
+  When the user enters a keyword in the search bar
+  And the user submits the search
+  Then the system should display results related to that keyword
+
+Scenario: Search with an empty query
+  Given the user is on the home screen
+  When the user leaves the search bar empty
+  And the user submits the search
+  Then the system should not execute the search
+  And the system should prompt the user to enter a search term
+
+Scenario: No results found
+  Given the user is on the home screen
+  When the user searches for a term with no matching results
+  Then the system should display an empty-state message
+  And the system should allow the user to refine or clear the search
 ```
 
 ### Value and effort
 * Value: Must have
-* Effort: M
+* Effort: L
 
 ### Domain model
 
