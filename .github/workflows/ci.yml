@@ -66,6 +66,9 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: ignore
 
+      - name: Run app smoke test
+        run: flutter test test/integration_test/app_test.dart
+
   web-smoke-build:
     name: Web Smoke Build
     runs-on: ubuntu-latest
