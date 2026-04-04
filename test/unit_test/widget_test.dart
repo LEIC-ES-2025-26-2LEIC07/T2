@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:four_u_app/main.dart';
 
 void main() {
@@ -45,17 +44,18 @@ void main() {
       expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
     });
 
-    testWidgets('keeps the search field text after interacting with navigation', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const MaterialApp(home: HomePage()));
+    testWidgets(
+      'keeps the search field text after interacting with navigation',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(const MaterialApp(home: HomePage()));
 
-      await tester.enterText(find.byType(TextField), 'treino');
-      await tester.tap(find.byIcon(Icons.home_outlined));
-      await tester.pump();
+        await tester.enterText(find.byType(TextField), 'treino');
+        await tester.tap(find.byIcon(Icons.home_outlined));
+        await tester.pump();
 
-      expect(find.text('treino'), findsOneWidget);
-      expect(find.byType(IconButton), findsNWidgets(5));
-    });
+        expect(find.text('treino'), findsOneWidget);
+        expect(find.byType(IconButton), findsNWidgets(5));
+      },
+    );
   });
 }

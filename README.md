@@ -1,10 +1,10 @@
 <!-- Template file for README.md for LEIC-ES-2025-26 -->
 
-# _[your product name]_ Development Report
+# _ClinicGO_ Development Report
 
-Welcome to the documentation of _[your product name]_!
+Welcome to the documentation of _ClinicGO_!
 
-This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _[your product name]_, starting from an high-level vision and going into low-level implementation decisions. 
+This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _ClinicGO_, starting from an high-level vision and going into low-level implementation decisions. 
 
 It is organised by the following activities: 
 
@@ -47,13 +47,31 @@ Thank you!
 ---
 ## Business Modelling
 
-Business modeling in software development involves defining the product's vision, understanding market needs, aligning features with user expectations, and setting the groundwork for strategic planning and execution.
+The Goal that was proposed to us for this project was creating an app that aligns with the sustainable development goals [(SDGs)](https://www.eca.europa.eu/en/sustainable-development-goals) is a meaningful and impactful way to contribute to global challenges, in a FEUP-centric setting, that may be expanded to other faculties, possibly universities.
+As such, we have arrived at a central theme:
+- Tracking daily medications, accessing exam results, and simplifying the process of reading medication leaflets, all within a simple and intuitive mobile app, for example.
 
 ### Product Vision
-To a future where effortless daily habits create lifelong vitality.
-<!-- 
-Start by defining a clear and concise product vision for your app, to help members of the team, contributors, and users into focusing their often disparate views into a concise, visual, and short textual form. 
 
+For patients who struggle to keep **track** of their medications, exam results, and clinical history, who need a **simple** and **reliable** way to manage their health information on the go, **ClinicGO** is a mobile health **companion** app that centralizes medication reminders, exam results, and medical records in **one** place. Unlike scattered paper records or generic reminder apps, our product gives patients a clear, personalized, and accessible view of their own health **anytime, anywhere**.
+
+### The Problem
+
+In today's fast-paced world, patients often struggle to keep **track** of their health information. Medication schedules are missed, exam results are lost in paper folders, and accessing clinical history through official portals is often slow and unintuitive. This disorganization can lead to missed doses, delayed diagnoses, and poor health outcomes. There is currently no simple, unified solution that brings all of this together in a patient-friendly way.
+
+ClinicGO addresses this by promoting proactive health management, aligning with two key **Sustainable Development Goals**:
+
+- **[(SDG 3)](https://www.eca.europa.eu/en/sustainable-development-goals): Good Health and Well-being** — By helping patients stay on top of their medication schedules and health records, ClinicGO contributes to better health outcomes and improved quality of life.
+- **[(SDG 10)](https://www.eca.europa.eu/en/sustainable-development-goals): Reduced Inequalities** — By simplifying access to personal health information, ClinicGO makes healthcare management more accessible to all patients, regardless of digital literacy or technical background.
+
+#### Target Audience
+
+ClinicGO is designed for anyone who needs to actively manage their health, including:
+
+- Patients with chronic conditions who take multiple medications daily and need reliable reminders.
+- Elderly individuals or their caregivers who need a simple way to track health records and appointments.
+- Young adults who want a modern, mobile-first alternative to paper prescriptions and hospital portals.
+<!-- 
 The vision should provide a "high concept" of the product for marketers, developers, and managers.
 
 A product vision describes the essential of the product and sets the direction to where a product is headed, and what the product will deliver in the future. 
@@ -82,7 +100,7 @@ Optionally, indicate an initial/tentative list of assumptions that you are doing
 
 ## Requirements
 
-### User Stories
+### User Storiesalvaroltor
 <!-- 
 In this section you should describe all kinds of requirements for your module: functional and non-functional requirements.
 
@@ -112,7 +130,7 @@ At the end, it is good to add a rough indication of the value of the user story 
 -->
 ## User Stories
 
-
+alvaroltor
 ### Story #1
 As an app user,
 I want to log into my account using my email and password,
@@ -184,7 +202,7 @@ Scenario: Navigation bar remains visible across core sections
   When the screen finishes loading
   Then the bottom navigation bar should remain visible
   And the user should be able to access every primary section with a single tap
-```
+```alvaroltor
 ### Value and effort
 * Value: Must have
 * Effort: XL
@@ -219,7 +237,7 @@ Scenario: No results found
   And the system should allow the user to refine or clear the search
 ```
 
-### Value and effort
+### Value and effortalvaroltor
 * Value: Must have
 * Effort: L
 
@@ -253,7 +271,7 @@ In this section you should start by briefly describing the components of the pro
 The purpose of this subsection is to document the high-level logical structure of the code (Logical View), using a UML diagram with logical packages, without the worry of allocating to components, processes or machines.
 
 It can be beneficial to present the system in a horizontal decomposition, defining layers and implementation concepts, such as the user interface, business logic and concepts.
-
+alvaroltor
 Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticketing System (to be accompanied by a short description of each package):
 
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
@@ -304,6 +322,28 @@ You can find below information and references related with the project managemen
 -->
 
 ### Sprint 0
+
+#### Project Board
+
+<div align="center" justify="center">
+  <p>Start of Sprint 0</p>
+  <img src="docs/boards/sprint0_beginning.png">
+  <p>End of Sprint 0</p>
+  <img src="docs/boards/sprint0_end.png">
+</div>
+
+#### Sprint Retrospective
+
+* Did well:
+  * Good team work and organization.
+  * Well defined product vision with clear user stories.
+  * Organized the foundations of the project management (Github scrum board) and from the app itself (MVVM architecture).
+* Do differently:
+  * Manage the time better, starting the iteration as soon as possible to avoid delays due to unexpected problems.
+  * Establish a git workflow, creating pull requests for each of the specific tasks assigned.
+  * Schedule sessions of pair programming so we can help each other and follow up on the progress of the project.
+* Puzzles:
+  * Getting familiar with the tech stack (Flutter, Firebase).
 
 ### Sprint 1
 
