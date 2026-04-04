@@ -1,10 +1,10 @@
 <!-- Template file for README.md for LEIC-ES-2025-26 -->
 
-# _[your product name]_ Development Report
+# _[ClinicGO]_ Development Report
 
-Welcome to the documentation of _[your product name]_!
+Welcome to the documentation of _[ClinicGO]_!
 
-This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _[your product name]_, starting from an high-level vision and going into low-level implementation decisions. 
+This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _[ClinicGO]_, starting from an high-level vision and going into low-level implementation decisions. 
 
 It is organised by the following activities: 
 
@@ -50,8 +50,22 @@ Thank you!
 Business modeling in software development involves defining the product's vision, understanding market needs, aligning features with user expectations, and setting the groundwork for strategic planning and execution.
 
 ### Product Vision
-To a future where effortless daily habits create lifelong vitality.
-<!-- 
+For patients who struggle to keep track of their medications, exam results, and clinical history, who need a simple and reliable way to manage their health information on the go, ClinicGO is a mobile health companion app that centralizes medication reminders, exam results, and medical records in one place, with seamless integration with SNS24. Unlike scattered paper records, generic reminder apps, or the complex SNS24 portal, our product gives patients a clear, personalized, and accessible view of their own health — anytime, anywhere.
+
+The Problem
+In today's fast-paced world, patients often struggle to keep track of their health information. Medication schedules are missed, exam results are lost in paper folders, and accessing clinical history through official portals like SNS24 is often slow and unintuitive. This disorganization can lead to missed doses, delayed diagnoses, and poor health outcomes. There is currently no simple, unified solution that brings all of this together in a patient-friendly way.
+ClinicGO addresses this by promoting proactive health management, aligning with two key Sustainable Development Goals:
+
+SDG 3: Good Health and Well-being — By helping patients stay on top of their medication and health records, ClinicGO contributes to better health outcomes and quality of life.
+SDG 10: Reduced Inequalities — By simplifying access to health information, ClinicGO makes healthcare management more accessible to all patients, regardless of digital literacy.
+
+
+Target Audience
+ClinicGO is designed for anyone who needs to actively manage their health, including:
+
+Patients with chronic conditions who take multiple medications daily and need reliable reminders.
+Elderly individuals or their caregivers who need a simple way to track health records and appointments.
+Young adults who want a modern, mobile-first alternative to paper prescriptions and hospital portals.<!-- 
 Start by defining a clear and concise product vision for your app, to help members of the team, contributors, and users into focusing their often disparate views into a concise, visual, and short textual form. 
 
 The vision should provide a "high concept" of the product for marketers, developers, and managers.
