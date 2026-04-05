@@ -8,13 +8,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  const MethodChannel('com.llfbandit.app_links/events')
-      .setMockMethodCallHandler((MethodCall methodCall) async {
+  const MethodChannel(
+    'com.llfbandit.app_links/events',
+  ).setMockMethodCallHandler((MethodCall methodCall) async {
     return null;
   });
 
-  const MethodChannel('com.llfbandit.app_links/messages')
-      .setMockMethodCallHandler((MethodCall methodCall) async {
+  const MethodChannel(
+    'com.llfbandit.app_links/messages',
+  ).setMockMethodCallHandler((MethodCall methodCall) async {
     return null;
   });
 
