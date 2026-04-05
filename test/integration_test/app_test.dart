@@ -8,21 +8,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  const MethodChannel(
-    'com.llfbandit.app_links/events',
-  ).setMockMethodCallHandler((MethodCall methodCall) async {
-    return null;
-  });
-
-  const MethodChannel(
-    'com.llfbandit.app_links/messages',
-  ).setMockMethodCallHandler((MethodCall methodCall) async {
-    return null;
-  });
-
   group('Smoke Test', () {
     testWidgets('Verify app starts and shows home screen', (tester) async {
       SharedPreferences.setMockInitialValues({});
+
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/events'),
+        (methodCall) async => null,
+      );
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+        (methodCall) async => null,
+      );
 
       try {
         await Supabase.initialize(
@@ -30,7 +27,7 @@ void main() {
               'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
           anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
         );
-      } catch (e) {}
+      } catch (_) {}
 
       app.main();
 

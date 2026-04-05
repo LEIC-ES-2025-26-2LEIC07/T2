@@ -9,15 +9,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   group('Integration Test', () {
     testWidgets('boots the app and keeps core components wired together', (
       WidgetTester tester,
     ) async {
       SharedPreferences.setMockInitialValues({});
 
-      // Mock app_links
+      // Modern mock app_links
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         const MethodChannel('com.llfbandit.app_links/events'),
         (methodCall) async => null,
@@ -33,7 +31,9 @@ void main() {
               'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
           anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
         );
-      } catch (e) {}
+      } catch (_) {
+        // Already initialized
+      }
 
       app.main();
       await tester.pump();
