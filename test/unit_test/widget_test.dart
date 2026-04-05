@@ -3,15 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:four_u_app/main.dart';
 
 void main() {
-  group('FourUApp', () {
+  group('ClinicGO', () {
     testWidgets('configures the main Material app shell', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(const FourUApp());
+      await tester.pumpWidget(const ClinicGO());
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
-      expect(materialApp.title, '4U');
+      expect(materialApp.title, 'ClinicGO');
       expect(materialApp.debugShowCheckedModeBanner, isFalse);
       expect(materialApp.theme?.useMaterial3, isTrue);
       expect(find.byType(HomePage), findsOneWidget);
