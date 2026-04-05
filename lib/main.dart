@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:four_u_app/ui/core/themes/app_colors.dart';
-import 'package:four_u_app/ui/background/view_models/app_background.dart';
-import 'package:four_u_app/ui/common/widgets/custom_search_bar.dart';
-import 'package:four_u_app/ui/common/widgets/floating_bottom_nav_bar.dart';
+import 'package:ClinicGO/ui/core/themes/app_colors.dart';
+import 'package:ClinicGO/ui/background/view_models/app_background.dart';
+import 'package:ClinicGO/ui/common/widgets/custom_search_bar.dart';
+import 'package:ClinicGO/ui/common/widgets/floating_bottom_nav_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
