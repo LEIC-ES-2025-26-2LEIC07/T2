@@ -1,87 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clinic_go/ui/core/themes/app_colors.dart';
-import 'package:clinic_go/ui/background/view_models/app_background.dart';
-import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
-import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(
-    url: 'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
-    anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
-  );
-  runApp(const ClinicGO());
+void main() {
+  runApp(const FourUApp());
 }
 
-class ClinicGO extends StatelessWidget {
-  const ClinicGO({super.key});
+class FourUApp extends StatelessWidget {
+  const FourUApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ClinicGO',
+      title: '4U',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey),
       ),
-      home: const MainScreen(),
+      home: const HomePage(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // Home as default
-
-  // Lista de ecrãs para navegação
-  final List<Widget> _pages = [
-    const Center(child: Text("Perfil")),
-    const Center(child: Text("Favoritos")),
-    const HomeContent(),
-    const Center(child: Text("Calendário")),
-    const Center(child: Text("Definições")),
-  ];
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          AppBackground(child: _pages[_currentIndex]),
+          // Background
+          Container(
+            color: const Color(0xFFF8F8F8),
+            // Note: To add the topographical pattern, you would add a DecorationImage here:
+            // decoration: const BoxDecoration(
+            //   image: DecorationImage(
+            //     image: AssetImage('assets/topography.png'),
+            //     opacity: 0.1,
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
+          ),
 
-          // Barra de Pesquisa fixa no topo apenas na Home
-          if (_currentIndex == 2)
-            const SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: CustomSearchBar(),
+          // Search Bar at the top
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'O que precisas?',
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
+                    prefixIcon: Padding(
+                      padding: EdgeInsets.only(left: 20.0, right: 10.0),
+                      child: Text(''), // Spacer to match padding if needed
+                    ),
+                    suffixIcon: Padding(
+                      padding: EdgeInsets.only(right: 15.0),
+                      child: Icon(Icons.search, color: Colors.black54),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                ),
               ),
             ),
+          ),
 
-          FloatingBottomNavBar(
-            currentIndex: _currentIndex,
-            onTap: (index) => setState(() => _currentIndex = index),
+          // Floating Bottom Navigation Bar
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 30,
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(Icons.person_outline),
+                  _buildNavItem(Icons.favorite_border),
+                  _buildNavItem(Icons.home_outlined),
+                  _buildNavItem(Icons.calendar_today_outlined),
+                  _buildNavItem(Icons.settings_outlined),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Bem-vindo à ClinicGO!"));
+  Widget _buildNavItem(IconData icon) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.black, size: 28),
+      onPressed: () {},
+    );
   }
 }
