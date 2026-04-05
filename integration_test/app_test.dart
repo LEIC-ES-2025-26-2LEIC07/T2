@@ -1,32 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:four_u_app/main.dart' as app;
 import 'package:integration_test/integration_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/main.dart' as app;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('boots the app and keeps core components wired together', (
-    WidgetTester tester,
-  ) async {
-    app.main();
-    await tester.pumpAndSettle();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    expect(find.byType(MaterialApp), findsOneWidget);
-    expect(find.byType(Scaffold), findsOneWidget);
-    expect(find.byType(TextField), findsOneWidget);
-    expect(find.text('O que precisas?'), findsOneWidget);
-    expect(find.byType(IconButton), findsNWidgets(5));
+  group('Integration Test', () {
+    testWidgets('boots the app and keeps core components wired together', (
+      WidgetTester tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
 
-    await tester.enterText(find.byType(TextField), 'yoga');
-    await tester.tap(find.byIcon(Icons.calendar_today_outlined));
-    await tester.pumpAndSettle();
+      // Mock app_links
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/events'),
+        (methodCall) async => null,
+      );
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        const MethodChannel('com.llfbandit.app_links/messages'),
+        (methodCall) async => null,
+      );
 
-    expect(find.text('yoga'), findsOneWidget);
-    expect(find.byIcon(Icons.person_outline), findsOneWidget);
-    expect(find.byIcon(Icons.favorite_border), findsOneWidget);
-    expect(find.byIcon(Icons.home_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.calendar_today_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+      try {
+        await Supabase.initialize(
+          url:
+              'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
+          anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
+        );
+      } catch (e) {}
+
+      app.main();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+    });
   });
 }
