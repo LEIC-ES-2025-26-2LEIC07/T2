@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:four_u_app/main.dart';
-import 'package:four_u_app/ui/common/widgets/custom_search_bar.dart';
-import 'package:four_u_app/ui/common/widgets/floating_bottom_nav_bar.dart';
+import 'package:clinic_go/main.dart';
+import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
+import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
 
 void main() {
   group('ClinicGO', () {
@@ -37,8 +37,6 @@ void main() {
       await tester.pumpWidget(const MaterialApp(home: MainScreen()));
 
       expect(find.byType(FloatingBottomNavBar), findsOneWidget);
-      // Based on the icons used in the actual FloatingBottomNavBar implementation
-      // These might need adjustment if the icons changed.
     });
 
     testWidgets(

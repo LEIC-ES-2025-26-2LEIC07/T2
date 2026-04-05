@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ClinicGO/main.dart' as app;
+import 'package:clinic_go/main.dart' as app;
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
