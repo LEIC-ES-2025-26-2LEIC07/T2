@@ -82,8 +82,6 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Bem-vindo à ClinicGO!"),
-    );
+    return const Center(child: Text("Bem-vindo à ClinicGO!"));
   }
 }
