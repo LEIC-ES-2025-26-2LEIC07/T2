@@ -4,23 +4,17 @@ import 'package:clinic_go/ui/core/themes/app_colors.dart';
 import 'package:clinic_go/ui/background/view_models/app_background.dart';
 import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
 import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
+import 'login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Usar variáveis de ambiente passadas por --dart-define para segurança
-  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-
-  // Fallback apenas para desenvolvimento local (REMOVER EM PRODUÇÃO)
-  const defaultUrl =
-      'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co';
-  const defaultKey = 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC';
-
+  // Simplificado para teste (hardcoded)
   await Supabase.initialize(
-    url: supabaseUrl.isNotEmpty ? supabaseUrl : defaultUrl,
-    anonKey: supabaseAnonKey.isNotEmpty ? supabaseAnonKey : defaultKey,
+    url: 'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
+    anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
   );
+
   runApp(const ClinicGO());
 }
 
@@ -36,7 +30,32 @@ class ClinicGO extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
       ),
-      home: const MainScreen(),
+      home: const AuthGate(),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<AuthState>(
+      stream: Supabase.instance.client.auth.onAuthStateChange,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final session = snapshot.data?.session;
+        if (session != null) {
+          return const MainScreen();
+        } else {
+          return const LoginPage();
+        }
+      },
     );
   }
 }
@@ -53,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // Lista de ecrãs para navegação
   final List<Widget> _pages = [
-    const Center(child: Text("Perfil")),
+    const ProfilePlaceholder(),
     const Center(child: Text("Favoritos")),
     const HomeContent(),
     const Center(child: Text("Calendário")),
@@ -79,6 +98,29 @@ class _MainScreenState extends State<MainScreen> {
           FloatingBottomNavBar(
             currentIndex: _currentIndex,
             onTap: (index) => setState(() => _currentIndex = index),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfilePlaceholder extends StatelessWidget {
+  const ProfilePlaceholder({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text("Perfil"),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () async {
+              await Supabase.instance.client.auth.signOut();
+            },
+            child: const Text("Sair"),
           ),
         ],
       ),
