@@ -4,6 +4,8 @@ import 'package:clinic_go/ui/core/themes/app_colors.dart';
 import 'package:clinic_go/ui/background/view_models/app_background.dart';
 import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
 import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
+import 'package:clinic_go/ui/profile/views/profile_view.dart';
+import 'package:clinic_go/ui/favorites/views/favorites_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,8 +46,8 @@ class _MainScreenState extends State<MainScreen> {
 
   // Lista de ecrãs para navegação
   final List<Widget> _pages = [
-    const Center(child: Text("Perfil")),
-    const Center(child: Text("Favoritos")),
+    const ProfileView(),
+    const FavoritesView(),
     const HomeContent(),
     const Center(child: Text("Calendário")),
     const Center(child: Text("Definições")),
