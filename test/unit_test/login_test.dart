@@ -42,7 +42,10 @@ void main() {
       await tester.tap(find.byType(ElevatedButton));
       await tester.pump();
 
-      expect(find.text('A password deve ter pelo menos 6 caracteres'), findsOneWidget);
+      expect(
+        find.text('A password deve ter pelo menos 6 caracteres'),
+        findsOneWidget,
+      );
     });
   });
 }
