@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart';
 
 void main() {
   runApp(const FourUApp());
@@ -21,8 +22,26 @@ class FourUApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 2;
+
+  void _onNavItemTapped(int index) {
+    setState(() => _selectedIndex = index);
+
+    if (index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +51,6 @@ class HomePage extends StatelessWidget {
           // Background
           Container(
             color: const Color(0xFFF8F8F8),
-            // Note: To add the topographical pattern, you would add a DecorationImage here:
-            // decoration: const BoxDecoration(
-            //   image: DecorationImage(
-            //     image: AssetImage('assets/topography.png'),
-            //     opacity: 0.1,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
           ),
 
           // Search Bar at the top
@@ -67,7 +78,7 @@ class HomePage extends StatelessWidget {
                     hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
                     prefixIcon: Padding(
                       padding: EdgeInsets.only(left: 20.0, right: 10.0),
-                      child: Text(''), // Spacer to match padding if needed
+                      child: Text(''),
                     ),
                     suffixIcon: Padding(
                       padding: EdgeInsets.only(right: 15.0),
@@ -102,11 +113,11 @@ class HomePage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem(Icons.person_outline),
-                  _buildNavItem(Icons.favorite_border),
-                  _buildNavItem(Icons.home_outlined),
-                  _buildNavItem(Icons.calendar_today_outlined),
-                  _buildNavItem(Icons.settings_outlined),
+                  _buildNavItem(Icons.person_outline, 0),
+                  _buildNavItem(Icons.favorite_border, 1),
+                  _buildNavItem(Icons.home_outlined, 2),
+                  _buildNavItem(Icons.calendar_today_outlined, 3),
+                  _buildNavItem(Icons.settings_outlined, 4),
                 ],
               ),
             ),
@@ -116,10 +127,15 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(IconData icon) {
+  Widget _buildNavItem(IconData icon, int index) {
+    final isSelected = _selectedIndex == index;
     return IconButton(
-      icon: Icon(icon, color: Colors.black, size: 28),
-      onPressed: () {},
+      icon: Icon(
+        icon,
+        color: isSelected ? Colors.black : Colors.black45,
+        size: isSelected ? 30 : 26,
+      ),
+      onPressed: () => _onNavItemTapped(index),
     );
   }
 }
