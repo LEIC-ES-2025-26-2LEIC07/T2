@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:clinic_go/ui/core/themes/app_colors.dart';
+import 'package:clinic_go/ui/auth/view_models/auth_view_model.dart';
+import 'package:clinic_go/ui/auth/views/auth_wrapper.dart';
 import 'package:clinic_go/ui/background/view_models/app_background.dart';
 import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
 import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/ui/profile/views/profile_view.dart';
 import 'package:clinic_go/ui/favorites/views/favorites_view.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load Supabase credentials from the bundled .env asset.
+  await dotenv.load(fileName: '.env');
+
   await Supabase.initialize(
-    url: 'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
-    anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
+    url: dotenv.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    anonKey: dotenv.env['SB_PV_KEY']!,
   );
+
   runApp(const ClinicGO());
 }
 
@@ -22,17 +31,22 @@ class ClinicGO extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ClinicGO',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthViewModel())],
+      child: MaterialApp(
+        title: 'ClinicGO',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+        ),
+        home: const AuthWrapper(authenticatedChild: MainScreen()),
       ),
-      home: const MainScreen(),
     );
   }
 }
+
+// ── Main shell (shown after authentication) ────────────────────────────────────
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -44,13 +58,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // Home as default
 
-  // Lista de ecrãs para navegação
   final List<Widget> _pages = [
     const ProfileView(),
     const FavoritesView(),
     const HomeContent(),
-    const Center(child: Text("Calendário")),
-    const Center(child: Text("Definições")),
+    const Center(child: Text('Calendário')),
+    const Center(child: Text('Definições')),
   ];
 
   @override
@@ -60,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           AppBackground(child: _pages[_currentIndex]),
 
-          // Barra de Pesquisa fixa no topo apenas na Home
+          // Search bar — fixed at top only on the Home tab.
           if (_currentIndex == 2)
             const SafeArea(
               child: Padding(
@@ -84,6 +97,6 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Bem-vindo à ClinicGO!"));
+    return const Center(child: Text('Bem-vindo à ClinicGO!'));
   }
 }
