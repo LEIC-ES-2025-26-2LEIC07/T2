@@ -1,141 +1,96 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/ui/core/themes/app_colors.dart';
+import 'package:clinic_go/ui/background/view_models/app_background.dart';
+import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
+import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
 
-void main() {
-  runApp(const FourUApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Usar variáveis de ambiente passadas por --dart-define para segurança
+  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+  // Fallback apenas para desenvolvimento local (REMOVER EM PRODUÇÃO)
+  const defaultUrl =
+      'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co';
+  const defaultKey = 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC';
+
+  await Supabase.initialize(
+    url: supabaseUrl.isNotEmpty ? supabaseUrl : defaultUrl,
+    anonKey: supabaseAnonKey.isNotEmpty ? supabaseAnonKey : defaultKey,
+  );
+  runApp(const ClinicGO());
 }
 
-class FourUApp extends StatelessWidget {
-  const FourUApp({super.key});
+class ClinicGO extends StatelessWidget {
+  const ClinicGO({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '4U',
+      title: 'ClinicGO',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.grey),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
       ),
-      home: const HomePage(),
+      home: const MainScreen(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 2;
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 2; // Home as default
 
-  void _onNavItemTapped(int index) {
-    setState(() => _selectedIndex = index);
-
-    if (index == 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
-    }
-  }
+  // Lista de ecrãs para navegação
+  final List<Widget> _pages = [
+    const Center(child: Text("Perfil")),
+    const Center(child: Text("Favoritos")),
+    const HomeContent(),
+    const Center(child: Text("Calendário")),
+    const Center(child: Text("Definições")),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background
-          Container(
-            color: const Color(0xFFF8F8F8),
-          ),
+          AppBackground(child: _pages[_currentIndex]),
 
-          // Search Bar at the top
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 16.0,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: 'O que precisas?',
-                    hintStyle: TextStyle(color: Colors.grey, fontSize: 16),
-                    prefixIcon: Padding(
-                      padding: EdgeInsets.only(left: 20.0, right: 10.0),
-                      child: Text(''),
-                    ),
-                    suffixIcon: Padding(
-                      padding: EdgeInsets.only(right: 15.0),
-                      child: Icon(Icons.search, color: Colors.black54),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 15),
-                  ),
-                ),
+          // Barra de Pesquisa fixa no topo apenas na Home
+          if (_currentIndex == 2)
+            const SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: CustomSearchBar(),
               ),
             ),
-          ),
 
-          // Floating Bottom Navigation Bar
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: 30,
-            child: Container(
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(35),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildNavItem(Icons.person_outline, 0),
-                  _buildNavItem(Icons.favorite_border, 1),
-                  _buildNavItem(Icons.home_outlined, 2),
-                  _buildNavItem(Icons.calendar_today_outlined, 3),
-                  _buildNavItem(Icons.settings_outlined, 4),
-                ],
-              ),
-            ),
+          FloatingBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildNavItem(IconData icon, int index) {
-    final isSelected = _selectedIndex == index;
-    return IconButton(
-      icon: Icon(
-        icon,
-        color: isSelected ? Colors.black : Colors.black45,
-        size: isSelected ? 30 : 26,
-      ),
-      onPressed: () => _onNavItemTapped(index),
-    );
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text("Bem-vindo à ClinicGO!"));
   }
 }
