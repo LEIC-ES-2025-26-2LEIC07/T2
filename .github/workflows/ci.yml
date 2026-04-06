@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create .env from template
+        run: cp .env.example .env
+
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
@@ -90,6 +93,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create .env from template
+        run: cp .env.example .env
 
       - name: Build web application
         run: flutter build web --release
