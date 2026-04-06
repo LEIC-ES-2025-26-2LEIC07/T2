@@ -38,15 +38,17 @@ jobs:
 
       - name: Publish quality summary
         run: |
-          coverage=$(awk '
-            /^LF:/ { lines += substr($0, 4) }
-            /^LH:/ { hit += substr($0, 4) }
-            END {
-              if (lines > 0) {
-                printf "%.2f", (hit / lines) * 100
+          if [ -f coverage/lcov.info ]; then
+            coverage=$(awk '
+              /^LF:/ { lines += substr($0, 4) }
+              /^LH:/ { hit += substr($0, 4) }
+              END {
+                if (lines > 0) {
+                  printf "%.2f", (hit / lines) * 100
+                }
               }
-            }
-          ' coverage/lcov.info)
+            ' coverage/lcov.info)
+          fi
 
           echo "## Quality Metrics" >> "$GITHUB_STEP_SUMMARY"
           echo "- Formatting: passed" >> "$GITHUB_STEP_SUMMARY"
