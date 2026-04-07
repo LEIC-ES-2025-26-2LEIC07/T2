@@ -21,7 +21,7 @@ class TopographicPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.03)
+      ..color = Colors.black.withValues(alpha: 0.03)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
