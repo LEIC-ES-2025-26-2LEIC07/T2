@@ -49,7 +49,9 @@ class FloatingBottomNavBar extends StatelessWidget {
     return IconButton(
       icon: Icon(
         icon,
-        color: isSelected ? Colors.black : const Color(0xFFB0B0B0), // Grey for inactive, black for active
+        color: isSelected
+            ? Colors.black
+            : const Color(0xFFB0B0B0), // Grey for inactive, black for active
         size: 30,
       ),
       onPressed: () => onTap(index),

@@ -55,3 +55,5 @@ app.*.map.json
 /windows/flutter/generated_plugins.cmake
 /ios/Runner/GeneratedPluginRegistrant.h
 /ios/Runner/GeneratedPluginRegistrant.m
+
+.env

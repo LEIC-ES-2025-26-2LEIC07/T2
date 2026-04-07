@@ -11,7 +11,9 @@ class ProfileView extends StatelessWidget {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          margin: const EdgeInsets.only(bottom: 90), // Spacing for the bottom nav bar
+          margin: const EdgeInsets.only(
+            bottom: 90,
+          ), // Spacing for the bottom nav bar
           decoration: BoxDecoration(
             color: const Color(0xFFE2E2D9), // Light grey/beige matching mockup
             borderRadius: BorderRadius.circular(50),

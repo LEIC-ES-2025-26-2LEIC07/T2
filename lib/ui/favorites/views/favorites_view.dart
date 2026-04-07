@@ -10,7 +10,9 @@ class FavoritesView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Column(
           children: [
-            const SizedBox(height: 100), // Push the search bar down mimicking mockup
+            const SizedBox(
+              height: 100,
+            ), // Push the search bar down mimicking mockup
             Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -26,14 +28,14 @@ class FavoritesView extends StatelessWidget {
               child: const TextField(
                 decoration: InputDecoration(
                   hintText: 'O que precisas?',
-                  hintStyle: TextStyle(
-                    color: Color(0xFFB0B0B0), 
-                    fontSize: 16,
-                  ),
+                  hintStyle: TextStyle(color: Color(0xFFB0B0B0), fontSize: 16),
                   prefixIcon: null,
                   suffixIcon: Icon(Icons.search, color: Colors.black, size: 26),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
                 ),
               ),
             ),
