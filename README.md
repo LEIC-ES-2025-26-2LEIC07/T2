@@ -97,10 +97,29 @@ Indicate an  initial/tentative list of high-level features - high-level capabili
 
 Optionally, indicate an initial/tentative list of assumptions that you are doing about the app and dependencies of the app to other systems.
 -->
+#### High-level Features
+- **Medication Management (Core)**: Initial setup (Add medication), editing, and deleting medications. Manual tracking ("Mark dose as taken") and visual control of pill inventory via a progress bar (Stock).
+<!-- - **AI & Vision Integration**: Use of the native camera with photo preview and sharpness verification (Blur check) to send images to an LLM/Vision API (e.g., to read prescriptions or identify medication boxes). Includes an interactive Chat per medication and the mandatory presentation of a Medical Disclaimer (AI).
+-->
+- **Reminders & Resilient Scheduling**: Notification system for dose reminders and missed dose alerts. Includes an offline mode (Schedule) that ensures alarms trigger locally even without internet access.
+- **Health Tracking**: Functionalities to log symptoms, view the user's medical history, analyze a monthly summary (Analytics), and schedule appointments.
+- **Security & Authentication**: Secure Login and Logout flows managed via Supabase Auth. Includes secure profile sharing (e.g., with family members or doctors) through a temporarily generated 6-digit code.
+- **Emergency & Location**: Integrated emergency alerts and a real-time map (potentially for locating on-duty pharmacies or nearby hospitals).
+- **UI/UX & Navigation**: Fluid navigation based on a Bottom Navigation Bar and intuitive screen flows (e.g., Home -> Profile navigation).
+- **Auxiliary Tools**: Practical day-to-day management through a Shopping list (focused on pharmacy and health supplies).
+
+#### Assumptions
+
+- **Local Notification Dependency**: The application relies on the mobile operating system's capability to deliver reliable and timely push notifications, ensuring reminders work consistently even offline.
+<!-- - **LLM/Vision API Availability**: It is assumed that there is a reliable external API for computer vision and LLM capabilities for the AI features context.
+-->
+- **Supabase Integration**: The app's authentication and secure token generation rely on Supabase backend services.
+- **Location Services**: Emergency alerts and map functionality assume the user grants the app proper location tracking/GPS permissions.
+
 
 ## Requirements
 
-### User Storiesalvaroltor
+### User Stories
 <!-- 
 In this section you should describe all kinds of requirements for your module: functional and non-functional requirements.
 
@@ -128,118 +147,36 @@ For each user story you should write also the acceptance tests (textually in [Gh
 At the end, it is good to add a rough indication of the value of the user story to the customers (e.g. [MoSCoW](https://en.wikipedia.org/wiki/MoSCoW_method) method) and the team should add an estimation of the effort to implement it using points in a kind-of-a Fibonnacci scale (1,2,3,5,8,13,20,40, no idea).
 
 -->
-## User Stories
-
-alvaroltor
-### Story #1
-As an app user,
-I want to log into my account using my email and password,
-So that I can access my personalized profile, settings, and private data.
-
-### User interface mock-up
-<p align="center">
-  <img src="docs/img/login.png" width="250">
-</p>
-
-### Acceptance tests
-```Gherkin
-Scenario: Successful Login
-  Given the user is on the login screen
-  When the user enters a valid email and a valid password
-  And the user taps the "Log In" button
-  Then the system should authenticate the user
-  And the system should open the main area of the application
-
-Scenario: Login fails with invalid credentials
-  Given the user is on the login screen
-  When the user enters a valid email but an incorrect password
-  And the user taps the "Log In" button
-  Then the system should deny access
-  And the system should display an error message stating "Invalid credentials"
-  And the system should keep the user on the login screen
-  And the system should empty the password input field for a retry
-
-Scenario: Login fails with missing fields
-  Given the user is on the login screen
-  When the user leaves the email or password field empty
-  And the user taps the "Log In" button
-  Then the system should not attempt authentication
-  And the system should highlight the missing required field or fields
-```
-
-### Value and effort
-* Value: Must have
-* Effort: XL
-
-### Story #2
-As an app user,
-I want to use a bottom navigation bar,
-So that I can easily switch between the core sections of the 4U app without
-losing my place or context.
-
-### User interface mock-up
-<p align="center">
-  <img src="docs/img/menu.png" width="250">
-</p>
 
 
-### Acceptance tests
-```Gherkin
-Scenario: Switching between primary tabs
-  Given the user is viewing the "Home" screen
-  When the user taps the "Me" (Profile) icon in the navigation bar
-  Then the system should display the Profile screen
-  And the system should visually update the navigation bar to show "Me" as the active tab
 
-Scenario: Returning to the home screen from another tab
-  Given the user is viewing the "Calendar" screen
-  When the user taps the "Home" icon in the navigation bar
-  Then the system should display the Home screen
-  And the system should visually update the navigation bar to show "Home" as the active tab
+The following table provides a concise summary of all the user stories planned for the application, prioritized and estimated in story points (SPs). These are detailed individually in our GitHub Project board.
 
-Scenario: Navigation bar remains visible across core sections
-  Given the user is viewing any primary section of the app
-  When the screen finishes loading
-  Then the bottom navigation bar should remain visible
-  And the user should be able to access every primary section with a single tap
-```alvaroltor
-### Value and effort
-* Value: Must have
-* Effort: XL
-
-
-### Story #3
-As an app user,
-I want to use the search bar on the home screen,
-So that I can quickly look for the content, service, or feature I need.
-
-### User interface mock-up
-
-### Acceptance tests
-```Gherkin
-Scenario: Search with a valid query
-  Given the user is on the home screen
-  When the user enters a keyword in the search bar
-  And the user submits the search
-  Then the system should display results related to that keyword
-
-Scenario: Search with an empty query
-  Given the user is on the home screen
-  When the user leaves the search bar empty
-  And the user submits the search
-  Then the system should not execute the search
-  And the system should prompt the user to enter a search term
-
-Scenario: No results found
-  Given the user is on the home screen
-  When the user searches for a term with no matching results
-  Then the system should display an empty-state message
-  And the system should allow the user to refine or clear the search
-```
-
-### Value and effortalvaroltor
-* Value: Must have
-* Effort: L
+| ID         | User Story                  | Priority | Effort (SPs) | Technical Justification                                          |
+| :--------- | :-------------------------- | :------- | :----------- | :--------------------------------------------------------------- |
+| **#22**    | Bottom Navigation Bar       | High     | 2            | Basic application routing structure.                             |
+| **#28**    | Monthly Summary (Analytics) | Medium   | 5            | Data aggregation and graphical visualization.                    |
+| **#29**    | Mark Dose as Taken          | High     | 2            | Simple update on the `medication_logs` table.                    |
+| **#31**    | Shopping List               | Low      | 3            | Basic CRUD operations for a task list.                           |
+| **#37**    | Home → Profile Navigation   | Medium   | 1            | Simple state change in the router.                               |
+| **#43**    | Missed Dose Notification    | High     | 5            | Scheduled verification against dose logs.                        |
+| **#44**    | Emergency Alerts            | High     | 5            | Critical notification trigger with SMS/Email API integration.    |
+| **#45/23** | Login (Supabase Auth)       | High     | 3            | Standard authentication provider configuration.                  |
+| **#46**    | Log Symptoms                | Medium   | 3            | Simple form submission to the `symptoms` table.                  |
+| **#47**    | Logout                      | Medium   | 1            | Basic session termination implementation.                        |
+| **#48**    | Schedule Appointments       | Low      | 8            | Integration with external calendar or appointment systems.       |
+| **#49**    | Medical History             | Medium   | 3            | Simple query with date-based filtering.                          |
+| **#50**    | Real-Time Map               | Medium   | 8            | Integration with a map/geolocation SDK.                          |
+| **#51**    | Progress Bar (Stock)        | Medium   | 3            | Simple calculations based on consumption logs.                   |
+| **#52**    | Reminder Notification       | High     | 8            | Local/remote push notification scheduling.                       |
+| **#63**    | Add Medication (Setup)      | High     | 5            | Complex CRUD with validations and business logic.                |
+| **#64**    | Edit/Delete Medication      | High     | 3            | Update/Delete operations with referential integrity constraints. |
+| **#65**    | Offline Mode (Schedule)     | High     | 13           | Local data synchronization (e.g., SQLite/WatermelonDB).          |
+| **#66**    | 6-Digit Code (Sharing)      | Medium   | 5            | Backend logic (RPC) and permission management.                   |
+| **#67**    | Open Native Camera          | High     | 3            | Standard hardware access and permission handling.                |
+| **#68**    | Photo Preview (Blur Check)  | Medium   | 5            | UI logic for real-time image validation.                         |
+| **#69**    | Send to LLM/Vision API      | High     | 8            | External API integration and image processing.                   |
+| **#70**    | Medication Chat             | Low      | 13           | High complexity: message storage and querying.                   |
 
 ### Domain model
 
@@ -276,6 +213,12 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
 -->
+<div align="center" justify="center">
+  <p>Start of Sprint 0</p>
+  <img src="docs/diagrams/clinicgo_uml_package_diagram.png">
+  <p>End of Sprint 0</p>
+  <img src="docs/boards/sprint0_end.png">
+</div>
 
 
 ### Physical architecture
