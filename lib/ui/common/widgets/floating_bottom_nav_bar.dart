@@ -15,15 +15,16 @@ class FloatingBottomNavBar extends StatelessWidget {
     return Positioned(
       left: 20,
       right: 20,
-      bottom: 30,
+      bottom: 20,
       child: Container(
         height: 70,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withValues(alpha: 0.85), // Glassmorphism base
           borderRadius: BorderRadius.circular(35),
+          border: Border.all(color: Colors.white, width: 2), // Clean outline
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -48,8 +49,10 @@ class FloatingBottomNavBar extends StatelessWidget {
     return IconButton(
       icon: Icon(
         icon,
-        color: isSelected ? Colors.blue : Colors.black,
-        size: 28,
+        color: isSelected
+            ? Colors.black
+            : const Color(0xFFB0B0B0), // Grey for inactive, black for active
+        size: 30,
       ),
       onPressed: () => onTap(index),
     );
