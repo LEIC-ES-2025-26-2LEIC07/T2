@@ -282,7 +282,10 @@ We developed the foundational application skeleton using Flutter. This prototype
 This prototype proves that our Flutter development environment is fully operational, cross-platform compilation is working properly, and the base View layer is structurally ready to be decoupled and connected to our ViewModels.
 
 Below is an animated snapshot of the functional prototype in action:
+<br>
+<div align="center" justify="center">
 <img src="docs/gifs/vertical.gif">
+</div>
 
 ## Project management
 <!--
