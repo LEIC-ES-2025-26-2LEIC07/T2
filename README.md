@@ -308,6 +308,21 @@ You can find below information and references related with the project managemen
     * list of a few improvements to implement next Sprint;
 
 -->
+You can find below information and references related with the project management in our team:
+
+    Backlog management: Product backlog and Sprint backlog in a Github Projects Board
+    Release management: v0
+    Sprint planning and retrospectives:
+        Sprint 0
+        Sprint 1
+        Sprint 2
+        Sprint 3
+        Final Release
+    Happiness Meters: each member fills the column associated with his number (the M3 fills the third column , e.g.).
+    Changelog: we keep a changelog to keep track important changes in each version released. It follows the format specified at Keep a Changelog.
+    Git Workflow: Feature-branches workflow based on the main branch. Each feature or fix is developed on its own branch and merged via a pull request. Code reviews are required (using branch protection) to ensure code quality and consistency.
+    CI/CD - Github Actions: Every pull request triggers a workflow that verifies code formatting and linting rules. This helps maintain code consistency and prevents errors from reaching the main branch.
+
 
 ### Sprint 0
 
