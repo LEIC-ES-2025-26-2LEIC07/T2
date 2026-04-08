@@ -150,33 +150,33 @@ At the end, it is good to add a rough indication of the value of the user story 
 
 
 
-The following table provides a concise summary of all the user stories planned for the application, prioritized and estimated in story points (SPs). These are detailed individually in our GitHub Project board.
+The following table provides a concise summary of all the user stories planned for the application. These are detailed individually in our **GitHub Project board.**
 
-| ID         | User Story                  | Priority | Effort (SPs) | Technical Justification                                          |
-| :--------- | :-------------------------- | :------- | :----------- | :--------------------------------------------------------------- |
-| **#22**    | Bottom Navigation Bar       | High     | 2            | Basic application routing structure.                             |
-| **#28**    | Monthly Summary (Analytics) | Medium   | 5            | Data aggregation and graphical visualization.                    |
-| **#29**    | Mark Dose as Taken          | High     | 2            | Simple update on the `medication_logs` table.                    |
-| **#31**    | Shopping List               | Low      | 3            | Basic CRUD operations for a task list.                           |
-| **#37**    | Home → Profile Navigation   | Medium   | 1            | Simple state change in the router.                               |
-| **#43**    | Missed Dose Notification    | High     | 5            | Scheduled verification against dose logs.                        |
-| **#44**    | Emergency Alerts            | High     | 5            | Critical notification trigger with SMS/Email API integration.    |
-| **#45/23** | Login (Supabase Auth)       | High     | 3            | Standard authentication provider configuration.                  |
-| **#46**    | Log Symptoms                | Medium   | 3            | Simple form submission to the `symptoms` table.                  |
-| **#47**    | Logout                      | Medium   | 1            | Basic session termination implementation.                        |
-| **#48**    | Schedule Appointments       | Low      | 8            | Integration with external calendar or appointment systems.       |
-| **#49**    | Medical History             | Medium   | 3            | Simple query with date-based filtering.                          |
-| **#50**    | Real-Time Map               | Medium   | 8            | Integration with a map/geolocation SDK.                          |
-| **#51**    | Progress Bar (Stock)        | Medium   | 3            | Simple calculations based on consumption logs.                   |
-| **#52**    | Reminder Notification       | High     | 8            | Local/remote push notification scheduling.                       |
-| **#63**    | Add Medication (Setup)      | High     | 5            | Complex CRUD with validations and business logic.                |
-| **#64**    | Edit/Delete Medication      | High     | 3            | Update/Delete operations with referential integrity constraints. |
-| **#65**    | Offline Mode (Schedule)     | High     | 13           | Local data synchronization (e.g., SQLite/WatermelonDB).          |
-| **#66**    | 6-Digit Code (Sharing)      | Medium   | 5            | Backend logic (RPC) and permission management.                   |
-| **#67**    | Open Native Camera          | High     | 3            | Standard hardware access and permission handling.                |
-| **#68**    | Photo Preview (Blur Check)  | Medium   | 5            | UI logic for real-time image validation.                         |
-| **#69**    | Send to LLM/Vision API      | High     | 8            | External API integration and image processing.                   |
-| **#70**    | Medication Chat             | Low      | 13           | High complexity: message storage and querying.                   |
+| ID         | User Story                   | Technical Justification                                          |
+| :--------- | :--------------------------  | :--------------------------------------------------------------- |
+| **#22**    | Bottom Navigation Bar       | Basic application routing structure.                             |
+| **#28**    | Monthly Summary (Analytics) | Data aggregation and graphical visualization.                    |
+| **#29**    | Mark Dose as Taken          | Simple update on the `medication_logs` table.                    |
+| **#31**    | Shopping List               | Basic CRUD operations for a task list.                           |
+| **#37**    | Home → Profile Navigation   | Simple state change in the router.                               |
+| **#43**    | Missed Dose Notification    | Scheduled verification against dose logs.                        |
+| **#44**    | Emergency Alerts            | Critical notification trigger with SMS/Email API integration.    |
+| **#45/23** | Login (Supabase Auth)       | Standard authentication provider configuration.                  |
+| **#46**    | Log Symptoms                | Simple form submission to the `symptoms` table.                  |
+| **#47**    | Logout                      | Basic session termination implementation.                        |
+| **#48**    | Schedule Appointments       | Integration with external calendar or appointment systems.       |
+| **#49**    | Medical History             | Simple query with date-based filtering.                          |
+| **#50**    | Real-Time Map               | Integration with a map/geolocation SDK.                          |
+| **#51**    | Progress Bar (Stock)        | Simple calculations based on consumption logs.                   |
+| **#52**    | Reminder Notification       | Local/remote push notification scheduling.                       |
+| **#63**    | Add Medication (Setup)      | Complex CRUD with validations and business logic.                |
+| **#64**    | Edit/Delete Medication      | Update/Delete operations with referential integrity constraints. |
+| **#65**    | Offline Mode (Schedule)     | Local data synchronization (e.g., SQLite/WatermelonDB).          |
+| **#66**    | 6-Digit Code (Sharing)      | Backend logic (RPC) and permission management.                   |
+| **#67**    | Open Native Camera          | Standard hardware access and permission handling.                |
+| **#68**    | Photo Preview (Blur Check)  | UI logic for real-time image validation.                         |
+| **#69**    | Send to LLM/Vision API      | External API integration and image processing.                   |
+| **#70**    | Medication Chat             | High complexity: message storage and querying.                   |
 
 ### Domain model
 
@@ -189,6 +189,23 @@ Example:
   <img src="https://github.com/FEUP-LEIC-ES-2022-23/templates/blob/main/images/DomainModel.png"/>
 </p>
 -->
+
+<img src="docs/diagrams/main.png">
+
+The ClinicGO domain is centred around the **User** (patient), who has a personal
+health profile containing their name, date of birth, and contact information.
+A **User** can register multiple **Medications**, each defined by a name, dosage,
+frequency, and treatment period (start and end dates). Each **Medication** can have
+one or more **Reminders**, which schedule notifications at specific times and on
+specific days of the week to alert the patient to take their medication.
+
+Every time a **Reminder** fires, a **MedicationLog** entry is created, recording
+whether the patient took the dose or missed it, along with the timestamp. This
+allows the app to track medication adherence over time.
+
+A **User** can also store **ExamResults**, which represent clinical documents such
+as blood tests or imaging results. Each exam result contains the exam type, date,
+a summary, an optional file attachment, and the name of the requesting doctor.
 
 
 ## Architecture and Design
