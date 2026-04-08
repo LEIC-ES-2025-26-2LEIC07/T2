@@ -232,7 +232,7 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 -->
 <div align="center" justify="center">
   <p>Start of Sprint 0</p>
-  <img src="docs/diagrams/view.png">
+  <img src="docs/diagrams/ViewLogical.png">
   <img src="docs/boards/sprint0_end.png">
 </div>
 
