@@ -308,21 +308,19 @@ You can find below information and references related with the project managemen
     * list of a few improvements to implement next Sprint;
 
 -->
-You can find below information and references related with the project management in our team:
+***
 
-    Backlog management: Product backlog and Sprint backlog in a Github Projects Board
-    Release management: v0
-    Sprint planning and retrospectives:
-        Sprint 0
-        Sprint 1
-        Sprint 2
-        Sprint 3
-        Final Release
-    Happiness Meters: each member fills the column associated with his number (the M3 fills the third column , e.g.).
-    Changelog: we keep a changelog to keep track important changes in each version released. It follows the format specified at Keep a Changelog.
-    Git Workflow: Feature-branches workflow based on the main branch. Each feature or fix is developed on its own branch and merged via a pull request. Code reviews are required (using branch protection) to ensure code quality and consistency.
-    CI/CD - Github Actions: Every pull request triggers a workflow that verifies code formatting and linting rules. This helps maintain code consistency and prevents errors from reaching the main branch.
+## Project Management
 
+You can find below information and references related to the project management practices and tools utilized by our team:
+
+* **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
+* **Release Management:** Version tracking begins with `v0`.
+* **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
+* **Happiness Meters:** We track team morale using a Happiness Meter. Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
+* **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Keep a Changelog](https://keepachangelog.com/).
+* **Git Workflow:** We follow a feature-branch workflow branching off `main`. Each feature or bug fix is developed on its own dedicated branch and integrated via a Pull Request (PR). Code reviews are mandatory and enforced using branch protection rules to ensure code quality and consistency.
+* **CI/CD (GitHub Actions):** Every Pull Request automatically triggers a GitHub Actions workflow that verifies code formatting and enforces linting rules. This helps maintain a consistent codebase and prevents errors from reaching the main branch.
 
 ### Sprint 0
 
