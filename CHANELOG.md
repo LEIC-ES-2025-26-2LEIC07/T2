@@ -4,13 +4,16 @@
 
 ### Added
 
+-----
 
-#### Release v0: Foundation & Core Navigation
+### Release v0: Foundation & Core Navigation
 
-* **App Architecture (MVVM Pattern):** Established a modular directory structure under `lib/ui/` with a strict separation between **Views** and **ViewModels**. This ensures UI and business logic remain decoupled as the system scales.
-* **Database Configuration (Supabase):** Integrated **Supabase** for backend services. Successfully initialized the `supabase_flutter` plugin in the `main()` method with API URL and anonymous key configurations.
-* **Navigation Flow & Mock Pages:** Created dummy screens to test application flow, including dedicated views for **Profile**, **Favorites**, and **Home**, with placeholders for **Calendar** and **Settings**.
-* **State-Based Routing:** Implemented a central `MainScreen` controller that manages page transitions using a reactive `_currentIndex` state to switch between active modules.
-* **Custom Navigation Components:** Developed a **FloatingBottomNavBar** for seamless page switching and a **CustomSearchBar** specific to the Home module.
-* **Unified Visual Theme:** Configured **Material 3** with a centralized color scheme derived from `AppColors.primaryColor`. Implemented a reusable `AppBackground` wrapper to maintain visual consistency across all screens.
-* **Reusable UI Foundation:** Built a library of foundational mock widgets (Search Bar, Bottom Nav) to serve as the building blocks for upcoming feature development.
+  * **App Architecture (MVVM Pattern) [[\#22](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/22)]:** Established a modular directory structure under `lib/ui/` with a strict separation between **Views** and **ViewModels**. This architecture provides the core routing structure needed for the entire app.
+  * **Database Configuration (Supabase) [[\#45](https://www.google.com/search?q=https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/45)]:** Integrated **Supabase** as the primary backend provider. Successfully initialized the `supabase_flutter` plugin in the `main()` method, setting the stage for secure authentication and cloud data storage.
+  * **Navigation Flow & Mock Pages [[\#37](https://www.google.com/search?q=https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/37), [\#22](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/22)]:** Created functional screens to test application flow, including **Profile (\#37)** and **Home**, with placeholders for **Calendar (\#48)** and **Settings**.
+  * **State-Based Routing [[\#22](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/22)]:** Implemented a central `MainScreen` controller that manages page transitions using a reactive `_currentIndex` state, allowing for modular switching between active features.
+  * **Custom Navigation Components [[\#22](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/22), [\#51](https://www.google.com/search?q=https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/51)]:** Developed the **FloatingBottomNavBar (\#22)** for global navigation and a **CustomSearchBar** to lay the groundwork for future search and stock filtering logic **(\#51)**.
+  * **Unified Visual Theme [[\#71](https://www.google.com/search?q=https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/71)]:** Configured **Material 3** with a centralized color scheme. This includes a reusable **AppBackground** and UI wrappers that will house future elements like the **Medical Disclaimer (\#71)**.
+  * **Reusable UI Foundation [[\#22](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/22), [\#67](https://www.google.com/search?q=https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/67)]:** Built a library of foundational mock widgets. These components provide the UI hooks necessary for upcoming hardware integrations like the **Native Camera (\#67)**.
+
+-----
