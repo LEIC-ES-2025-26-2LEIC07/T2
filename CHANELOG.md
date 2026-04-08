@@ -7,8 +7,6 @@
 
 #### Release v0: Foundation & Core Navigation
 
-### Release v0: Foundation & Core Navigation
-
 * **App Architecture (MVVM Pattern):** Established a modular directory structure under `lib/ui/` with a strict separation between **Views** and **ViewModels**. This ensures UI and business logic remain decoupled as the system scales.
 * **Database Configuration (Supabase):** Integrated **Supabase** for backend services. Successfully initialized the `supabase_flutter` plugin in the `main()` method with API URL and anonymous key configurations.
 * **Navigation Flow & Mock Pages:** Created dummy screens to test application flow, including dedicated views for **Profile**, **Favorites**, and **Home**, with placeholders for **Calendar** and **Settings**.
