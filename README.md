@@ -254,7 +254,7 @@ Example of _UML deployment diagram_ showing a _deployment view_ of the Eletronic
 
 ![DeploymentView](https://user-images.githubusercontent.com/9655877/160592491-20e85af9-0758-4e1e-a704-0db1be3ee65d.png)
 -->
-
+<img src="docs/diagrams/physical.png">
 The physical architecture outlines the main components of the ClinicGO application, illustrating 
 not only how they connect with one another but also how they interact with external APIs and native 
 hardware. Our application's core business logic and authentication features depend directly on Supabase
