@@ -97,10 +97,29 @@ Indicate an  initial/tentative list of high-level features - high-level capabili
 
 Optionally, indicate an initial/tentative list of assumptions that you are doing about the app and dependencies of the app to other systems.
 -->
+#### High-level Features
+- **Medication Management (Core)**: Initial setup (Add medication), editing, and deleting medications. Manual tracking ("Mark dose as taken") and visual control of pill inventory via a progress bar (Stock).
+<!-- - **AI & Vision Integration**: Use of the native camera with photo preview and sharpness verification (Blur check) to send images to an LLM/Vision API (e.g., to read prescriptions or identify medication boxes). Includes an interactive Chat per medication and the mandatory presentation of a Medical Disclaimer (AI).
+-->
+- **Reminders & Resilient Scheduling**: Notification system for dose reminders and missed dose alerts. Includes an offline mode (Schedule) that ensures alarms trigger locally even without internet access.
+- **Health Tracking**: Functionalities to log symptoms, view the user's medical history, analyze a monthly summary (Analytics), and schedule appointments.
+- **Security & Authentication**: Secure Login and Logout flows managed via Supabase Auth. Includes secure profile sharing (e.g., with family members or doctors) through a temporarily generated 6-digit code.
+- **Emergency & Location**: Integrated emergency alerts and a real-time map (potentially for locating on-duty pharmacies or nearby hospitals).
+- **UI/UX & Navigation**: Fluid navigation based on a Bottom Navigation Bar and intuitive screen flows (e.g., Home -> Profile navigation).
+- **Auxiliary Tools**: Practical day-to-day management through a Shopping list (focused on pharmacy and health supplies).
+
+#### Assumptions
+
+- **Local Notification Dependency**: The application relies on the mobile operating system's capability to deliver reliable and timely push notifications, ensuring reminders work consistently even offline.
+<!-- - **LLM/Vision API Availability**: It is assumed that there is a reliable external API for computer vision and LLM capabilities for the AI features context.
+-->
+- **Supabase Integration**: The app's authentication and secure token generation rely on Supabase backend services.
+- **Location Services**: Emergency alerts and map functionality assume the user grants the app proper location tracking/GPS permissions.
+
 
 ## Requirements
 
-### User Storiesalvaroltor
+### User Stories
 <!-- 
 In this section you should describe all kinds of requirements for your module: functional and non-functional requirements.
 
@@ -128,119 +147,40 @@ For each user story you should write also the acceptance tests (textually in [Gh
 At the end, it is good to add a rough indication of the value of the user story to the customers (e.g. [MoSCoW](https://en.wikipedia.org/wiki/MoSCoW_method) method) and the team should add an estimation of the effort to implement it using points in a kind-of-a Fibonnacci scale (1,2,3,5,8,13,20,40, no idea).
 
 -->
-## User Stories
-
-alvaroltor
-### Story #1
-As an app user,
-I want to log into my account using my email and password,
-So that I can access my personalized profile, settings, and private data.
-
-### User interface mock-up
-<p align="center">
-  <img src="docs/img/login.png" width="250">
-</p>
-
-### Acceptance tests
-```Gherkin
-Scenario: Successful Login
-  Given the user is on the login screen
-  When the user enters a valid email and a valid password
-  And the user taps the "Log In" button
-  Then the system should authenticate the user
-  And the system should open the main area of the application
-
-Scenario: Login fails with invalid credentials
-  Given the user is on the login screen
-  When the user enters a valid email but an incorrect password
-  And the user taps the "Log In" button
-  Then the system should deny access
-  And the system should display an error message stating "Invalid credentials"
-  And the system should keep the user on the login screen
-  And the system should empty the password input field for a retry
-
-Scenario: Login fails with missing fields
-  Given the user is on the login screen
-  When the user leaves the email or password field empty
-  And the user taps the "Log In" button
-  Then the system should not attempt authentication
-  And the system should highlight the missing required field or fields
-```
-
-### Value and effort
-* Value: Must have
-* Effort: XL
-
-### Story #2
-As an app user,
-I want to use a bottom navigation bar,
-So that I can easily switch between the core sections of the 4U app without
-losing my place or context.
-
-### User interface mock-up
-<p align="center">
-  <img src="docs/img/menu.png" width="250">
-</p>
 
 
-### Acceptance tests
-```Gherkin
-Scenario: Switching between primary tabs
-  Given the user is viewing the "Home" screen
-  When the user taps the "Me" (Profile) icon in the navigation bar
-  Then the system should display the Profile screen
-  And the system should visually update the navigation bar to show "Me" as the active tab
 
-Scenario: Returning to the home screen from another tab
-  Given the user is viewing the "Calendar" screen
-  When the user taps the "Home" icon in the navigation bar
-  Then the system should display the Home screen
-  And the system should visually update the navigation bar to show "Home" as the active tab
+The following table provides a concise summary of all the user stories planned for the application. These are detailed individually in our **GitHub Project board.**
 
-Scenario: Navigation bar remains visible across core sections
-  Given the user is viewing any primary section of the app
-  When the screen finishes loading
-  Then the bottom navigation bar should remain visible
-  And the user should be able to access every primary section with a single tap
-```alvaroltor
-### Value and effort
-* Value: Must have
-* Effort: XL
+| ID         | User Story                   | Technical Justification                                          |
+| :--------- | :--------------------------  | :--------------------------------------------------------------- |
+| **#22**    | Bottom Navigation Bar       | Basic application routing structure.                             |
+| **#28**    | Monthly Summary (Analytics) | Data aggregation and graphical visualization.                    |
+| **#29**    | Mark Dose as Taken          | Simple update on the `medication_logs` table.                    |
+| **#31**    | Shopping List               | Basic CRUD operations for a task list.                           |
+| **#37**    | Home → Profile Navigation   | Simple state change in the router.                               |
+| **#43**    | Missed Dose Notification    | Scheduled verification against dose logs.                        |
+| **#44**    | Emergency Alerts            | Critical notification trigger with SMS/Email API integration.    |
+| **#45/23** | Login (Supabase Auth)       | Standard authentication provider configuration.                  |
+| **#46**    | Log Symptoms                | Simple form submission to the `symptoms` table.                  |
+| **#47**    | Logout                      | Basic session termination implementation.                        |
+| **#48**    | Schedule Appointments       | Integration with external calendar or appointment systems.       |
+| **#49**    | Medical History             | Simple query with date-based filtering.                          |
+| **#50**    | Real-Time Map               | Integration with a map/geolocation SDK.                          |
+| **#51**    | Progress Bar (Stock)        | Simple calculations based on consumption logs.                   |
+| **#52**    | Reminder Notification       | Local/remote push notification scheduling.                       |
+| **#63**    | Add Medication (Setup)      | Complex CRUD with validations and business logic.                |
+| **#64**    | Edit/Delete Medication      | Update/Delete operations with referential integrity constraints. |
+| **#65**    | Offline Mode (Schedule)     | Local data synchronization (e.g., SQLite/WatermelonDB).          |
+| **#66**    | 6-Digit Code (Sharing)      | Backend logic (RPC) and permission management.                   |
+| **#67**    | Open Native Camera          | Standard hardware access and permission handling.                |
+| **#68**    | Photo Preview (Blur Check)  | UI logic for real-time image validation.                         |
+| **#69**    | Send to LLM/Vision API      | External API integration and image processing.                   |
+| **#70**    | Medication Chat             | High complexity: message storage and querying.                   |
 
+#### User Validation & Refinement
 
-### Story #3
-As an app user,
-I want to use the search bar on the home screen,
-So that I can quickly look for the content, service, or feature I need.
-
-### User interface mock-up
-
-### Acceptance tests
-```Gherkin
-Scenario: Search with a valid query
-  Given the user is on the home screen
-  When the user enters a keyword in the search bar
-  And the user submits the search
-  Then the system should display results related to that keyword
-
-Scenario: Search with an empty query
-  Given the user is on the home screen
-  When the user leaves the search bar empty
-  And the user submits the search
-  Then the system should not execute the search
-  And the system should prompt the user to enter a search term
-
-Scenario: No results found
-  Given the user is on the home screen
-  When the user searches for a term with no matching results
-  Then the system should display an empty-state message
-  And the system should allow the user to refine or clear the search
-```
-
-### Value and effortalvaroltor
-* Value: Must have
-* Effort: L
-
+To ensure the **ClinicGO** application addresses real-world needs, we conducted a systematic validation phase involving potential target users. See more [here](docs/forms/validate.md)
 ### Domain model
 
 <!-- 
@@ -252,6 +192,23 @@ Example:
   <img src="https://github.com/FEUP-LEIC-ES-2022-23/templates/blob/main/images/DomainModel.png"/>
 </p>
 -->
+
+<img src="docs/diagrams/main.png">
+
+The ClinicGO domain is centred around the **User** (patient), who has a personal
+health profile containing their name, date of birth, and contact information.
+A **User** can register multiple **Medications**, each defined by a name, dosage,
+frequency, and treatment period (start and end dates). Each **Medication** can have
+one or more **Reminders**, which schedule notifications at specific times and on
+specific days of the week to alert the patient to take their medication.
+
+Every time a **Reminder** fires, a **MedicationLog** entry is created, recording
+whether the patient took the dose or missed it, along with the timestamp. This
+allows the app to track medication adherence over time.
+
+A **User** can also store **ExamResults**, which represent clinical documents such
+as blood tests or imaging results. Each exam result contains the exam type, date,
+a summary, an optional file attachment, and the name of the requesting doctor.
 
 
 ## Architecture and Design
@@ -276,7 +233,19 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
 -->
-
+<div align="center" justify="center">
+  <img src="docs/diagrams/ViewLogical.png">
+</div>
+<br>
+The logical architecture represents the high-level structure of the ClinicGO application, illustrating 
+the main feature modules and their internal interactions based on the Model-View-ViewModel (MVVM) 
+pattern. Each component's declarative UI (View) is strictly decoupled from data processing; 
+it interacts solely with its corresponding presentation logic (ViewModel). This logic, in turn,
+communicates with the core Domain Entities and Repositories. These repositories are linked to Supabase
+for secure user authentication and cloud data storage, as well as to Local Storage to ensure offline 
+functionality for critical features like medication reminders. For specific external integrations, 
+the system relies on the Google Maps API to fetch and display real-time map data, and an LLM/Vision 
+API to process images of prescriptions and medication boxes.
 
 ### Physical architecture
 <!--
@@ -288,7 +257,18 @@ Example of _UML deployment diagram_ showing a _deployment view_ of the Eletronic
 
 ![DeploymentView](https://user-images.githubusercontent.com/9655877/160592491-20e85af9-0758-4e1e-a704-0db1be3ee65d.png)
 -->
-
+<img src="docs/diagrams/physical.png">
+The physical architecture outlines the main components of the ClinicGO application, illustrating 
+not only how they connect with one another but also how they interact with external APIs and native 
+hardware. Our application's core business logic and authentication features depend directly on Supabase
+(PostgreSQL and Supabase Auth) to securely store, retrieve, and sync cloud data.
+<br>
+The application logic also communicates seamlessly with native OS capabilities, such as the device
+camera for prescription scanning and the notification manager for local medication alerts. To guarantee our 
+critical Offline Mode, a Local Storage solution (such as SQLite or Hive) is responsible for saving and retrieving 
+schedule data directly on the user's device. Finally, the location services depend on the Google Maps API to
+retrieve relevant geolocation data, while an external LLM/Vision API is utilized to process and analyze images of
+medication boxes and clinical documents.
 
 ### Functional prototype
 <!--
@@ -298,6 +278,17 @@ In this subsection please describe which feature, or part of it, you have implem
 
 At this phase, instead of a complete user story, you can simply implement a small part of a feature that demonstrates thay you can use the technology, for example, show a screen with the app credits (name and authors).
 -->
+To validate our architectural decisions and technology stack, we implemented a thin vertical slice of the ClinicGO application focused on Core Navigation and UI Structure.
+
+We developed the foundational application skeleton using Flutter. This prototype successfully demonstrates the implementation of the primary routing architecture anchored on a BottomNavigationBar (addressing User Story #22). It showcases the dynamic state changes required to switch seamlessly between the main functional modules of the application (Profile, Health/Favorites, Home, Schedule, and Settings).
+
+This prototype proves that our Flutter development environment is fully operational, cross-platform compilation is working properly, and the base View layer is structurally ready to be decoupled and connected to our ViewModels.
+
+Below is an animated snapshot of the functional prototype in action:
+<br>
+<div align="center" justify="center">
+<img src="docs/gifs/vertical.gif">
+</div>
 
 ## Project management
 <!--
@@ -320,6 +311,17 @@ You can find below information and references related with the project managemen
     * list of a few improvements to implement next Sprint;
 
 -->
+***
+
+You can find below information and references related to the project management practices and tools utilized by our team:
+
+* **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
+* **Release Management:** Version tracking begins with `v0`.
+* **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
+* **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1lBXRWSGOGwlCaAO6XVjdQlxRd8Vy1xQ2nmZJSPKH9LQ/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
+* **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANELOG.md)).
+* **Git Workflow:** We follow a feature-branch workflow branching off `main`. Each feature or bug fix is developed on its own dedicated branch and integrated via a Pull Request (PR). Code reviews are mandatory and enforced using branch protection rules to ensure code quality and consistency.
+* **CI/CD (GitHub Actions):** Every Pull Request automatically triggers a GitHub Actions workflow that verifies code formatting and enforces linting rules. This helps maintain a consistent codebase and prevents errors from reaching the main branch.
 
 ### Sprint 0
 
@@ -327,23 +329,29 @@ You can find below information and references related with the project managemen
 
 <div align="center" justify="center">
   <p>Start of Sprint 0</p>
-  <img src="docs/boards/sprint0_beginning.png">
+  <img src="docs/boards/sprint0/start.png">
   <p>End of Sprint 0</p>
-  <img src="docs/boards/sprint0_end.png">
+  <img src="docs/boards/sprint0/end.png">
 </div>
 
-#### Sprint Retrospective
+***
 
-* Did well:
-  * Good team work and organization.
-  * Well defined product vision with clear user stories.
-  * Organized the foundations of the project management (Github scrum board) and from the app itself (MVVM architecture).
-* Do differently:
-  * Manage the time better, starting the iteration as soon as possible to avoid delays due to unexpected problems.
-  * Establish a git workflow, creating pull requests for each of the specific tasks assigned.
-  * Schedule sessions of pair programming so we can help each other and follow up on the progress of the project.
-* Puzzles:
-  * Getting familiar with the tech stack (Flutter, Firebase).
+### Sprint 0 Retrospective
+
+* **Did well:**
+    * **Product Definition:** Successfully established a clear product vision and well-defined user stories for ClinicGO.
+    * **Architecture Foundation:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase**.
+    * **Tooling:** Initial setup of the GitHub Scrum board was effective for tracking technical requirements.
+
+* **Do differently:**
+    * **Team Balance & Participation:** **Improve workload distribution.** During this sprint, the team did not function at its best as the vast majority of the work was carried out by only a few members. We need to ensure everyone is actively contributing to avoid bottlenecks.
+    * **Time Management:** Start iterations immediately to prevent "crunching" at the end of the sprint and to account for unexpected technical hurdles.
+    * **Git Workflow:** Strictly enforce the use of feature branches and pull requests for every task to maintain code quality and visibility.
+    * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
+
+* **Puzzles:**
+    * **Tech Stack Proficiency:** Getting the entire team up to speed with **Flutter** and **Supabase** to ensure everyone can contribute technically.
+    * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
 
 ### Sprint 1
 
