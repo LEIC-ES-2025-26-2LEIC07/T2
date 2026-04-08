@@ -275,6 +275,14 @@ In this subsection please describe which feature, or part of it, you have implem
 
 At this phase, instead of a complete user story, you can simply implement a small part of a feature that demonstrates thay you can use the technology, for example, show a screen with the app credits (name and authors).
 -->
+To validate our architectural decisions and technology stack, we implemented a thin vertical slice of the ClinicGO application focused on Core Navigation and UI Structure.
+
+We developed the foundational application skeleton using Flutter. This prototype successfully demonstrates the implementation of the primary routing architecture anchored on a BottomNavigationBar (addressing User Story #22). It showcases the dynamic state changes required to switch seamlessly between the main functional modules of the application (Profile, Health/Favorites, Home, Schedule, and Settings).
+
+This prototype proves that our Flutter development environment is fully operational, cross-platform compilation is working properly, and the base View layer is structurally ready to be decoupled and connected to our ViewModels.
+
+Below is an animated snapshot of the functional prototype in action:
+<img src="docs/gifs/vertical.gif">
 
 ## Project management
 <!--
