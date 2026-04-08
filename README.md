@@ -310,8 +310,6 @@ You can find below information and references related with the project managemen
 -->
 ***
 
-## Project Management
-
 You can find below information and references related to the project management practices and tools utilized by our team:
 
 * **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
