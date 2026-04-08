@@ -326,12 +326,11 @@ You can find below information and references related to the project management 
 
 <div align="center" justify="center">
   <p>Start of Sprint 0</p>
-  <img src="docs/boards/sprint0_beginning.png">
+  <img src="docs/boards/sprint0/start.png">
   <p>End of Sprint 0</p>
-  <img src="docs/boards/sprint0_end.png">
+  <img src="docs/boards/sprint0/end.png">
 </div>
 
-#### Sprint Retrospective
 ***
 
 ### Sprint 0 Retrospective
