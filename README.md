@@ -178,6 +178,9 @@ The following table provides a concise summary of all the user stories planned f
 | **#69**    | Send to LLM/Vision API      | External API integration and image processing.                   |
 | **#70**    | Medication Chat             | High complexity: message storage and querying.                   |
 
+#### User Validation & Refinement
+
+To ensure the **ClinicGO** application addresses real-world needs, we conducted a systematic validation phase involving potential target users. See more [here](docs/forms/validate.md)
 ### Domain model
 
 <!-- 
