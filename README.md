@@ -315,7 +315,7 @@ You can find below information and references related to the project management 
 * **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
 * **Release Management:** Version tracking begins with `v0`.
 * **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
-* **Happiness Meters:** We track team morale using a Happiness Meter. Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
+* **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1lBXRWSGOGwlCaAO6XVjdQlxRd8Vy1xQ2nmZJSPKH9LQ/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
 * **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANELOG.md)).
 * **Git Workflow:** We follow a feature-branch workflow branching off `main`. Each feature or bug fix is developed on its own dedicated branch and integrated via a Pull Request (PR). Code reviews are mandatory and enforced using branch protection rules to ensure code quality and consistency.
 * **CI/CD (GitHub Actions):** Every Pull Request automatically triggers a GitHub Actions workflow that verifies code formatting and enforces linting rules. This helps maintain a consistent codebase and prevents errors from reaching the main branch.
@@ -332,17 +332,24 @@ You can find below information and references related to the project management 
 </div>
 
 #### Sprint Retrospective
+***
 
-* Did well:
-  * Good team work and organization.
-  * Well defined product vision with clear user stories.
-  * Organized the foundations of the project management (Github scrum board) and from the app itself (MVVM architecture).
-* Do differently:
-  * Manage the time better, starting the iteration as soon as possible to avoid delays due to unexpected problems.
-  * Establish a git workflow, creating pull requests for each of the specific tasks assigned.
-  * Schedule sessions of pair programming so we can help each other and follow up on the progress of the project.
-* Puzzles:
-  * Getting familiar with the tech stack (Flutter, Firebase).
+### Sprint 0 Retrospective
+
+* **Did well:**
+    * **Product Definition:** Successfully established a clear product vision and well-defined user stories for ClinicGO.
+    * **Architecture Foundation:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase**.
+    * **Tooling:** Initial setup of the GitHub Scrum board was effective for tracking technical requirements.
+
+* **Do differently:**
+    * **Team Balance & Participation:** **Improve workload distribution.** During this sprint, the team did not function at its best as the vast majority of the work was carried out by only a few members. We need to ensure everyone is actively contributing to avoid bottlenecks.
+    * **Time Management:** Start iterations immediately to prevent "crunching" at the end of the sprint and to account for unexpected technical hurdles.
+    * **Git Workflow:** Strictly enforce the use of feature branches and pull requests for every task to maintain code quality and visibility.
+    * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
+
+* **Puzzles:**
+    * **Tech Stack Proficiency:** Getting the entire team up to speed with **Flutter** and **Supabase** to ensure everyone can contribute technically.
+    * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
 
 ### Sprint 1
 
