@@ -231,11 +231,17 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
 -->
 <div align="center" justify="center">
-  <p>Start of Sprint 0</p>
   <img src="docs/diagrams/ViewLogical.png">
-  <img src="docs/boards/sprint0_end.png">
 </div>
-
+The logical architecture represents the high-level structure of the ClinicGO application, illustrating 
+the main feature modules and their internal interactions based on the Model-View-ViewModel (MVVM) 
+pattern. Each component's declarative UI (View) is strictly decoupled from data processing; 
+it interacts solely with its corresponding presentation logic (ViewModel). This logic, in turn,
+communicates with the core Domain Entities and Repositories. These repositories are linked to Supabase
+for secure user authentication and cloud data storage, as well as to Local Storage to ensure offline 
+functionality for critical features like medication reminders. For specific external integrations, 
+the system relies on the Google Maps API to fetch and display real-time map data, and an LLM/Vision 
+API to process images of prescriptions and medication boxes.
 
 ### Physical architecture
 <!--
