@@ -316,7 +316,7 @@ You can find below information and references related with the project managemen
 You can find below information and references related to the project management practices and tools utilized by our team:
 
 * **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
-* **Release Management:** Version tracking begins with `v0`.
+* * **Release Management:** Version tracking begins with [v0](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0), followed by v1, v2, v3...
 * **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
 * **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1lBXRWSGOGwlCaAO6XVjdQlxRd8Vy1xQ2nmZJSPKH9LQ/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
 * **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANELOG.md)).
