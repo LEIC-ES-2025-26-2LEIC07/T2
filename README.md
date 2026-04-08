@@ -232,9 +232,8 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 -->
 <div align="center" justify="center">
   <p>Start of Sprint 0</p>
-  <img src="docs/diagrams/clinicgo_uml_package_diagram.png">
-  <p>End of Sprint 0</p>
-  <img src="docs/boards/sprint0_end.png">
+  <img src="docs/diagrams/logicalView.png">
+
 </div>
 
 
