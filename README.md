@@ -354,6 +354,8 @@ You can find below information and references related to the project management 
     * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
 
 ### Sprint 1
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/efcaed02-e470-452a-be86-48606d606afd" />
+
 
 ### Sprint 2
 
