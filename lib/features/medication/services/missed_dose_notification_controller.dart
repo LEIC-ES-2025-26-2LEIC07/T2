@@ -1,0 +1,132 @@
+import '../data/dose_log_repository.dart';
+import '../models/notification_payload.dart';
+import '../models/pending_missed_dose_notification.dart';
+import '../models/scheduled_dose.dart';
+import 'local_notification_gateway.dart';
+import 'pending_notification_store.dart';
+
+class MissedDoseNotificationController {
+  MissedDoseNotificationController({
+    required LocalNotificationGateway notificationGateway,
+    required DoseLogRepository doseLogRepository,
+    required PendingNotificationStore pendingNotificationStore,
+    this.gracePeriod = const Duration(minutes: 30),
+  }) : _notificationGateway = notificationGateway,
+       _doseLogRepository = doseLogRepository,
+       _pendingNotificationStore = pendingNotificationStore;
+
+  final LocalNotificationGateway _notificationGateway;
+  final DoseLogRepository _doseLogRepository;
+  final PendingNotificationStore _pendingNotificationStore;
+  final Duration gracePeriod;
+
+  Future<void> scheduleDoseReminder(ScheduledDose dose) async {
+    final primaryPayload = NotificationPayload(
+      route: buildDoseLoggingRoute(dose),
+      status: 'scheduled',
+      doseId: dose.id,
+    );
+    final missedPayload = NotificationPayload(
+      route: buildDoseLoggingRoute(dose, isOverdue: true),
+      status: 'overdue',
+      doseId: dose.id,
+    );
+
+    await _notificationGateway.schedule(
+      NotificationRequest(
+        id: primaryNotificationIdForDose(dose.id),
+        title: 'Time for Medication',
+        body: 'Take ${dose.dosage} of ${dose.medicationName}',
+        scheduledTime: dose.scheduledTime,
+        payload: primaryPayload.encode(),
+      ),
+    );
+
+    final missedScheduledTime = dose.scheduledTime.add(gracePeriod);
+    final missedNotificationId = missedNotificationIdForDose(dose.id);
+    await _notificationGateway.schedule(
+      NotificationRequest(
+        id: missedNotificationId,
+        title: 'Missed Medication',
+        body:
+            'You are ${gracePeriod.inMinutes} mins late for ${dose.medicationName}',
+        scheduledTime: missedScheduledTime,
+        payload: missedPayload.encode(),
+      ),
+    );
+
+    await _pendingNotificationStore.upsert(
+      PendingMissedDoseNotification(
+        dose: dose,
+        notificationId: missedNotificationId,
+        scheduledTime: missedScheduledTime,
+      ),
+    );
+  }
+
+  Future<void> logDose({
+    required ScheduledDose dose,
+    required DoseLogStatus status,
+    DateTime? loggedAt,
+  }) async {
+    final timestamp = loggedAt ?? DateTime.now();
+    await _doseLogRepository.insertDoseLog(
+      dose: dose,
+      status: status,
+      loggedAt: timestamp,
+    );
+    await cancelMissedDoseNotification(dose.id);
+  }
+
+  Future<void> cancelMissedDoseNotification(String doseId) async {
+    await _notificationGateway.cancel(missedNotificationIdForDose(doseId));
+    await _pendingNotificationStore.removeByDoseId(doseId);
+  }
+
+  Future<void> syncPendingMissedNotifications() async {
+    final pendingNotifications = await _pendingNotificationStore.loadPending();
+
+    for (final notification in pendingNotifications) {
+      final alreadyLogged = await _doseLogRepository.hasDoseLog(
+        notification.dose.id,
+      );
+      if (!alreadyLogged) {
+        continue;
+      }
+
+      await _notificationGateway.cancel(notification.notificationId);
+      await _pendingNotificationStore.removeByDoseId(notification.dose.id);
+    }
+  }
+
+  static int primaryNotificationIdForDose(String doseId) =>
+      _stableNotificationId(doseId, salt: 17);
+
+  static int missedNotificationIdForDose(String doseId) =>
+      _stableNotificationId(doseId, salt: 53);
+
+  static String buildDoseLoggingRoute(
+    ScheduledDose dose, {
+    bool isOverdue = false,
+  }) {
+    final uri = Uri(
+      path: '/log-dose/${dose.id}',
+      queryParameters: {
+        'status': isOverdue ? 'overdue' : 'scheduled',
+        'medicationId': dose.medicationId,
+        'medicationName': dose.medicationName,
+        'dosage': dose.dosage,
+        'scheduledTime': dose.scheduledTime.toIso8601String(),
+      },
+    );
+    return uri.toString();
+  }
+
+  static int _stableNotificationId(String value, {required int salt}) {
+    var hash = salt;
+    for (final codeUnit in value.codeUnits) {
+      hash = ((hash * 31) + codeUnit) & 0x7fffffff;
+    }
+    return hash;
+  }
+}
