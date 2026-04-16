@@ -9,7 +9,9 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Smoke Test', () {
-    testWidgets('Verify app starts and shows home screen', (tester) async {
+    testWidgets('Verify app starts and shows medication dashboard', (
+      tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
@@ -35,7 +37,8 @@ void main() {
       await tester.pump(const Duration(seconds: 2));
       await tester.pump();
 
-      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+      expect(find.text('Today\'s medication plan'), findsOneWidget);
+      expect(find.text('Lisinopril'), findsOneWidget);
     });
   });
 }

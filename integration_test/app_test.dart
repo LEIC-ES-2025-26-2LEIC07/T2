@@ -41,7 +41,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);
-      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+      expect(find.text('Today\'s medication plan'), findsOneWidget);
+      expect(find.text('Lisinopril'), findsOneWidget);
     });
   });
 }

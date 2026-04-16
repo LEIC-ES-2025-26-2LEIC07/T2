@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/features/doses/data/dose_log_repository.dart';
+import 'package:clinic_go/features/doses/models/scheduled_dose.dart';
+import 'package:clinic_go/features/doses/view_models/daily_doses_controller.dart';
+import 'package:clinic_go/features/doses/views/medication_dashboard_view.dart';
 import 'package:clinic_go/ui/core/themes/app_colors.dart';
 import 'package:clinic_go/ui/background/view_models/app_background.dart';
 import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
@@ -14,11 +18,17 @@ void main() async {
     url: 'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
     anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
   );
-  runApp(const ClinicGO());
+  runApp(
+    ClinicGO(
+      doseLogRepository: SupabaseDoseLogRepository(Supabase.instance.client),
+    ),
+  );
 }
 
 class ClinicGO extends StatelessWidget {
-  const ClinicGO({super.key});
+  const ClinicGO({super.key, this.doseLogRepository});
+
+  final DoseLogRepository? doseLogRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +39,17 @@ class ClinicGO extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
       ),
-      home: const MainScreen(),
+      home: MainScreen(
+        doseLogRepository: doseLogRepository ?? const NoopDoseLogRepository(),
+      ),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, this.doseLogRepository});
+
+  final DoseLogRepository? doseLogRepository;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -43,12 +57,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // Home as default
+  late final DailyDosesController _dailyDosesController;
 
-  // Lista de ecrãs para navegação
-  final List<Widget> _pages = [
+  @override
+  void initState() {
+    super.initState();
+    _dailyDosesController = DailyDosesController(
+      repository: widget.doseLogRepository ?? const NoopDoseLogRepository(),
+      initialDoses: _buildInitialDoses(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _dailyDosesController.dispose();
+    super.dispose();
+  }
+
+  List<Widget> get _pages => [
     const ProfileView(),
     const FavoritesView(),
-    const HomeContent(),
+    HomeContent(controller: _dailyDosesController),
     const Center(child: Text("Calendário")),
     const Center(child: Text("Definições")),
   ];
@@ -80,10 +109,44 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+  const HomeContent({super.key, required this.controller});
+
+  final DailyDosesController controller;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Bem-vindo à ClinicGO!"));
+    return MedicationDashboardView(controller: controller);
   }
+}
+
+List<ScheduledDose> _buildInitialDoses() {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+
+  return [
+    ScheduledDose(
+      id: 'dose-1',
+      medicationId: 'med-1',
+      medicationName: 'Lisinopril',
+      dosage: '10 mg tablet',
+      instructions: 'Take with water after breakfast.',
+      scheduledTime: today.add(const Duration(hours: 8)),
+    ),
+    ScheduledDose(
+      id: 'dose-2',
+      medicationId: 'med-2',
+      medicationName: 'Metformin',
+      dosage: '500 mg tablet',
+      instructions: 'Take with food to avoid stomach discomfort.',
+      scheduledTime: today.add(const Duration(hours: 13)),
+    ),
+    ScheduledDose(
+      id: 'dose-3',
+      medicationId: 'med-3',
+      medicationName: 'Vitamin D',
+      dosage: '1 capsule',
+      instructions: 'Best taken with lunch or a meal containing fat.',
+      scheduledTime: today.add(const Duration(hours: 20, minutes: 30)),
+    ),
+  ];
 }
