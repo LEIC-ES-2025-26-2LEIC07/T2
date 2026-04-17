@@ -1,54 +1,63 @@
+import 'package:clinic_go/app.dart';
+import 'package:clinic_go/ui/symptoms/view_models/symptom_form_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clinic_go/main.dart';
-import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
-import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
-  group('ClinicGO', () {
-    testWidgets('configures the main Material app shell', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const ClinicGO());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+  setUpAll(() async {
+    try {
+      await Supabase.initialize(
+        url: 'https://example.supabase.co',
+        anonKey: 'public-anon-key',
+      );
+    } catch (_) {}
+  });
 
-      expect(materialApp.title, 'ClinicGO');
-      expect(materialApp.debugShowCheckedModeBanner, isFalse);
-      expect(materialApp.theme?.useMaterial3, isTrue);
-      expect(find.byType(MainScreen), findsOneWidget);
+  group('ClinicGoApp', () {
+    testWidgets('renders the router app shell', (tester) async {
+      await tester.pumpWidget(const ProviderScope(child: ClinicGoApp()));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.text('Track how you feel'), findsOneWidget);
+      expect(find.text('Log symptom'), findsWidgets);
     });
   });
 
-  group('MainScreen', () {
-    testWidgets('renders the home screen search bar', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const MaterialApp(home: MainScreen()));
+  group('SymptomFormController', () {
+    test('requires a selected symptom before submit', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-      expect(find.byType(Scaffold), findsOneWidget);
-      expect(find.byType(CustomSearchBar), findsOneWidget);
-      expect(find.text('O que precisas?'), findsOneWidget);
+      final controller = container.read(symptomFormControllerProvider.notifier);
+
+      final success = await controller.submitSymptomLog();
+      final state = container.read(symptomFormControllerProvider);
+
+      expect(success, isFalse);
+      expect(state.errorMessage, 'Sign in to save a symptom log.');
     });
 
-    testWidgets('shows the five primary navigation actions', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const MaterialApp(home: MainScreen()));
+    test('marks the form dirty after user input', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-      expect(find.byType(FloatingBottomNavBar), findsOneWidget);
+      final controller = container.read(symptomFormControllerProvider.notifier);
+
+      controller.selectSymptom('headache');
+      controller.setSeverity(7);
+      controller.setNotes('Started after lunch');
+
+      final state = container.read(symptomFormControllerProvider);
+
+      expect(state.isDirty, isTrue);
+      expect(state.selectedSymptom, 'headache');
+      expect(state.severity, 7);
+      expect(state.notes, 'Started after lunch');
     });
-
-    testWidgets(
-      'keeps the search field text after interacting with navigation',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(const MaterialApp(home: MainScreen()));
-
-        await tester.enterText(find.byType(TextField), 'treino');
-        await tester.pump();
-
-        expect(find.text('treino'), findsOneWidget);
-      },
-    );
   });
 }
