@@ -232,6 +232,12 @@ class _MockAuthService implements AuthService {
   }) async {}
 
   @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+  }) async {}
+
+  @override
   Future<void> signOut() async {}
 }
 

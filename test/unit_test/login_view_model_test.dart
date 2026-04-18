@@ -20,6 +20,14 @@ class _AlwaysSuccessAuth implements AuthService {
   }
 
   @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+  }) async {
+    // Success — does nothing.
+  }
+
+  @override
   Future<void> signOut() async {}
 
   @override
@@ -38,6 +46,14 @@ class _AlwaysFailAuth implements AuthService {
 
   @override
   Future<void> signIn({required String email, required String password}) async {
+    throw error;
+  }
+
+  @override
+  Future<void> signUp({
+    required String email,
+    required String password,
+  }) async {
     throw error;
   }
 

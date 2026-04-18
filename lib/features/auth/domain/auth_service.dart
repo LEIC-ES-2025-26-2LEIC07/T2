@@ -12,6 +12,11 @@ abstract class AuthService {
   /// Throws on invalid credentials.
   Future<void> signIn({required String email, required String password});
 
+  /// Create a new account with email + password.
+  /// Throws [AuthException] if the email is already in use or the password
+  /// does not meet Supabase requirements.
+  Future<void> signUp({required String email, required String password});
+
   /// Sign out the current user.
   Future<void> signOut();
 
