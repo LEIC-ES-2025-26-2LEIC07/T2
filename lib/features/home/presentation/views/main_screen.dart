@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
 import 'package:clinic_go/core/widgets/custom_search_bar.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
@@ -17,6 +20,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // Home as default
 
+  StreamSubscription<AuthState>? _authSubscription;
+
   final List<Widget> _pages = [
     const ProfileView(),
     const FavoritesView(),
@@ -24,6 +29,28 @@ class _MainScreenState extends State<MainScreen> {
     const Center(child: Text('Calendário')),
     const Center(child: Text('Definições')),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(
+      (data) {
+        if (!mounted) return;
+        final event = data.event;
+        if (event == AuthChangeEvent.signedIn) {
+          setState(() => _currentIndex = 2); // jump to Home on login
+        } else if (event == AuthChangeEvent.signedOut) {
+          setState(() => _currentIndex = 0); // return to Profile on logout
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +81,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
+
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});

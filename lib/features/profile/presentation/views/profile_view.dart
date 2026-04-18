@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
 class ProfileView extends StatefulWidget {
@@ -190,6 +191,27 @@ class _LoginForm extends StatelessWidget {
         _ContinueButton(
           isLoading: viewModel.isLoading,
           onPressed: onLoginPressed,
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: viewModel.isLoading
+              ? null
+              : () => SignUpSheet.show(context),
+          child: const Text.rich(
+            TextSpan(
+              text: 'Não tens conta? ',
+              style: TextStyle(color: Color(0xFF8F8F8F)),
+              children: [
+                TextSpan(
+                  text: 'Cria uma agora',
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
