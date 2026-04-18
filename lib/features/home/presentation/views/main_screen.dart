@@ -6,7 +6,6 @@ import 'package:clinic_go/features/profile/presentation/views/profile_view.dart'
 import 'package:clinic_go/features/favorites/presentation/views/favorites_view.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
-import 'package:clinic_go/core/di/service_locator.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
