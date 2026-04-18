@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
+/// ViewModel for the Profile screen.
+///
+/// Delegates all auth side-effects to the injected [AuthService],
+/// keeping this class fully testable without a live Supabase connection.
 class ProfileViewModel extends ChangeNotifier {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  ProfileViewModel({required AuthService authService}) : _auth = authService;
+
+  final AuthService _auth;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -11,8 +17,8 @@ class ProfileViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get infoMessage => _infoMessage;
-  User? get currentUser => _supabase.auth.currentUser;
-  bool get isLoggedIn => currentUser != null;
+  String? get currentUserEmail => _auth.currentUserEmail;
+  bool get isLoggedIn => _auth.isLoggedIn;
 
   Future<void> signIn({required String email, required String password}) async {
     final cleanEmail = email.trim();
@@ -32,16 +38,10 @@ class ProfileViewModel extends ChangeNotifier {
     _clearMessages(notify: false);
 
     try {
-      await _supabase.auth.signInWithPassword(
-        email: cleanEmail,
-        password: cleanPassword,
-      );
-
+      await _auth.signIn(email: cleanEmail, password: cleanPassword);
       _infoMessage = 'Login feito com sucesso.';
-    } on AuthException catch (error) {
-      _errorMessage = error.message;
     } catch (_) {
-      _errorMessage = 'Nao foi possivel entrar. Tenta outra vez.';
+      _errorMessage = 'Credenciais invalidas.';
     } finally {
       _setLoading(false);
     }
@@ -59,10 +59,8 @@ class ProfileViewModel extends ChangeNotifier {
     _clearMessages(notify: false);
 
     try {
-      await _supabase.auth.resetPasswordForEmail(cleanEmail);
+      await _auth.resetPassword(cleanEmail);
       _infoMessage = 'Enviamos um email para redefinir a palavra-passe.';
-    } on AuthException catch (error) {
-      _errorMessage = error.message;
     } catch (_) {
       _errorMessage = 'Nao foi possivel enviar o email de recuperacao.';
     } finally {
@@ -75,10 +73,8 @@ class ProfileViewModel extends ChangeNotifier {
     _clearMessages(notify: false);
 
     try {
-      await _supabase.auth.signOut();
+      await _auth.signOut();
       _infoMessage = 'Sessao terminada com sucesso.';
-    } on AuthException catch (error) {
-      _errorMessage = error.message;
     } catch (_) {
       _errorMessage = 'Nao foi possivel terminar a sessao.';
     } finally {
@@ -86,13 +82,9 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
-  void clearMessages() {
-    _clearMessages();
-  }
+  void clearMessages() => _clearMessages();
 
-  void refreshSession() {
-    notifyListeners();
-  }
+  void refreshSession() => notifyListeners();
 
   void _setError(String message) {
     _errorMessage = message;
@@ -108,9 +100,6 @@ class ProfileViewModel extends ChangeNotifier {
   void _clearMessages({bool notify = true}) {
     _errorMessage = null;
     _infoMessage = null;
-
-    if (notify) {
-      notifyListeners();
-    }
+    if (notify) notifyListeners();
   }
 }
