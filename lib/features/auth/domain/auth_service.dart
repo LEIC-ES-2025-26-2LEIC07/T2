@@ -8,6 +8,13 @@ abstract class AuthService {
   /// Convenience check: true when a user session is active.
   bool get isLoggedIn;
 
+  /// Emits `true` on sign-in and `false` on sign-out.
+  ///
+  /// Widgets that need to react to session changes should subscribe here
+  /// rather than using `Supabase.instance` directly so the dependency can
+  /// be mocked in tests.
+  Stream<bool> get authStateChanges;
+
   /// Sign in with email + password.
   /// Throws on invalid credentials.
   Future<void> signIn({required String email, required String password});

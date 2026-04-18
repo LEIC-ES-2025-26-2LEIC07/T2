@@ -1,68 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/login_view_model.dart';
-
-// ---------------------------------------------------------------------------
-// Hand-rolled mocks — no extra packages required.
-// ---------------------------------------------------------------------------
-
-class _AlwaysSuccessAuth implements AuthService {
-  @override
-  String? get currentUserEmail => null;
-
-  @override
-  bool get isLoggedIn => false;
-
-  @override
-  Future<void> signIn({required String email, required String password}) async {
-    // Success — does nothing.
-  }
-
-  @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
-    // Success — does nothing.
-  }
-
-  @override
-  Future<void> signOut() async {}
-
-  @override
-  Future<void> resetPassword(String email) async {}
-}
-
-class _AlwaysFailAuth implements AuthService {
-  final Object error;
-  _AlwaysFailAuth({required this.error});
-
-  @override
-  String? get currentUserEmail => null;
-
-  @override
-  bool get isLoggedIn => false;
-
-  @override
-  Future<void> signIn({required String email, required String password}) async {
-    throw error;
-  }
-
-  @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
-    throw error;
-  }
-
-  @override
-  Future<void> signOut() async {}
-
-  @override
-  Future<void> resetPassword(String email) async {}
-}
+import '../../../../helpers/mocks.dart';
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -73,7 +12,7 @@ void main() {
     // ── Input validation ────────────────────────────────────────────────────
 
     test('sets errorMessage when email is blank', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.signIn(email: '', password: 'secret');
 
@@ -82,7 +21,7 @@ void main() {
     });
 
     test('sets errorMessage when password is blank', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.signIn(email: 'user@example.com', password: '');
 
@@ -91,7 +30,7 @@ void main() {
     });
 
     test('sets errorMessage when email has no @', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.signIn(email: 'notanemail', password: 'secret');
 
@@ -105,7 +44,7 @@ void main() {
       'sets errorMessage to "Credenciais inválidas" when AuthException is thrown',
       () async {
         final vm = LoginViewModel(
-          authService: _AlwaysFailAuth(
+          authService: AlwaysFailAuth(
             error: const AuthException('Invalid login credentials'),
           ),
         );
@@ -118,7 +57,7 @@ void main() {
 
     test('sets clearPassword=true on AuthException', () async {
       final vm = LoginViewModel(
-        authService: _AlwaysFailAuth(
+        authService: AlwaysFailAuth(
           error: const AuthException('Invalid login credentials'),
         ),
       );
@@ -132,7 +71,7 @@ void main() {
       'clearPassword resets to false after acknowledgePasswordClear',
       () async {
         final vm = LoginViewModel(
-          authService: _AlwaysFailAuth(
+          authService: AlwaysFailAuth(
             error: const AuthException('Invalid login credentials'),
           ),
         );
@@ -150,7 +89,7 @@ void main() {
 
     test('sets clearPassword=true on generic error', () async {
       final vm = LoginViewModel(
-        authService: _AlwaysFailAuth(error: Exception('network error')),
+        authService: AlwaysFailAuth(error: Exception('network error')),
       );
 
       await vm.signIn(email: 'user@example.com', password: 'secret');
@@ -164,7 +103,7 @@ void main() {
     test(
       'clears errorMessage and keeps clearPassword=false on success',
       () async {
-        final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+        final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
         await vm.signIn(email: 'user@example.com', password: 'correct');
 
@@ -174,7 +113,7 @@ void main() {
     );
 
     test('isLoading is false after signIn completes', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.signIn(email: 'user@example.com', password: 'correct');
 
@@ -184,7 +123,7 @@ void main() {
     // ── resetPassword ───────────────────────────────────────────────────────
 
     test('sets errorMessage when resetPassword email is blank', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.resetPassword('');
 
@@ -192,7 +131,7 @@ void main() {
     });
 
     test('clears errorMessage on successful resetPassword', () async {
-      final vm = LoginViewModel(authService: _AlwaysSuccessAuth());
+      final vm = LoginViewModel(authService: AlwaysSuccessAuth());
 
       await vm.resetPassword('user@example.com');
 

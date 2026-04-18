@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
 import 'package:clinic_go/core/widgets/custom_search_bar.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 import 'package:clinic_go/features/favorites/presentation/views/favorites_view.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
@@ -20,7 +21,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // Home as default
 
-  StreamSubscription<AuthState>? _authSubscription;
+  StreamSubscription<bool>? _authSubscription;
 
   final List<Widget> _pages = [
     const ProfileView(),
@@ -33,17 +34,16 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen(
-      (data) {
-        if (!mounted) return;
-        final event = data.event;
-        if (event == AuthChangeEvent.signedIn) {
-          setState(() => _currentIndex = 2); // jump to Home on login
-        } else if (event == AuthChangeEvent.signedOut) {
-          setState(() => _currentIndex = 0); // return to Profile on logout
-        }
-      },
-    );
+    _authSubscription = getIt<AuthService>().authStateChanges.listen((
+      isSignedIn,
+    ) {
+      if (!mounted) return;
+      if (isSignedIn) {
+        setState(() => _currentIndex = 2); // jump to Home on login
+      } else {
+        setState(() => _currentIndex = 0); // return to Profile on logout
+      }
+    });
   }
 
   @override
@@ -81,7 +81,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});

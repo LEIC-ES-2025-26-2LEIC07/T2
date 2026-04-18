@@ -82,125 +82,127 @@ class _SignUpSheetState extends State<SignUpSheet> {
         child: AnimatedBuilder(
           animation: _viewModel,
           builder: (context, _) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Handle bar
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDDDDDD),
-                      borderRadius: BorderRadius.circular(2),
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDDDDDD),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                const Text(
-                  'Criar conta',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  const Text(
+                    'Criar conta',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Regista-te para começar a usar o ClinicGO.',
-                  style: TextStyle(color: Color(0xFF8F8F8F)),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Regista-te para começar a usar o ClinicGO.',
+                    style: TextStyle(color: Color(0xFF8F8F8F)),
+                  ),
+                  const SizedBox(height: 24),
 
-                _SignUpTextField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 12),
-                _SignUpTextField(
-                  controller: _passwordController,
-                  hintText: 'Palavra-passe',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 12),
-                _SignUpTextField(
-                  controller: _confirmController,
-                  hintText: 'Confirmar palavra-passe',
-                  obscureText: true,
-                ),
-                const SizedBox(height: 16),
+                  _SignUpTextField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 12),
+                  _SignUpTextField(
+                    controller: _passwordController,
+                    hintText: 'Palavra-passe',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _SignUpTextField(
+                    controller: _confirmController,
+                    hintText: 'Confirmar palavra-passe',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 16),
 
-                if (_viewModel.errorMessage != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
+                  if (_viewModel.errorMessage != null) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFECEC),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Text(
+                        _viewModel.errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFC62828),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFECEC),
-                      borderRadius: BorderRadius.circular(14),
+                    const SizedBox(height: 16),
+                  ],
+
+                  SizedBox(
+                    height: 58,
+                    child: ElevatedButton(
+                      onPressed: _viewModel.isLoading ? null : _handleSignUp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryColor,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: AppColors.primaryColor,
+                        disabledForegroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                      ),
+                      child: _viewModel.isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Criar conta',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
-                    child: Text(
-                      _viewModel.errorMessage!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFFC62828),
+                  ),
+                  const SizedBox(height: 12),
+
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Já tenho conta',
+                      style: TextStyle(
+                        color: Color(0xFF7F7F7F),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
                 ],
-
-                SizedBox(
-                  height: 58,
-                  child: ElevatedButton(
-                    onPressed: _viewModel.isLoading ? null : _handleSignUp,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: AppColors.primaryColor,
-                      disabledForegroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: _viewModel.isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Criar conta',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text(
-                    'Já tenho conta',
-                    style: TextStyle(
-                      color: Color(0xFF7F7F7F),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            );
+              ), // Column
+            ); // SingleChildScrollView
           },
         ),
       ),

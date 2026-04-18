@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
@@ -22,14 +21,12 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  StreamSubscription<AuthState>? _authSubscription;
+  StreamSubscription<bool>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
-    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((
-      _,
-    ) {
+    _authSubscription = getIt<AuthService>().authStateChanges.listen((_) {
       if (mounted) {
         _viewModel.refreshSession();
       }
@@ -374,9 +371,15 @@ class _SocialLoginButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
