@@ -14,7 +14,9 @@ import 'package:clinic_go/features/medication/models/notification_payload.dart';
 
 final getIt = GetIt.instance;
 
-Future<NotificationPayload?> setupServiceLocator(GlobalKey<NavigatorState> navigatorKey) async {
+Future<NotificationPayload?> setupServiceLocator(
+  GlobalKey<NavigatorState> navigatorKey,
+) async {
   // Supabase Client
   getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
 
@@ -23,12 +25,12 @@ Future<NotificationPayload?> setupServiceLocator(GlobalKey<NavigatorState> navig
 
   // Dose Log Repository
   getIt.registerLazySingleton<SupabaseDoseLogRepository>(
-    () => SupabaseDoseLogRepository(getIt<SupabaseClient>())
+    () => SupabaseDoseLogRepository(getIt<SupabaseClient>()),
   );
-  
+
   // Pending Notification Store
   getIt.registerLazySingleton<PendingNotificationStore>(
-    () => const PendingNotificationStore()
+    () => const PendingNotificationStore(),
   );
 
   // Notification Gateway Bootstrap
@@ -60,7 +62,7 @@ Future<NotificationPayload?> setupServiceLocator(GlobalKey<NavigatorState> navig
       notificationGateway: getIt<LocalNotificationGateway>(),
       doseLogRepository: getIt<SupabaseDoseLogRepository>(),
       pendingNotificationStore: getIt<PendingNotificationStore>(),
-    )
+    ),
   );
 
   return initialPayload;

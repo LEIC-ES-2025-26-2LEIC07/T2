@@ -34,11 +34,11 @@ void main() {
       doseLogRepository: doseLogRepository,
       pendingNotificationStore: const PendingNotificationStore(),
     );
-    
+
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(_MockAuthService());
   });
-  
+
   tearDown(() async {
     await GetIt.I.reset();
   });
@@ -193,7 +193,7 @@ void main() {
         doseLogRepository: _FailingDoseLogRepository(),
         pendingNotificationStore: const PendingNotificationStore(),
       );
-      
+
       // Update the mock in DI
       GetIt.I.unregister<MissedDoseNotificationController>();
       GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
@@ -226,7 +226,10 @@ class _MockAuthService implements AuthService {
   Future<void> resetPassword(String email) async {}
 
   @override
-  Future<void> signIn({required String email, required String password}) async {}
+  Future<void> signIn({
+    required String email,
+    required String password,
+  }) async {}
 
   @override
   Future<void> signOut() async {}

@@ -13,7 +13,8 @@ class NotificationLifecycleWrapper extends StatefulWidget {
 }
 
 class _NotificationLifecycleWrapperState
-    extends State<NotificationLifecycleWrapper> with WidgetsBindingObserver {
+    extends State<NotificationLifecycleWrapper>
+    with WidgetsBindingObserver {
   late final MissedDoseNotificationController _notificationController;
 
   @override
