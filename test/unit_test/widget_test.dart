@@ -3,6 +3,7 @@ import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
+import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
