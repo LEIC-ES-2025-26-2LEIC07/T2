@@ -1,0 +1,128 @@
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
+
+/// ViewModel for the login form inside [ProfileView].
+///
+/// Exposes [isLoading], [errorMessage], and [clearPassword] so the view
+/// can react without holding any business logic itself.
+class LoginViewModel extends ChangeNotifier {
+  LoginViewModel({required AuthService authService}) : _auth = authService;
+
+  final AuthService _auth;
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  /// Whether a network request is in flight.
+  bool get isLoading => _isLoading;
+
+  /// Non-null when the last sign-in attempt failed.
+  /// Null on success or before any attempt.
+  String? get errorMessage => _errorMessage;
+
+  /// True once after a failed sign-in; the view must clear the password
+  /// field when it observes this, then call [acknowledgePasswordClear].
+  bool _clearPassword = false;
+  bool get clearPassword => _clearPassword;
+
+  /// Called by the view after it has cleared the password field.
+  void acknowledgePasswordClear() {
+    _clearPassword = false;
+    // No notifyListeners — this is a one-shot handshake.
+  }
+
+  // ---------------------------------------------------------------------------
+  // Actions
+  // ---------------------------------------------------------------------------
+
+  /// Attempt sign-in with [email] and [password].
+  ///
+  /// On [AuthException] the error surfaced to the UI is always
+  /// **'Credenciais inválidas'**, keeping internal Supabase messages hidden.
+  Future<void> signIn({required String email, required String password}) async {
+    final cleanEmail = email.trim();
+    final cleanPassword = password.trim();
+
+    // Local validation first — no network call needed.
+    if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
+      _setError('Preenche o email e a palavra-passe.');
+      return;
+    }
+
+    if (!cleanEmail.contains('@')) {
+      _setError('Escreve um email válido.');
+      return;
+    }
+
+    _setLoading(true);
+    _clearError(notify: false);
+
+    try {
+      await _auth.signIn(email: cleanEmail, password: cleanPassword);
+      // Success — no error, no clear flag needed.
+      _clearError();
+    } on AuthException {
+      // Always surface a generic message to avoid leaking Supabase internals.
+      _errorMessage = 'Credenciais inválidas';
+      _clearPassword = true;
+      notifyListeners();
+    } catch (_) {
+      _errorMessage = 'Não foi possível entrar. Tenta outra vez.';
+      _clearPassword = true;
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Send a password-reset e-mail.
+  Future<void> resetPassword(String email) async {
+    final cleanEmail = email.trim();
+
+    if (cleanEmail.isEmpty) {
+      _setError('Escreve o teu email para recuperar a palavra-passe.');
+      return;
+    }
+
+    _setLoading(true);
+    _clearError(notify: false);
+
+    try {
+      await _auth.resetPassword(cleanEmail);
+      // Info message is handled by ProfileViewModel; here we just clear errors.
+      _clearError();
+    } on AuthException {
+      _errorMessage = 'Não foi possível enviar o email de recuperação.';
+      notifyListeners();
+    } catch (_) {
+      _errorMessage = 'Não foi possível enviar o email de recuperação.';
+      notifyListeners();
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Dismiss any displayed error message.
+  void clearError() => _clearError();
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  void _setError(String message) {
+    _errorMessage = message;
+    _clearPassword = false;
+    notifyListeners();
+  }
+
+  void _clearError({bool notify = true}) {
+    _errorMessage = null;
+    if (notify) notifyListeners();
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+}
