@@ -6,11 +6,10 @@ import 'package:clinic_go/features/profile/presentation/views/profile_view.dart'
 import 'package:clinic_go/features/favorites/presentation/views/favorites_view.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/core/di/service_locator.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.notificationController});
-
-  final MissedDoseNotificationController? notificationController;
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -34,9 +33,7 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           AppBackground(
             child: _currentIndex == 2
-                ? HomeContent(
-                    notificationController: widget.notificationController,
-                  )
+                ? const HomeContent()
                 : _pages[_currentIndex],
           ),
 
@@ -60,9 +57,7 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key, this.notificationController});
-
-  final MissedDoseNotificationController? notificationController;
+  const HomeContent({super.key});
 
   ScheduledDose get _demoDose => ScheduledDose(
     id: 'demo-dose-08-00',
@@ -102,16 +97,14 @@ class HomeContent extends StatelessWidget {
                   const Text('Scheduled for 08:00'),
                   const SizedBox(height: 16),
                   FilledButton(
-                    onPressed: notificationController == null
-                        ? null
-                        : () {
-                            Navigator.of(context).pushNamed(
-                              MissedDoseNotificationController.buildDoseLoggingRoute(
-                                _demoDose,
-                                isOverdue: true,
-                              ),
-                            );
-                          },
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        MissedDoseNotificationController.buildDoseLoggingRoute(
+                          _demoDose,
+                          isOverdue: true,
+                        ),
+                      );
+                    },
                     child: const Text('Open overdue dose'),
                   ),
                 ],

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
-import 'package:clinic_go/features/auth/data/supabase_auth_service.dart';
+import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
 class ProfileView extends StatefulWidget {
@@ -15,7 +16,7 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final ProfileViewModel _viewModel = ProfileViewModel(
-    authService: SupabaseAuthService(),
+    authService: getIt<AuthService>(),
   );
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

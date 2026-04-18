@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
@@ -11,10 +12,7 @@ class AppRouter {
   const AppRouter._();
 
   /// Called by [MaterialApp.onGenerateRoute].
-  static Route<dynamic>? onGenerateRoute(
-    RouteSettings settings,
-    MissedDoseNotificationController? controller,
-  ) {
+  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final routeName = settings.name;
     if (routeName == null || !routeName.startsWith('/log-dose/')) {
       return null;
@@ -22,7 +20,7 @@ class AppRouter {
 
     final uri = Uri.parse(routeName);
     final doseId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-    if (doseId == null || controller == null) {
+    if (doseId == null) {
       return null;
     }
 
@@ -47,6 +45,8 @@ class AppRouter {
       dosage: dosage,
       scheduledTime: scheduledTime,
     );
+
+    final controller = getIt<MissedDoseNotificationController>();
 
     return MaterialPageRoute<void>(
       settings: settings,
