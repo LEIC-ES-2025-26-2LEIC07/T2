@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clinic_go/features/doses/data/dose_log_repository.dart';
-import 'package:clinic_go/features/doses/models/scheduled_dose.dart';
-import 'package:clinic_go/features/doses/view_models/daily_doses_controller.dart';
-import 'package:clinic_go/features/doses/views/medication_dashboard_view.dart';
+import 'package:clinic_go/ui/doses/data/dose_log_repository.dart';
+import 'package:clinic_go/ui/doses/models/scheduled_dose.dart';
+import 'package:clinic_go/ui/doses/view_models/daily_doses_controller.dart';
+import 'package:clinic_go/ui/doses/views/medication_dashboard_view.dart';
 import 'package:clinic_go/main.dart';
 import 'package:clinic_go/ui/common/widgets/custom_search_bar.dart';
 import 'package:clinic_go/ui/common/widgets/floating_bottom_nav_bar.dart';
