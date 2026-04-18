@@ -4,7 +4,7 @@ import '../data/dose_log_repository.dart';
 import '../models/scheduled_dose.dart';
 import '../services/missed_dose_notification_controller.dart';
 
-class DoseLoggingScreen extends StatelessWidget {
+class DoseLoggingScreen extends StatefulWidget {
   const DoseLoggingScreen({
     super.key,
     required this.dose,
@@ -17,9 +17,16 @@ class DoseLoggingScreen extends StatelessWidget {
   final bool isOverdue;
 
   @override
+  State<DoseLoggingScreen> createState() => _DoseLoggingScreenState();
+}
+
+class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
+  bool _isSubmitting = false;
+
+  @override
   Widget build(BuildContext context) {
     final scheduledLabel = TimeOfDay.fromDateTime(
-      dose.scheduledTime,
+      widget.dose.scheduledTime,
     ).format(context);
 
     return Scaffold(
@@ -29,7 +36,7 @@ class DoseLoggingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isOverdue)
+            if (widget.isOverdue)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -42,29 +49,39 @@ class DoseLoggingScreen extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
-            if (isOverdue) const SizedBox(height: 16),
+            if (widget.isOverdue) const SizedBox(height: 16),
             Text(
-              dose.medicationName,
+              widget.dose.medicationName,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
-            Text('${dose.dosage} scheduled for $scheduledLabel'),
+            Text('${widget.dose.dosage} scheduled for $scheduledLabel'),
             const SizedBox(height: 24),
             FilledButton(
-              onPressed: () => _logDose(
-                context,
-                status: DoseLogStatus.taken,
-                message: 'Dose marked as taken.',
-              ),
-              child: const Text('Mark as Taken'),
+              onPressed: _isSubmitting
+                  ? null
+                  : () => _logDose(
+                      context,
+                      status: DoseLogStatus.taken,
+                      successMessage: 'Dose marked as taken.',
+                    ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Mark as Taken'),
             ),
             const SizedBox(height: 12),
             OutlinedButton(
-              onPressed: () => _logDose(
-                context,
-                status: DoseLogStatus.skipped,
-                message: 'Dose marked as skipped.',
-              ),
+              onPressed: _isSubmitting
+                  ? null
+                  : () => _logDose(
+                      context,
+                      status: DoseLogStatus.skipped,
+                      successMessage: 'Dose marked as skipped.',
+                    ),
               child: const Text('Skip Dose'),
             ),
           ],
@@ -76,15 +93,39 @@ class DoseLoggingScreen extends StatelessWidget {
   Future<void> _logDose(
     BuildContext context, {
     required DoseLogStatus status,
-    required String message,
+    required String successMessage,
   }) async {
-    await controller.logDose(dose: dose, status: status);
-    if (!context.mounted) {
-      return;
-    }
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    try {
+      await widget.controller.logDose(dose: widget.dose, status: status);
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(successMessage)));
+    } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'We could not save this dose right now. Please try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 }
