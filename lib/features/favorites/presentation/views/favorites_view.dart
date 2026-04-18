@@ -27,7 +27,7 @@ class FavoritesView extends StatelessWidget {
               ),
               child: const TextField(
                 decoration: InputDecoration(
-                  hintText: 'O que precisas?',
+                  hintText: 'What do you need?',
                   hintStyle: TextStyle(color: Color(0xFFB0B0B0), fontSize: 16),
                   prefixIcon: null,
                   suffixIcon: Icon(Icons.search, color: Colors.black, size: 26),

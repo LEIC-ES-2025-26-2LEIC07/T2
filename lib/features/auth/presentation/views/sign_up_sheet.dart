@@ -101,7 +101,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   const SizedBox(height: 20),
 
                   const Text(
-                    'Criar conta',
+                    'Create account',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -110,7 +110,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Regista-te para começar a usar o ClinicGO.',
+                    'Sign up to start using ClinicGO.',
                     style: TextStyle(color: Color(0xFF8F8F8F)),
                   ),
                   const SizedBox(height: 24),
@@ -123,13 +123,13 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   const SizedBox(height: 12),
                   _SignUpTextField(
                     controller: _passwordController,
-                    hintText: 'Palavra-passe',
+                    hintText: 'Password',
                     obscureText: true,
                   ),
                   const SizedBox(height: 12),
                   _SignUpTextField(
                     controller: _confirmController,
-                    hintText: 'Confirmar palavra-passe',
+                    hintText: 'Confirm password',
                     obscureText: true,
                   ),
                   const SizedBox(height: 16),
@@ -180,7 +180,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                               ),
                             )
                           : const Text(
-                              'Criar conta',
+                              'Create account',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -193,7 +193,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text(
-                      'Já tenho conta',
+                      'Already have an account',
                       style: TextStyle(
                         color: Color(0xFF7F7F7F),
                         fontWeight: FontWeight.w600,

@@ -101,7 +101,7 @@ class HomeContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Bem-vindo à ClinicGO!'),
+            const Text('Welcome to ClinicGO!'),
             const SizedBox(height: 24),
             Container(
               width: double.infinity,

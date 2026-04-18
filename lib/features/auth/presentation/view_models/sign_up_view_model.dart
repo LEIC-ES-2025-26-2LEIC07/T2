@@ -35,22 +35,22 @@ class SignUpViewModel extends ChangeNotifier {
     final cleanPassword = password.trim();
 
     if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
-      _setError('Preenche o email e a palavra-passe.');
+      _setError('Please fill in email and password.');
       return;
     }
 
     if (!cleanEmail.contains('@')) {
-      _setError('Escreve um email válido.');
+      _setError('Enter a valid email.');
       return;
     }
 
     if (cleanPassword.length < 6) {
-      _setError('A palavra-passe deve ter pelo menos 6 caracteres.');
+      _setError('Password must be at least 6 characters long.');
       return;
     }
 
     if (cleanPassword != confirmPassword.trim()) {
-      _setError('As palavras-passe não coincidem.');
+      _setError('Passwords do not match.');
       return;
     }
 
@@ -64,7 +64,7 @@ class SignUpViewModel extends ChangeNotifier {
     } on AuthException catch (e) {
       _setError(_friendlyAuthError(e.message));
     } catch (_) {
-      _setError('Não foi possível criar a conta. Tenta outra vez.');
+      _setError('Could not create account. Please try again.');
     } finally {
       _setLoading(false);
     }
@@ -79,12 +79,12 @@ class SignUpViewModel extends ChangeNotifier {
   String _friendlyAuthError(String supabaseMessage) {
     final msg = supabaseMessage.toLowerCase();
     if (msg.contains('already registered') || msg.contains('already in use')) {
-      return 'Este email já está registado.';
+      return 'This email is already registered.';
     }
     if (msg.contains('password')) {
-      return 'A palavra-passe não cumpre os requisitos mínimos.';
+      return 'Password does not meet minimum requirements.';
     }
-    return 'Não foi possível criar a conta. Tenta outra vez.';
+    return 'Could not create account. Please try again.';
   }
 
   void _setError(String message) {

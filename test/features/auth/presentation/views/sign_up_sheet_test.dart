@@ -80,7 +80,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Criar conta'), findsWidgets);
+      expect(find.text('Create account'), findsWidgets);
       expect(find.byType(TextField), findsNWidgets(3));
     });
 
@@ -105,10 +105,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap Create Account without filling anything
-      await tester.tap(find.text('Criar conta').last);
+      await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Preenche'), findsOneWidget);
+      expect(find.textContaining('Please fill in'), findsOneWidget);
     });
 
     testWidgets('shows error when passwords do not match', (tester) async {
@@ -136,13 +136,15 @@ void main() {
       await tester.enterText(fields.at(1), 'abc123');
       await tester.enterText(fields.at(2), 'different');
 
-      await tester.tap(find.text('Criar conta').last);
+      await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('coincidem'), findsOneWidget);
+      expect(find.textContaining('match'), findsOneWidget);
     });
 
-    testWidgets('closes sheet when "Já tenho conta" is tapped', (tester) async {
+    testWidgets('closes sheet when "Already have an account" is tapped', (
+      tester,
+    ) async {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
@@ -162,9 +164,9 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Criar conta'), findsWidgets);
+      expect(find.text('Create account'), findsWidgets);
 
-      await tester.tap(find.text('Já tenho conta'));
+      await tester.tap(find.text('Already have an account'));
       await tester.pumpAndSettle();
 
       expect(find.text('Registar'), findsNothing);

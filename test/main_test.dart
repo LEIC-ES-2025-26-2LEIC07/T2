@@ -95,7 +95,7 @@ void main() {
     ) async {
       await tester.pumpWidget(const ClinicGO());
       expect(find.byType(Scaffold), findsOneWidget);
-      expect(find.text('O que precisas?'), findsOneWidget);
+      expect(find.text('What do you need?'), findsOneWidget);
       expect(find.text('Open overdue dose'), findsOneWidget);
     });
 
@@ -148,7 +148,7 @@ void main() {
 
     testWidgets('renders Home tab by default', (tester) async {
       await pumpApp(tester);
-      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
     });
 
     testWidgets('Profile tab shows login form when not logged in', (
@@ -157,31 +157,30 @@ void main() {
       await pumpApp(tester);
       await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
-      expect(find.text('Continuar com Apple'), findsOneWidget);
+      expect(find.text('Continue with Apple'), findsOneWidget);
     });
 
-    testWidgets('Profile tab shows "Criar conta" link', (tester) async {
+    testWidgets('Profile tab shows "Create account" link', (tester) async {
       await pumpApp(tester);
       await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
-      expect(find.textContaining('Cria uma agora'), findsOneWidget);
+      expect(find.textContaining('Create one now'), findsOneWidget);
     });
 
-    testWidgets('tapping "Criar conta" link opens SignUpSheet', (tester) async {
+    testWidgets('tapping "Create account" link opens SignUpSheet', (
+      tester,
+    ) async {
       await pumpApp(tester);
       await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
 
-      final createAccountFinder = find.textContaining('Cria uma agora');
+      final createAccountFinder = find.textContaining('Create one now');
       await tester.ensureVisible(createAccountFinder);
 
       await tester.tap(createAccountFinder);
       await tester.pumpAndSettle();
-      expect(find.text('Criar conta'), findsWidgets);
-      expect(
-        find.text('Regista-te para começar a usar o ClinicGO.'),
-        findsOneWidget,
-      );
+      expect(find.text('Create account'), findsWidgets);
+      expect(find.text('Sign up to start using ClinicGO.'), findsOneWidget);
     });
   });
 }

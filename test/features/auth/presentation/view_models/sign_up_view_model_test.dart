@@ -57,7 +57,7 @@ void main() {
         password: 'abc123',
         confirmPassword: 'xyz999',
       );
-      expect(vm.errorMessage, contains('coincidem'));
+      expect(vm.errorMessage, contains('match'));
       expect(vm.success, isFalse);
     });
 
@@ -74,7 +74,7 @@ void main() {
         password: 'abc123',
         confirmPassword: 'abc123',
       );
-      expect(vm.errorMessage, contains('registado'));
+      expect(vm.errorMessage, contains('registered'));
       expect(vm.success, isFalse);
     });
 

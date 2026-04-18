@@ -145,19 +145,19 @@ class _LoginForm extends StatelessWidget {
       children: [
         const _SocialLoginButton(
           icon: Icons.apple,
-          label: 'Continuar com Apple',
+          label: 'Continue with Apple',
           iconColor: Colors.black,
         ),
         const SizedBox(height: 14),
         const _SocialLoginButton(
-          label: 'Continuar com Google',
+          label: 'Continue with Google',
           customIconText: 'G',
           customIconColor: Color(0xFFEA4335),
         ),
         const SizedBox(height: 14),
         const _SocialLoginButton(
           icon: Icons.facebook,
-          label: 'Continuar com Facebook',
+          label: 'Continue with Facebook',
           iconColor: Color(0xFF1877F2),
         ),
         const SizedBox(height: 26),
@@ -171,7 +171,7 @@ class _LoginForm extends StatelessWidget {
         const SizedBox(height: 12),
         _LoginTextField(
           controller: passwordController,
-          hintText: 'Palavra-Passe',
+          hintText: 'Password',
           obscureText: true,
         ),
         const SizedBox(height: 16),
@@ -196,11 +196,11 @@ class _LoginForm extends StatelessWidget {
               : () => SignUpSheet.show(context),
           child: const Text.rich(
             TextSpan(
-              text: 'Não tens conta? ',
+              text: "Don't have an account? ",
               style: TextStyle(color: Color(0xFF8F8F8F)),
               children: [
                 TextSpan(
-                  text: 'Cria uma agora',
+                  text: 'Create one now',
                   style: TextStyle(
                     color: AppColors.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _LoggedInCard extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         const Text(
-          'Sessao iniciada',
+          'Signed in',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -253,8 +253,7 @@ class _LoggedInCard extends StatelessWidget {
         const SizedBox(height: 20),
         _StatusMessage(
           errorMessage: viewModel.errorMessage,
-          infoMessage:
-              viewModel.infoMessage ?? 'Entraste com sucesso na conta.',
+          infoMessage: viewModel.infoMessage ?? 'Successfully signed in.',
         ),
         const SizedBox(height: 28),
         SizedBox(
@@ -278,7 +277,7 @@ class _LoggedInCard extends StatelessWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Text(
-                    'Terminar sessao',
+                    'Sign out',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
           ),
@@ -399,7 +398,7 @@ class _LoginDivider extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'Continuar com',
+            'Continue with',
             style: TextStyle(
               color: Color(0xFF8F8F8F),
               fontWeight: FontWeight.w600,
@@ -471,7 +470,7 @@ class _ForgotPasswordText extends StatelessWidget {
     return TextButton(
       onPressed: isLoading ? null : onPressed,
       child: const Text(
-        'Esqueci-me da palavra-passe',
+        'Forgot password',
         style: TextStyle(
           color: Color(0xFF7F7F7F),
           decoration: TextDecoration.underline,
@@ -515,7 +514,7 @@ class _ContinueButton extends StatelessWidget {
                 ),
               )
             : const Text(
-                'Continuar',
+                'Continue',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
       ),

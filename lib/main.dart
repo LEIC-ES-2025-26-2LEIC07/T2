@@ -7,7 +7,7 @@ import 'package:clinic_go/core/widgets/notification_lifecycle_wrapper.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(

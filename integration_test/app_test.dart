@@ -35,13 +35,13 @@ void main() {
         // Already initialized
       }
 
-      app.main();
+      await app.main();
       await tester.pump();
       await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);
-      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
     });
   });
 }

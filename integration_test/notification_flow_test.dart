@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,12 +27,26 @@ void main() {
           // Already initialized
         }
 
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          const MethodChannel('com.llfbandit.app_links/events'),
+          (methodCall) async => null,
+        );
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          const MethodChannel('com.llfbandit.app_links/messages'),
+          (methodCall) async => null,
+        );
+
         // Start the app
-        app.main();
+        await app.main();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.home_outlined));
         await tester.pumpAndSettle();
 
         // Verify we are on the Home screen
-        expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+        expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
         expect(find.text('Upcoming dose'), findsOneWidget);
 
         // Find the button that simulates opening an overdue dose (notification behavior)
