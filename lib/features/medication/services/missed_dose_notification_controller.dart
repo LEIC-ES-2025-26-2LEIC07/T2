@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../data/dose_log_repository.dart';
 import '../models/notification_payload.dart';
 import '../models/pending_missed_dose_notification.dart';
@@ -75,7 +77,24 @@ class MissedDoseNotificationController {
       status: status,
       loggedAt: timestamp,
     );
-    await cancelMissedDoseNotification(dose.id);
+
+    try {
+      await cancelMissedDoseNotification(dose.id);
+    } catch (error, stackTrace) {
+      debugPrint(
+        'Failed to cancel missed notification for dose ${dose.id}: $error',
+      );
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stackTrace,
+          library: 'missed_dose_notification_controller',
+          context: ErrorDescription(
+            'while canceling a pending missed medication notification',
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> cancelMissedDoseNotification(String doseId) async {
@@ -87,15 +106,19 @@ class MissedDoseNotificationController {
     final pendingNotifications = await _pendingNotificationStore.loadPending();
 
     for (final notification in pendingNotifications) {
-      final alreadyLogged = await _doseLogRepository.hasDoseLog(
-        notification.dose.id,
-      );
+      final alreadyLogged = await _safeHasDoseLog(notification.dose.id);
       if (!alreadyLogged) {
         continue;
       }
 
-      await _notificationGateway.cancel(notification.notificationId);
-      await _pendingNotificationStore.removeByDoseId(notification.dose.id);
+      try {
+        await _notificationGateway.cancel(notification.notificationId);
+        await _pendingNotificationStore.removeByDoseId(notification.dose.id);
+      } catch (error) {
+        debugPrint(
+          'Failed to reconcile missed notification for dose ${notification.dose.id}: $error',
+        );
+      }
     }
   }
 
@@ -128,5 +151,14 @@ class MissedDoseNotificationController {
       hash = ((hash * 31) + codeUnit) & 0x7fffffff;
     }
     return hash;
+  }
+
+  Future<bool> _safeHasDoseLog(String doseId) async {
+    try {
+      return await _doseLogRepository.hasDoseLog(doseId);
+    } catch (error) {
+      debugPrint('Failed to read dose log state for $doseId: $error');
+      return false;
+    }
   }
 }

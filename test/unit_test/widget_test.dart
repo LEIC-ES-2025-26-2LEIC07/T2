@@ -81,6 +81,32 @@ void main() {
     );
 
     test(
+      'keeps the pending missed notification when the dose log insert fails',
+      () async {
+        final failingRepository = _FailingDoseLogRepository();
+        controller = MissedDoseNotificationController(
+          notificationGateway: notificationGateway,
+          doseLogRepository: failingRepository,
+          pendingNotificationStore: const PendingNotificationStore(),
+        );
+
+        await controller.scheduleDoseReminder(demoDose);
+
+        await expectLater(
+          controller.logDose(dose: demoDose, status: DoseLogStatus.taken),
+          throwsA(isA<StateError>()),
+        );
+
+        expect(notificationGateway.cancelledNotificationIds, isEmpty);
+        final preferences = await SharedPreferences.getInstance();
+        expect(
+          preferences.getStringList('pending_missed_dose_notifications'),
+          isNotEmpty,
+        );
+      },
+    );
+
+    test(
       'startup sync cancels locally pending missed notifications logged on another device',
       () async {
         await controller.scheduleDoseReminder(demoDose);
@@ -95,6 +121,11 @@ void main() {
               demoDose.id,
             ),
           ),
+        );
+        final preferences = await SharedPreferences.getInstance();
+        expect(
+          preferences.getStringList('pending_missed_dose_notifications'),
+          isEmpty,
         );
       },
     );
@@ -142,6 +173,30 @@ void main() {
         expect(find.text('Mark as Taken'), findsOneWidget);
       },
     );
+
+    testWidgets('shows an error snackbar if dose logging fails', (
+      WidgetTester tester,
+    ) async {
+      controller = MissedDoseNotificationController(
+        notificationGateway: notificationGateway,
+        doseLogRepository: _FailingDoseLogRepository(),
+        pendingNotificationStore: const PendingNotificationStore(),
+      );
+
+      await tester.pumpWidget(ClinicGO(notificationController: controller));
+
+      await tester.tap(find.text('Open overdue dose'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Mark as Taken'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(
+        find.text('We could not save this dose right now. Please try again.'),
+        findsOneWidget,
+      );
+    });
   });
 }
 
@@ -178,5 +233,19 @@ class _InMemoryDoseLogRepository implements DoseLogRepository {
 
   void seedLoggedDose(String doseId) {
     _loggedDoseIds.add(doseId);
+  }
+}
+
+class _FailingDoseLogRepository implements DoseLogRepository {
+  @override
+  Future<bool> hasDoseLog(String doseId) async => false;
+
+  @override
+  Future<void> insertDoseLog({
+    required ScheduledDose dose,
+    required DoseLogStatus status,
+    required DateTime loggedAt,
+  }) {
+    throw StateError('insert failed');
   }
 }
