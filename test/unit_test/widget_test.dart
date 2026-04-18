@@ -4,10 +4,12 @@ import 'package:clinic_go/features/medication/services/local_notification_gatewa
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_it/get_it.dart';
 
 void main() {
   late _MemoryNotificationGateway notificationGateway;
@@ -22,8 +24,9 @@ void main() {
     scheduledTime: DateTime(2026, 4, 16, 8),
   );
 
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    await GetIt.I.reset();
     notificationGateway = _MemoryNotificationGateway();
     doseLogRepository = _InMemoryDoseLogRepository();
     controller = MissedDoseNotificationController(
@@ -31,6 +34,13 @@ void main() {
       doseLogRepository: doseLogRepository,
       pendingNotificationStore: const PendingNotificationStore(),
     );
+    
+    GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
+    GetIt.I.registerSingleton<AuthService>(_MockAuthService());
+  });
+  
+  tearDown(() async {
+    await GetIt.I.reset();
   });
 
   group('MissedDoseNotificationController', () {
@@ -136,7 +146,7 @@ void main() {
     testWidgets('configures the main Material app shell', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(ClinicGO(notificationController: controller));
+      await tester.pumpWidget(const ClinicGO());
 
       final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
 
@@ -149,7 +159,7 @@ void main() {
     testWidgets('renders the home screen search bar', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(ClinicGO(notificationController: controller));
+      await tester.pumpWidget(const ClinicGO());
 
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.text('O que precisas?'), findsOneWidget);
@@ -159,7 +169,7 @@ void main() {
     testWidgets(
       'deep-links to the dose logging screen with overdue messaging',
       (WidgetTester tester) async {
-        await tester.pumpWidget(ClinicGO(notificationController: controller));
+        await tester.pumpWidget(const ClinicGO());
 
         await tester.tap(find.text('Open overdue dose'));
         await tester.pumpAndSettle();
@@ -183,8 +193,12 @@ void main() {
         doseLogRepository: _FailingDoseLogRepository(),
         pendingNotificationStore: const PendingNotificationStore(),
       );
+      
+      // Update the mock in DI
+      GetIt.I.unregister<MissedDoseNotificationController>();
+      GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
 
-      await tester.pumpWidget(ClinicGO(notificationController: controller));
+      await tester.pumpWidget(const ClinicGO());
 
       await tester.tap(find.text('Open overdue dose'));
       await tester.pumpAndSettle();
@@ -199,6 +213,23 @@ void main() {
       );
     });
   });
+}
+
+class _MockAuthService implements AuthService {
+  @override
+  String? get currentUserEmail => null;
+
+  @override
+  bool get isLoggedIn => false;
+
+  @override
+  Future<void> resetPassword(String email) async {}
+
+  @override
+  Future<void> signIn({required String email, required String password}) async {}
+
+  @override
+  Future<void> signOut() async {}
 }
 
 class _MemoryNotificationGateway implements LocalNotificationGateway {
