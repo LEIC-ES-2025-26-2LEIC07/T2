@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clinic_go/ui/core/themes/app_colors.dart';
-import 'package:clinic_go/ui/profile/view_models/profile_view_model.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
+import 'package:clinic_go/features/auth/data/supabase_auth_service.dart';
+import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -13,7 +14,9 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  final ProfileViewModel _viewModel = ProfileViewModel();
+  final ProfileViewModel _viewModel = ProfileViewModel(
+    authService: SupabaseAuthService(),
+  );
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -61,45 +64,60 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Center(
-        child: AnimatedBuilder(
-          animation: _viewModel,
-          builder: (context, _) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 110),
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 340),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 28,
-                  vertical: 34,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8F6F0),
-                  borderRadius: BorderRadius.circular(34),
-                  image: const DecorationImage(
-                    image: AssetImage(
-                      'assets/images/background_topography.png',
-                    ),
-                    fit: BoxFit.cover,
-                    opacity: 0.08,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          margin: const EdgeInsets.only(bottom: 90),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4E84E5),
+            borderRadius: BorderRadius.circular(36),
+          ),
+          child: Center(
+            child: AnimatedBuilder(
+              animation: _viewModel,
+              builder: (context, _) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 20,
                   ),
-                ),
-                child: _viewModel.isLoggedIn
-                    ? _LoggedInCard(
-                        viewModel: _viewModel,
-                        onLogoutPressed: _handleLogout,
-                      )
-                    : _LoginForm(
-                        viewModel: _viewModel,
-                        emailController: _emailController,
-                        passwordController: _passwordController,
-                        onLoginPressed: _handleLogin,
-                        onForgotPasswordPressed: _handleResetPassword,
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 340),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 34,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F6F0),
+                      borderRadius: BorderRadius.circular(34),
+                      image: const DecorationImage(
+                        image: AssetImage(
+                          'assets/images/background_topography.png',
+                        ),
+                        fit: BoxFit.cover,
+                        opacity: 0.08,
                       ),
-              ),
-            );
-          },
+                    ),
+                    child: _viewModel.isLoggedIn
+                        ? _LoggedInCard(
+                            viewModel: _viewModel,
+                            onLogoutPressed: _handleLogout,
+                          )
+                        : _LoginForm(
+                            viewModel: _viewModel,
+                            emailController: _emailController,
+                            passwordController: _passwordController,
+                            onLoginPressed: _handleLogin,
+                            onForgotPasswordPressed: _handleResetPassword,
+                          ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -185,8 +203,6 @@ class _LoggedInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = viewModel.currentUser;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -206,7 +222,7 @@ class _LoggedInCard extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          user?.email ?? 'Utilizador autenticado',
+          viewModel.currentUserEmail ?? 'Utilizador autenticado',
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 16,
