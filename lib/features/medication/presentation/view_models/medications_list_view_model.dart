@@ -5,7 +5,7 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 /// ViewModel for the Medications list screen.
 class MedicationsListViewModel extends ChangeNotifier {
   MedicationsListViewModel({required MedicationRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   final MedicationRepository _repository;
 
