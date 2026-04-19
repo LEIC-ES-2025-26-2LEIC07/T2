@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -8,17 +9,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Smoke Test', () {
-    testWidgets('Verify app starts and shows home screen', (tester) async {
+  group('Integration Test', () {
+    testWidgets('boots the app and keeps core components wired together', (
+      WidgetTester tester,
+    ) async {
       SharedPreferences.setMockInitialValues({});
 
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('com.llfbandit.app_links/events'),
-        (methodCall) async => null,
+      // Modern mock app_links
+      tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+        const EventChannel('com.llfbandit.app_links/events'),
+        _MockStreamHandler(),
       );
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('com.llfbandit.app_links/messages'),
-        (methodCall) async => null,
+      tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+        const EventChannel('com.llfbandit.app_links/messages'),
+        _MockStreamHandler(),
       );
 
       try {
@@ -27,15 +31,24 @@ void main() {
               'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
           anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
         );
-      } catch (_) {}
+      } catch (_) {
+        // Already initialized
+      }
 
-      app.main();
-
+      await app.main();
       await tester.pump();
       await tester.pump(const Duration(seconds: 2));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
     });
   });
+}
+
+class _MockStreamHandler extends MockStreamHandler {
+  @override
+  void onListen(Object? arguments, MockStreamHandlerEventSink events) {}
+  @override
+  void onCancel(Object? arguments) {}
 }

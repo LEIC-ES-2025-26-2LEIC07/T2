@@ -70,7 +70,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Run app smoke test
-        run: flutter test test/integration_test/app_test.dart
+        run: flutter test test/integration_test
 
   web-smoke-build:
     name: Web Smoke Build

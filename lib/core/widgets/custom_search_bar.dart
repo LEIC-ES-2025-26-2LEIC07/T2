@@ -6,7 +6,7 @@ class CustomSearchBar extends StatelessWidget {
 
   const CustomSearchBar({
     super.key,
-    this.hintText = 'O que precisas?',
+    this.hintText = 'What do you need?',
     this.onChanged,
   });
 

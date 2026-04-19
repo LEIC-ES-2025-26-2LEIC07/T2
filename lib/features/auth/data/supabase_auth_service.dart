@@ -18,8 +18,18 @@ class SupabaseAuthService implements AuthService {
   bool get isLoggedIn => _client.auth.currentUser != null;
 
   @override
+  Stream<bool> get authStateChanges => _client.auth.onAuthStateChange.map(
+    (data) => data.event == AuthChangeEvent.signedIn,
+  );
+
+  @override
   Future<void> signIn({required String email, required String password}) async {
     await _client.auth.signInWithPassword(email: email, password: password);
+  }
+
+  @override
+  Future<void> signUp({required String email, required String password}) async {
+    await _client.auth.signUp(email: email, password: password);
   }
 
   @override

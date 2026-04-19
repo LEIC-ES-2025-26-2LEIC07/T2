@@ -25,12 +25,12 @@ class ProfileViewModel extends ChangeNotifier {
     final cleanPassword = password.trim();
 
     if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
-      _setError('Preenche o email e a palavra-passe.');
+      _setError('Please fill in email and password.');
       return;
     }
 
     if (!cleanEmail.contains('@')) {
-      _setError('Escreve um email valido.');
+      _setError('Enter a valid email.');
       return;
     }
 
@@ -39,9 +39,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.signIn(email: cleanEmail, password: cleanPassword);
-      _infoMessage = 'Login feito com sucesso.';
+      _infoMessage = 'Successfully logged in.';
     } catch (_) {
-      _errorMessage = 'Credenciais invalidas.';
+      _errorMessage = 'Invalid credentials.';
     } finally {
       _setLoading(false);
     }
@@ -51,7 +51,7 @@ class ProfileViewModel extends ChangeNotifier {
     final cleanEmail = email.trim();
 
     if (cleanEmail.isEmpty) {
-      _setError('Escreve o teu email para recuperar a palavra-passe.');
+      _setError('Enter your email to recover your password.');
       return;
     }
 
@@ -60,9 +60,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.resetPassword(cleanEmail);
-      _infoMessage = 'Enviamos um email para redefinir a palavra-passe.';
+      _infoMessage = 'We sent an email to reset your password.';
     } catch (_) {
-      _errorMessage = 'Nao foi possivel enviar o email de recuperacao.';
+      _errorMessage = 'Could not send recovery email.';
     } finally {
       _setLoading(false);
     }
@@ -74,9 +74,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.signOut();
-      _infoMessage = 'Sessao terminada com sucesso.';
+      _infoMessage = 'Successfully signed out.';
     } catch (_) {
-      _errorMessage = 'Nao foi possivel terminar a sessao.';
+      _errorMessage = 'Could not sign out.';
     } finally {
       _setLoading(false);
     }

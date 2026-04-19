@@ -1,16 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
 import 'package:clinic_go/core/widgets/custom_search_bar.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 import 'package:clinic_go/features/favorites/presentation/views/favorites_view.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.notificationController});
-
-  final MissedDoseNotificationController? notificationController;
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -18,6 +20,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2; // Home as default
+
+  StreamSubscription<bool>? _authSubscription;
 
   final List<Widget> _pages = [
     const ProfileView(),
@@ -28,15 +32,34 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _authSubscription = getIt<AuthService>().authStateChanges.listen((
+      isSignedIn,
+    ) {
+      if (!mounted) return;
+      if (isSignedIn) {
+        setState(() => _currentIndex = 2); // jump to Home on login
+      } else {
+        setState(() => _currentIndex = 0); // return to Profile on logout
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           AppBackground(
             child: _currentIndex == 2
-                ? HomeContent(
-                    notificationController: widget.notificationController,
-                  )
+                ? const HomeContent()
                 : _pages[_currentIndex],
           ),
 
@@ -60,9 +83,7 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key, this.notificationController});
-
-  final MissedDoseNotificationController? notificationController;
+  const HomeContent({super.key});
 
   ScheduledDose get _demoDose => ScheduledDose(
     id: 'demo-dose-08-00',
@@ -80,7 +101,7 @@ class HomeContent extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Bem-vindo à ClinicGO!'),
+            const Text('Welcome to ClinicGO!'),
             const SizedBox(height: 24),
             Container(
               width: double.infinity,
@@ -102,16 +123,14 @@ class HomeContent extends StatelessWidget {
                   const Text('Scheduled for 08:00'),
                   const SizedBox(height: 16),
                   FilledButton(
-                    onPressed: notificationController == null
-                        ? null
-                        : () {
-                            Navigator.of(context).pushNamed(
-                              MissedDoseNotificationController.buildDoseLoggingRoute(
-                                _demoDose,
-                                isOverdue: true,
-                              ),
-                            );
-                          },
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        MissedDoseNotificationController.buildDoseLoggingRoute(
+                          _demoDose,
+                          isOverdue: true,
+                        ),
+                      );
+                    },
                     child: const Text('Open overdue dose'),
                   ),
                 ],

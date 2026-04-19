@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,6 +17,15 @@ void main() {
         // Mock shared preferences
         SharedPreferences.setMockInitialValues({});
 
+        tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+          const EventChannel('com.llfbandit.app_links/events'),
+          _MockStreamHandler(),
+        );
+        tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+          const EventChannel('com.llfbandit.app_links/messages'),
+          _MockStreamHandler(),
+        );
+
         // Initialize Supabase with mock or real dev keys (using the ones from main.dart)
         try {
           await Supabase.initialize(
@@ -26,11 +37,16 @@ void main() {
         }
 
         // Start the app
-        app.main();
+        await app.main();
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.home_outlined));
         await tester.pumpAndSettle();
 
         // Verify we are on the Home screen
-        expect(find.text('Bem-vindo à ClinicGO!'), findsOneWidget);
+        expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
         expect(find.text('Upcoming dose'), findsOneWidget);
 
         // Find the button that simulates opening an overdue dose (notification behavior)
@@ -59,4 +75,11 @@ void main() {
       },
     );
   });
+}
+
+class _MockStreamHandler extends MockStreamHandler {
+  @override
+  void onListen(Object? arguments, MockStreamHandlerEventSink events) {}
+  @override
+  void onCancel(Object? arguments) {}
 }

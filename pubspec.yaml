@@ -39,6 +39,7 @@ dependencies:
   supabase_flutter: ^2.12.2
   shared_preferences: ^2.3.5
   timezone: ^0.11.0
+  get_it: ^9.2.1
 
 dev_dependencies:
   flutter_test:
