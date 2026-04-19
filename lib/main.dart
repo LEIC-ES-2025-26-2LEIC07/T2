@@ -21,11 +21,7 @@ const _supabaseAnonKey = String.fromEnvironment(
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-
-  await Supabase.initialize(
-    url: _supabaseUrl,
-    anonKey: _supabaseAnonKey,
-  );
+  await Supabase.initialize(url: _supabaseUrl, anonKey: _supabaseAnonKey);
 
   final navigatorKey = GlobalKey<NavigatorState>();
   final initialPayload = await setupServiceLocator(navigatorKey);

@@ -27,8 +27,14 @@ void main() {
 
       try {
         await Supabase.initialize(
-          url: const String.fromEnvironment('NEXT_PUBLIC_SUPABASE_URL', defaultValue: 'https://test.supabase.co'),
-          anonKey: const String.fromEnvironment('SB_PV_KEY', defaultValue: 'test-anon-key'),
+          url: const String.fromEnvironment(
+            'NEXT_PUBLIC_SUPABASE_URL',
+            defaultValue: 'https://test.supabase.co',
+          ),
+          anonKey: const String.fromEnvironment(
+            'SB_PV_KEY',
+            defaultValue: 'test-anon-key',
+          ),
         );
       } catch (_) {
         // Already initialized
