@@ -92,4 +92,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web application
-        run: flutter build web --release
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
+        run: flutter build web --release --dart-define=NEXT_PUBLIC_SUPABASE_URL="$SUPABASE_URL" --dart-define=SB_PV_KEY="$SUPABASE_KEY"

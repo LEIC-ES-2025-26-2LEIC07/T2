@@ -27,9 +27,8 @@ void main() {
 
       try {
         await Supabase.initialize(
-          url:
-              'https://sb_publishable_e-bQdp8wGizIL1py2JMrSg_3GZtj_Lz.supabase.co',
-          anonKey: 'sb_secret_8-OsrH4yDDnRHgOHj4Ls3Q_HNovhjgC',
+          url: const String.fromEnvironment('NEXT_PUBLIC_SUPABASE_URL', defaultValue: 'https://test.supabase.co'),
+          anonKey: const String.fromEnvironment('SB_PV_KEY', defaultValue: 'test-anon-key'),
         );
       } catch (_) {
         // Already initialized

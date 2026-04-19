@@ -38,7 +38,10 @@ jobs:
         run: flutter pub get
 
       - name: Build release APK
-        run: flutter build apk --release
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
+        run: flutter build apk --release --dart-define=NEXT_PUBLIC_SUPABASE_URL="$SUPABASE_URL" --dart-define=SB_PV_KEY="$SUPABASE_KEY"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

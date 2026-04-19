@@ -7,12 +7,24 @@ import 'package:clinic_go/core/widgets/notification_lifecycle_wrapper.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 
+// Credentials are injected at build time via --dart-define-from-file=.env
+// and must never be committed as plain strings.
+const _supabaseUrl = String.fromEnvironment(
+  'NEXT_PUBLIC_SUPABASE_URL',
+  defaultValue: 'https://test.supabase.co',
+);
+const _supabaseAnonKey = String.fromEnvironment(
+  'SB_PV_KEY',
+  defaultValue: 'test-anon-key',
+);
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+
   await Supabase.initialize(
-    url: 'https://pizwimuaqaafcgfibkdy.supabase.co',
-    anonKey: 'sb_secret_keDm_RYq9eICBxw1Pvty8g_5Wf3E7I5',
+    url: _supabaseUrl,
+    anonKey: _supabaseAnonKey,
   );
 
   final navigatorKey = GlobalKey<NavigatorState>();
