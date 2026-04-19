@@ -1,0 +1,130 @@
+import 'package:clinic_go/features/medication/data/medication_repository.dart';
+import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/presentation/views/add_medication_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+
+// ── Mock repository ─────────────────────────────────────────────────
+
+class _MockMedicationRepository implements MedicationRepository {
+  bool shouldFail;
+  _MockMedicationRepository({this.shouldFail = false});
+
+  @override
+  Future<String> addMedication(AddMedicationPayload payload) async {
+    if (shouldFail) {
+      throw const MedicationSaveException('Rollback occurred.');
+    }
+    return 'mock-id';
+  }
+
+  @override
+  Future<List<Medication>> fetchMedications() async => [];
+
+  @override
+  Future<void> deleteMedication(String id) async {}
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────
+
+Widget _buildScreen(_MockMedicationRepository repo) {
+  GetIt.I.registerSingleton<MedicationRepository>(repo);
+  return const MaterialApp(home: AddMedicationScreen());
+}
+
+// ── Tests ───────────────────────────────────────────────────────────
+
+void main() {
+  setUp(() async => await GetIt.I.reset());
+  tearDown(() async => await GetIt.I.reset());
+
+  testWidgets('renders all required form fields and colour swatch', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildScreen(_MockMedicationRepository()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('add med'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'name'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'dosage'), findsOneWidget);
+    // colour swatch container (GestureDetector child)
+    expect(find.byType(GestureDetector), findsWidgets);
+    expect(find.text('tap to\nchange\nthe color'), findsOneWidget);
+    expect(find.text('cancel'), findsOneWidget);
+    expect(find.text('Save'), findsOneWidget);
+  });
+
+  testWidgets('tapping Save with empty fields shows validation errors', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildScreen(_MockMedicationRepository()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('med_save_button')));
+    await tester.pump();
+
+    expect(find.text('Name is required'), findsOneWidget);
+    expect(find.text('Dosage is required'), findsOneWidget);
+  });
+
+  testWidgets('Save button shows spinner while loading', (tester) async {
+    // Use a slow-completing repo
+    final slowRepo = _SlowRepo();
+    GetIt.I.registerSingleton<MedicationRepository>(slowRepo);
+
+    await tester.pumpWidget(const MaterialApp(home: AddMedicationScreen()));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.widgetWithText(TextField, 'name'), 'Aspirin');
+    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '100mg');
+    await tester.tap(find.byKey(const Key('med_save_button')));
+    await tester.pump(); // start async
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('tapping colour swatch opens colour picker bottom sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildScreen(_MockMedicationRepository()));
+    await tester.pumpAndSettle();
+
+    // The colour swatch is the first GestureDetector that is a plain Container
+    final swatch = find.byWidgetPredicate((w) => w is GestureDetector);
+    await tester.tap(swatch.first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Choose a colour'), findsOneWidget);
+  });
+
+  testWidgets('error message is shown when repository throws', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(_MockMedicationRepository(shouldFail: true)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.widgetWithText(TextField, 'name'), 'Med');
+    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '5mg');
+    await tester.tap(find.byKey(const Key('med_save_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Rollback occurred'), findsOneWidget);
+  });
+}
+
+// Slow mock — delays so the test can observe the loading spinner.
+class _SlowRepo implements MedicationRepository {
+  @override
+  Future<String> addMedication(AddMedicationPayload p) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    return 'id';
+  }
+
+  @override
+  Future<List<Medication>> fetchMedications() async => [];
+
+  @override
+  Future<void> deleteMedication(String id) async {}
+}
