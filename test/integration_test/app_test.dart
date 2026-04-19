@@ -41,7 +41,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);
-      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
     });
   });
 }
