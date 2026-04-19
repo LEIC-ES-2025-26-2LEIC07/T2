@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/data/supabase_auth_service.dart';
 import 'package:clinic_go/features/medication/data/supabase_dose_log_repository.dart';
+import 'package:clinic_go/features/medication/data/medication_repository.dart';
+import 'package:clinic_go/features/medication/data/supabase_medication_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/flutter_local_notification_gateway.dart';
@@ -26,6 +28,11 @@ Future<NotificationPayload?> setupServiceLocator(
   // Dose Log Repository
   getIt.registerLazySingleton<SupabaseDoseLogRepository>(
     () => SupabaseDoseLogRepository(getIt<SupabaseClient>()),
+  );
+
+  // Medication Repository
+  getIt.registerLazySingleton<MedicationRepository>(
+    () => SupabaseMedicationRepository(getIt<SupabaseClient>()),
   );
 
   // Pending Notification Store
