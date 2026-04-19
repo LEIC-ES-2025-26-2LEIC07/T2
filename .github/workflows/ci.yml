@@ -95,4 +95,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
-        run: flutter build web --release --dart-define=NEXT_PUBLIC_SUPABASE_URL="$SUPABASE_URL" --dart-define=SB_PV_KEY="$SUPABASE_KEY"
+        run: |
+          URL=$(echo "$SUPABASE_URL" | tr -d '\n\r')
+          KEY=$(echo "$SUPABASE_KEY" | tr -d '\n\r')
+          flutter build web --release --dart-define="NEXT_PUBLIC_SUPABASE_URL=$URL" --dart-define="SB_PV_KEY=$KEY"
