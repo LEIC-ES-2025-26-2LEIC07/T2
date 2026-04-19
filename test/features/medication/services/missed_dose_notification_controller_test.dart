@@ -170,5 +170,3 @@ class _MockAuthService implements AuthService {
   @override
   Future<void> signOut() async {}
 }
-
-
