@@ -7,7 +7,7 @@ import 'package:clinic_go/core/widgets/custom_search_bar.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
-import 'package:clinic_go/features/favorites/presentation/views/favorites_view.dart';
+import 'package:clinic_go/features/medication/presentation/views/medications_list_screen.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 
@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     const ProfileView(),
-    const FavoritesView(),
+    const MedicationsListScreen(),
     const HomeContent(),
     const Center(child: Text('Calendário')),
     const Center(child: Text('Definições')),
