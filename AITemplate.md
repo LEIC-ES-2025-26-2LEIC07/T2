@@ -151,35 +151,69 @@ Supabase notes:
 - Handle network failures without leaving the UI in an invalid state.
 ```
 
-### For test-sensitive work
+Testing requirements (mandatory — do not skip):
 
-```text
+Before writing any test, inspect:
+- test/unit_test/widget_test.dart
+- test/integration_test/app_test.dart
+- integration_test/app_test.dart
+Understand the existing mock setup, test helpers, and Supabase stub patterns. Reuse them.
+
+Unit tests — required for every service/repository introduced:
+- Test each public method independently.
+- Mock Supabase client using the existing mock pattern in the repo (do not reinvent).
+- Cover: happy path, network failure (SupabaseException), empty result, malformed data.
+- Name tests as: `test('methodName: [scenario] → [expected outcome]', ...)`
+
+Widget tests — required for every new screen or modified screen:
+- Use `WidgetTester` to pump the widget under test.
+- Inject fakes/stubs via constructor or provider — never hit real Supabase.
+- Cover: loading state renders correctly, success state shows expected data,
+  error state shows error message, empty state shows empty widget.
+- Test user interactions: tap, form input, navigation trigger.
+- Use `find.byType`, `find.text`, `find.byKey` — avoid brittle `find.byWidget`.
+
+Integration tests — required if the feature crosses 2+ screens or involves auth:
+- Follow the existing integration_test/app_test.dart structure.
+- Use `IntegrationTestWidgetsFlutterBinding.ensureInitialized()`.
+- Stub Supabase at the HTTP layer or use the existing test Supabase project if configured.
+- Cover the full user journey: enter screen → interact → verify final state.
+- Include at least one failure journey (e.g., network down, invalid input).
+
+Test file placement:
+- Unit tests: test/unit_test/[feature_name]_test.dart
+- Widget tests: test/unit_test/[screen_name]_widget_test.dart
+- Integration tests: integration_test/[feature_name]_test.dart
+
+After writing tests, run:
+  flutter test test/unit_test/
+  flutter test test/unit_test/ --coverage
+  flutter test integration_test/ (if integration tests added)
+Report the result. If a test fails, fix it before finalising.
+
+Definition of done for tests:
+- [ ] Unit tests pass for all new service/repository methods.
+- [ ] Widget tests cover all 4 states: loading, success, error, empty.
+- [ ] At least one user interaction is tested per new screen.
+- [ ] Integration test covers the full happy path if feature spans multiple screens.
+- [ ] No test uses real Supabase — all network calls are mocked or stubbed.
+- [ ] flutter test passes with 0 failures.
+
+Substituição do add-on ### For test-sensitive work
+text### For test-sensitive work
+
 Testing notes:
-- Update existing tests instead of duplicating coverage when possible.
-- Add widget tests for user interaction.
-- Add or adjust integration coverage if the repo pattern supports it.
-- Cover both happy path and failure path.
-```
+- Inspect existing test files first — understand mock/stub conventions before writing new ones.
+- Unit test every public method on new services and repositories.
+  Scenarios per method: happy path, empty result, network error, bad data.
+- Widget test every new or modified screen for all 4 UI states:
+  loading, success, error, empty.
+- Integration test any feature that touches 2+ screens or requires auth.
+- Use fakes injected via constructor or provider — never hit real Supabase in tests.
+- Name tests descriptively: 'fetchAppointments: network error → returns Failure'.
+- Run `flutter test --coverage` and report coverage for new files.
+- Fix failing tests before summarising. Do not leave broken tests with a TODO.
 
-## Copy-paste quick version
-
-```text
-Act as a senior Flutter engineer inside my existing `T2` repo for ClinicGO. Inspect the current codebase first, especially `lib/main.dart`, `lib/ui/`, `lib/features/`, and existing tests. Then implement this feature end-to-end in the real app using the current architecture and style. Reuse current patterns, keep changes minimal and production-ready, handle loading/success/failure states, add tests, run format/tests if possible, and finish with a concise summary of changes, assumptions, and verification.
-
-Feature:
-[PASTE FEATURE HERE]
-
-Requirements:
-- [REQ 1]
-- [REQ 2]
-- [REQ 3]
-
-Constraints:
-- Don’t refactor unrelated areas
-- Don’t stop at analysis
-- Keep the solution testable
-- Include edge-case handling
-```
 
 ## Recommended inputs before sending to an AI
 
