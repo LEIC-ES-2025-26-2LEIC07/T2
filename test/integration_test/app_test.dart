@@ -16,13 +16,13 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       // Modern mock app_links
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('com.llfbandit.app_links/events'),
-        (methodCall) async => null,
+      tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+        const EventChannel('com.llfbandit.app_links/events'),
+        _MockStreamHandler(),
       );
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('com.llfbandit.app_links/messages'),
-        (methodCall) async => null,
+      tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+        const EventChannel('com.llfbandit.app_links/messages'),
+        _MockStreamHandler(),
       );
 
       try {
@@ -44,4 +44,11 @@ void main() {
       expect(find.text('Continue'), findsOneWidget);
     });
   });
+}
+
+class _MockStreamHandler extends MockStreamHandler {
+  @override
+  void onListen(Object? arguments, MockStreamHandlerEventSink events) {}
+  @override
+  void onCancel(Object? arguments) {}
 }

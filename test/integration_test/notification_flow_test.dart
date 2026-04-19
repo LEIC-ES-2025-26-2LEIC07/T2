@@ -17,6 +17,15 @@ void main() {
         // Mock shared preferences
         SharedPreferences.setMockInitialValues({});
 
+        tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+          const EventChannel('com.llfbandit.app_links/events'),
+          _MockStreamHandler(),
+        );
+        tester.binding.defaultBinaryMessenger.setMockStreamHandler(
+          const EventChannel('com.llfbandit.app_links/messages'),
+          _MockStreamHandler(),
+        );
+
         // Initialize Supabase with mock or real dev keys (using the ones from main.dart)
         try {
           await Supabase.initialize(
@@ -26,15 +35,6 @@ void main() {
         } catch (_) {
           // Already initialized
         }
-
-        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          const MethodChannel('com.llfbandit.app_links/events'),
-          (methodCall) async => null,
-        );
-        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          const MethodChannel('com.llfbandit.app_links/messages'),
-          (methodCall) async => null,
-        );
 
         // Start the app
         await app.main();
@@ -75,4 +75,11 @@ void main() {
       },
     );
   });
+}
+
+class _MockStreamHandler extends MockStreamHandler {
+  @override
+  void onListen(Object? arguments, MockStreamHandlerEventSink events) {}
+  @override
+  void onCancel(Object? arguments) {}
 }
