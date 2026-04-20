@@ -1,6 +1,3 @@
-import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
-import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
-import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
@@ -11,59 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_it/get_it.dart';
 import 'helpers/mocks.dart';
-
-class _MemoryNotificationGateway implements LocalNotificationGateway {
-  final List<NotificationRequest> scheduledRequests = [];
-  final List<int> cancelledNotificationIds = [];
-  @override
-  Future<void> cancel(int notificationId) async {
-    cancelledNotificationIds.add(notificationId);
-  }
-
-  @override
-  Future<void> schedule(NotificationRequest request) async {
-    scheduledRequests.add(request);
-  }
-}
-
-class _InMemoryDoseLogRepository implements DoseLogRepository {
-  final Set<String> _loggedDoseIds = <String>{};
-  @override
-  Future<bool> hasDoseLog(String doseId) async =>
-      _loggedDoseIds.contains(doseId);
-  @override
-  Future<void> insertDoseLog({
-    required ScheduledDose dose,
-    required DoseLogStatus status,
-    required DateTime loggedAt,
-  }) async {
-    _loggedDoseIds.add(dose.id);
-  }
-}
-
-class _FailingDoseLogRepository implements DoseLogRepository {
-  @override
-  Future<bool> hasDoseLog(String doseId) async => false;
-  @override
-  Future<void> insertDoseLog({
-    required ScheduledDose dose,
-    required DoseLogStatus status,
-    required DateTime loggedAt,
-  }) {
-    throw StateError('insert failed');
-  }
-}
+import 'helpers/medication_mocks.dart';
 
 void main() {
-  late _MemoryNotificationGateway notificationGateway;
-  late _InMemoryDoseLogRepository doseLogRepository;
+  late MemoryNotificationGateway notificationGateway;
+  late InMemoryDoseLogRepository doseLogRepository;
   late MissedDoseNotificationController controller;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await GetIt.I.reset();
-    notificationGateway = _MemoryNotificationGateway();
-    doseLogRepository = _InMemoryDoseLogRepository();
+    notificationGateway = MemoryNotificationGateway();
+    doseLogRepository = InMemoryDoseLogRepository();
     controller = MissedDoseNotificationController(
       notificationGateway: notificationGateway,
       doseLogRepository: doseLogRepository,
@@ -121,7 +77,7 @@ void main() {
     ) async {
       controller = MissedDoseNotificationController(
         notificationGateway: notificationGateway,
-        doseLogRepository: _FailingDoseLogRepository(),
+        doseLogRepository: FailingDoseLogRepository(),
         pendingNotificationStore: const PendingNotificationStore(),
       );
       GetIt.I.unregister<MissedDoseNotificationController>();

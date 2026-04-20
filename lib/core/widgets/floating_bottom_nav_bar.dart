@@ -34,7 +34,7 @@ class FloatingBottomNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildNavItem(0, Icons.person_outline),
-            _buildNavItem(1, Icons.favorite_border),
+            _buildNavItem(1, Icons.medication_outlined),
             _buildNavItem(2, Icons.home_outlined),
             _buildNavItem(3, Icons.calendar_today_outlined),
             _buildNavItem(4, Icons.settings_outlined),

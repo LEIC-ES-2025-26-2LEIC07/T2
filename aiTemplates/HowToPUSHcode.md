@@ -8,8 +8,9 @@ dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 
 # 4. Correr testes de widget
-flutter test
+# As credenciais do Supabase são injectadas via --dart-define-from-file
+flutter test --dart-define-from-file=.env
 
 # 5. Correr o teste de integração (smoke test)
-flutter test test/integration_test/app_test.dart
+flutter test --dart-define-from-file=.env test/integration_test/app_test.dart
 

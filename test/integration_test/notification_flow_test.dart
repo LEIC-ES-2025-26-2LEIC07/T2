@@ -29,8 +29,14 @@ void main() {
         // Initialize Supabase with mock or real dev keys (using the ones from main.dart)
         try {
           await Supabase.initialize(
-            url: 'https://pizwimuaqaafcgfibkdy.supabase.co',
-            anonKey: 'sb_secret_keDm_RYq9eICBxw1Pvty8g_5Wf3E7I5',
+            url: const String.fromEnvironment(
+              'NEXT_PUBLIC_SUPABASE_URL',
+              defaultValue: 'https://test.supabase.co',
+            ),
+            anonKey: const String.fromEnvironment(
+              'SB_PV_KEY',
+              defaultValue: 'test-anon-key',
+            ),
           );
         } catch (_) {
           // Already initialized

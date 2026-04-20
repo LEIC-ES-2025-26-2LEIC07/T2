@@ -1,19 +1,5 @@
-# AI Feature Prompt Template for ClinicGO
-
-Use this prompt when you want another AI to add a new feature to the `T2` Flutter app with minimal back-and-forth.
-
-## How to use
-
-1. Copy the template below.
-2. Replace every `[PLACEHOLDER]` with your feature details.
-3. Paste the completed prompt into the AI tool.
-4. If the feature includes backend or Supabase work, include the exact table and field names.
-5. If there is a GitHub issue, paste the full issue body into the `Feature specification` section.
-
-## Full prompt template
-
-```text
 You are a senior Flutter engineer working directly in my existing repository.
+Your job in this pass: implement the feature only. Do not write tests.
 
 Project:
 - Name: ClinicGO
@@ -35,11 +21,11 @@ Core instructions:
 Repository-specific guidance:
 - Check `lib/main.dart` first to understand bootstrapping and the current main screen.
 - Check `lib/ui/` and `lib/features/` before creating new folders.
-- Check `test/unit_test/widget_test.dart`, `test/integration_test/app_test.dart`, and `integration_test/app_test.dart` before editing tests.
 - Reuse existing Supabase initialization instead of creating a second app bootstrap path.
-- If a feature needs persistence or network behavior that should be testable, add a small repository/service abstraction and inject it where appropriate.
+- If a feature needs persistence or network behavior that should be testable,
+  add a small repository/service abstraction and inject it where appropriate.
 - Keep file and class names consistent with existing naming in this repo.
-- Don’t replace the current UI language/style unless explicitly requested.
+- Don't replace the current UI language/style unless explicitly requested.
 - Preserve existing user changes if the git worktree is dirty.
 
 Your task:
@@ -95,99 +81,40 @@ Architecture expectations:
 - Avoid introducing new packages unless truly necessary.
 - Reuse existing components before creating new ones.
 - If creating new files, place them in the most natural existing location.
+- Every new service or repository must be injectable (constructor injection preferred)
+  so the test pass can mock it without modifying the implementation.
 
-Implementation steps you should follow:
+Implementation steps:
 1. Inspect the current implementation and identify integration points.
 2. Explain the implementation plan briefly only after you understand the repo.
 3. Implement the feature in code.
 4. Update models, services/repositories, controllers/view models, and UI as needed.
 5. Handle success and failure states properly.
-6. Add tests for the core user interaction and critical edge cases.
-7. Run formatting and tests if possible.
-8. Summarize what changed, assumptions made, and how it was verified.
+6. Run flutter format and flutter analyze. Fix all warnings before finishing.
+7. Do NOT write tests. Leave that for the test pass.
 
 Definition of done:
 - The feature works in the actual app flow.
 - The UI reflects the expected behavior clearly.
 - Data is persisted correctly if backend writes are required.
 - Failure cases are handled gracefully.
-- Tests cover the main behavior.
+- flutter analyze returns no errors or warnings.
 - The code fits the current repo instead of fighting it.
 
 Constraints:
 - Do not stop at analysis or pseudocode.
 - Do not output only suggestions; make the code changes.
 - If blocked, explain the blocker briefly and choose the smallest safe fallback.
-- Keep the final summary concise and practical.
+- Do NOT write any test files in this pass.
 
-At the end, provide:
-- Short summary of implementation
-- Files changed
-- Assumptions
-- Verification performed
-```
+At the end, output this exact block (the test pass will consume it):
 
-## Best-practice add-ons
-
-If you want better results, append one or more of these sections to the prompt before sending it:
-
-### For UI-heavy features
-
-```text
-UI notes:
-- Keep the current visual language unless asked to redesign.
-- Make mobile layout the priority.
-- Ensure loading, disabled, and success states are visually obvious.
-- Avoid placeholder UI unless explicitly approved.
-```
-
-### For Supabase-backed features
-
-```text
-Supabase notes:
-- Use the existing Supabase client setup in the repo.
-- Keep database access easy to mock in tests.
-- Match exact table and field names from the specification.
-- Handle network failures without leaving the UI in an invalid state.
-```
-
-### For test-sensitive work
-
-```text
-Testing notes:
-- Update existing tests instead of duplicating coverage when possible.
-- Add widget tests for user interaction.
-- Add or adjust integration coverage if the repo pattern supports it.
-- Cover both happy path and failure path.
-```
-
-## Copy-paste quick version
-
-```text
-Act as a senior Flutter engineer inside my existing `T2` repo for ClinicGO. Inspect the current codebase first, especially `lib/main.dart`, `lib/ui/`, `lib/features/`, and existing tests. Then implement this feature end-to-end in the real app using the current architecture and style. Reuse current patterns, keep changes minimal and production-ready, handle loading/success/failure states, add tests, run format/tests if possible, and finish with a concise summary of changes, assumptions, and verification.
-
-Feature:
-[PASTE FEATURE HERE]
-
-Requirements:
-- [REQ 1]
-- [REQ 2]
-- [REQ 3]
-
-Constraints:
-- Don’t refactor unrelated areas
-- Don’t stop at analysis
-- Keep the solution testable
-- Include edge-case handling
-```
-
-## Recommended inputs before sending to an AI
-
-Always prepare these six items first:
-
-1. User story
-2. Exact screens affected
-3. Backend or storage changes
-4. Success and failure behavior
-5. Test expectations
-6. Definition of done
+FEATURE_SUMMARY:
+- Files created: [list every new file with its full path]
+- Files modified: [list every modified file with its full path]
+- New public classes: [list class name + file]
+- New public methods: [list method name + class + file]
+- Supabase tables touched: [list table names]
+- Supabase fields touched: [list field names per table]
+- Injectable dependencies: [list class name + how it is injected]
+- Known gaps or assumptions: [list anything the test pass should know]
