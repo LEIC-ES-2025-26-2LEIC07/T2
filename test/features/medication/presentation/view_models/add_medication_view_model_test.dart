@@ -1,8 +1,21 @@
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockMissedDoseNotificationController extends Mock
+    implements MissedDoseNotificationController {}
+
+class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
+
+class FakeMedication extends Fake implements Medication {}
+
+class FakeMedicationReminder extends Fake implements MedicationReminder {}
 
 // ── Hand-rolled mock repositories ──────────────────────────────────
 
@@ -20,6 +33,9 @@ class _SuccessRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 class _RollbackRepo implements MedicationRepository {
@@ -34,6 +50,9 @@ class _RollbackRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 class _NetworkErrorRepo implements MedicationRepository {
@@ -47,14 +66,52 @@ class _NetworkErrorRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 // ── Tests ───────────────────────────────────────────────────────────
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeMedication());
+    registerFallbackValue(FakeMedicationReminder());
+    registerFallbackValue(
+      Medication(
+        id: '',
+        userId: '',
+        name: '',
+        color: Colors.black,
+        createdAt: DateTime(2000),
+      ),
+    );
+    registerFallbackValue(<MedicationReminder>[]);
+  });
+
+  late MockMissedDoseNotificationController mockController;
+  late MockDoseSchedulingService mockScheduling;
+
+  setUp(() {
+    mockController = MockMissedDoseNotificationController();
+    mockScheduling = MockDoseSchedulingService();
+
+    // Stubbing for the happy-path logic
+    when(
+      () => mockScheduling.calculateUpcomingDoses(any(), any()),
+    ).thenReturn([]);
+  });
+
+  AddMedicationViewModel vmFactory({MedicationRepository? repo}) =>
+      AddMedicationViewModel(
+        repository: repo ?? _SuccessRepo(),
+        notificationController: mockController,
+        schedulingService: mockScheduling,
+      );
+
   group('AddMedicationViewModel – validation', () {
     test('submit with empty name sets nameError', () async {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setDosage('10mg');
       await vm.submit();
 
@@ -64,7 +121,7 @@ void main() {
     });
 
     test('submit with empty dosage sets dosageError', () async {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setName('Lisinopril');
       await vm.submit();
 
@@ -73,7 +130,7 @@ void main() {
     });
 
     test('submit with both blank fields sets both errors', () async {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       await vm.submit();
 
       expect(vm.nameError, isNotNull);
@@ -81,7 +138,7 @@ void main() {
     });
 
     test('setName clears nameError', () async {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       await vm.submit(); // triggers nameError
       expect(vm.nameError, isNotNull);
       vm.setName('Aspirin');
@@ -92,7 +149,7 @@ void main() {
   group('AddMedicationViewModel – happy path', () {
     test('sets isSuccess after successful submit', () async {
       final repo = _SuccessRepo();
-      final vm = AddMedicationViewModel(repository: repo);
+      final vm = vmFactory(repo: repo);
       vm.setName('Lisinopril');
       vm.setDosage('10 mg');
       await vm.submit();
@@ -103,7 +160,7 @@ void main() {
     });
 
     test('isDirty becomes false after successful submit', () async {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setName('Med');
       vm.setDosage('5mg');
       expect(vm.isDirty, isTrue);
@@ -114,7 +171,7 @@ void main() {
     test('payload contains selected colour', () async {
       AddMedicationPayload? captured;
       final repo = _CapturingRepo((p) => captured = p);
-      final vm = AddMedicationViewModel(repository: repo);
+      final vm = vmFactory(repo: repo);
       vm.setName('Med');
       vm.setDosage('5mg');
       vm.setColor(const Color(0xFFE53935));
@@ -126,7 +183,7 @@ void main() {
 
   group('AddMedicationViewModel – rollback path', () {
     test('sets errorMessage when MedicationSaveException is thrown', () async {
-      final vm = AddMedicationViewModel(repository: _RollbackRepo());
+      final vm = vmFactory(repo: _RollbackRepo());
       vm.setName('Med');
       vm.setDosage('5mg');
       await vm.submit();
@@ -136,7 +193,7 @@ void main() {
     });
 
     test('sets generic errorMessage on unknown exception', () async {
-      final vm = AddMedicationViewModel(repository: _NetworkErrorRepo());
+      final vm = vmFactory(repo: _NetworkErrorRepo());
       vm.setName('Med');
       vm.setDosage('5mg');
       await vm.submit();
@@ -148,13 +205,13 @@ void main() {
 
   group('AddMedicationViewModel – colour picker', () {
     test('setColor updates selectedColor', () {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setColor(const Color(0xFFE53935));
       expect(vm.selectedColor, equals(const Color(0xFFE53935)));
     });
 
     test('setColor marks form as dirty', () {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       expect(vm.isDirty, isFalse);
       vm.setColor(const Color(0xFF43A047));
       expect(vm.isDirty, isTrue);
@@ -163,19 +220,19 @@ void main() {
 
   group('AddMedicationViewModel – reminder slots', () {
     test('Twice daily produces two reminder slots', () {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setFrequency('Twice daily');
       expect(vm.reminderTimes.length, 2);
     });
 
     test('Three times daily produces three slots', () {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setFrequency('Three times daily');
       expect(vm.reminderTimes.length, 3);
     });
 
     test('switching back to Once daily reduces to one slot', () {
-      final vm = AddMedicationViewModel(repository: _SuccessRepo());
+      final vm = vmFactory();
       vm.setFrequency('Three times daily');
       vm.setFrequency('Once daily');
       expect(vm.reminderTimes.length, 1);
@@ -199,4 +256,7 @@ class _CapturingRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }

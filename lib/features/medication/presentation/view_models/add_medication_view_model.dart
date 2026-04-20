@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
+import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 
 /// ViewModel for the Add Medication form.
 ///
 /// Owns all form field state, validation, color selection, and async submission.
 /// Uses [ChangeNotifier] to match the repo's existing state-management pattern.
 class AddMedicationViewModel extends ChangeNotifier {
-  AddMedicationViewModel({required MedicationRepository repository})
-    : _repository = repository;
+  AddMedicationViewModel({
+    required MedicationRepository repository,
+    required MissedDoseNotificationController notificationController,
+    required DoseSchedulingService schedulingService,
+  }) : _repository = repository,
+       _notificationController = notificationController,
+       _schedulingService = schedulingService;
 
   final MedicationRepository _repository;
+  final MissedDoseNotificationController _notificationController;
+  final DoseSchedulingService _schedulingService;
 
   // ── Form fields ──────────────────────────────────────────────────
   String name = '';
@@ -139,7 +150,7 @@ class AddMedicationViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.addMedication(
+      final newMedicationId = await _repository.addMedication(
         AddMedicationPayload(
           name: name.trim(),
           dosage: dosage.trim(),
@@ -157,6 +168,10 @@ class AddMedicationViewModel extends ChangeNotifier {
           notes: notes.trim().isEmpty ? null : notes.trim(),
         ),
       );
+
+      // ── Step 2: Schedule notifications for the next 24 hours ────────
+      await _scheduleInitialNotifications(newMedicationId);
+
       isSuccess = true;
       isDirty = false;
     } on MedicationSaveException catch (e) {
@@ -212,6 +227,41 @@ class AddMedicationViewModel extends ChangeNotifier {
         return 3;
       default:
         return 1;
+    }
+  }
+
+  Future<void> _scheduleInitialNotifications(String medicationId) async {
+    // Construct domain models from the current form state to avoid an extra fetch
+    final medication = Medication(
+      id: medicationId,
+      userId: '', // Not needed for scheduling
+      name: name.trim(),
+      dosage: dosage.trim(),
+      color: selectedColor,
+      frequency: frequency,
+      startDate: startDate,
+      endDate: endDate,
+      createdAt: DateTime.now(),
+    );
+
+    final reminders = reminderTimes
+        .map(
+          (t) => MedicationReminder(
+            medicationId: medicationId,
+            reminderTime:
+                '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:00',
+            daysOfWeek: daysOfWeek,
+          ),
+        )
+        .toList();
+
+    final upcomingDoses = _schedulingService.calculateUpcomingDoses(
+      medication,
+      reminders,
+    );
+
+    for (final dose in upcomingDoses) {
+      await _notificationController.scheduleDoseReminder(dose);
     }
   }
 }

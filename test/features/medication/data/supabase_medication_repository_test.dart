@@ -224,7 +224,7 @@ void main() {
 
           // Should throw MedicationSaveException for the rollback
           expect(
-            () => repository.addMedication(payload),
+            repository.addMedication(payload),
             throwsA(
               isA<MedicationSaveException>().having(
                 (e) => e.message,
@@ -364,6 +364,84 @@ void main() {
         expect(
           () => repository.deleteMedication('med-123'),
           throwsA(isA<PostgrestException>()),
+        );
+      });
+    });
+
+    group('fetchAllReminders', () {
+      test('Happy path: successfully returns all reminders', () async {
+        final queryBuilder = FakeQueryBuilder();
+        final filterBuilder = FakeFilterBuilder<PostgrestList>(
+          () => Future.value([
+            {
+              'id': 'rem-1',
+              'medication_id': 'med-1',
+              'reminder_time': '08:00:00',
+              'days_of_week': ['monday'], // added missing required field
+              'is_active': true,
+            },
+          ]),
+        );
+
+        when(
+          () => mockClient.from('medication_reminders'),
+        ).thenAnswer((_) => queryBuilder);
+        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+
+        final result = await repository.fetchAllReminders();
+        expect(result.length, 1);
+        expect(result.first.id, 'rem-1');
+        expect(result.first.reminderTime, '08:00:00');
+      });
+
+      test('Empty result: returns empty list safely', () async {
+        final queryBuilder = FakeQueryBuilder();
+        final filterBuilder = FakeFilterBuilder<PostgrestList>(
+          () => Future.value([]),
+        );
+
+        when(
+          () => mockClient.from('medication_reminders'),
+        ).thenAnswer((_) => queryBuilder);
+        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+
+        final result = await repository.fetchAllReminders();
+        expect(result, isEmpty);
+      });
+
+      test('Network failure: throws PostgrestException', () async {
+        final queryBuilder = FakeQueryBuilder();
+        final filterBuilder = FakeFilterBuilder<PostgrestList>(
+          () => Future.error(const PostgrestException(message: 'Fetch failed')),
+        );
+
+        when(
+          () => mockClient.from('medication_reminders'),
+        ).thenAnswer((_) => queryBuilder);
+        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+
+        expect(
+          () => repository.fetchAllReminders(),
+          throwsA(isA<PostgrestException>()),
+        );
+      });
+
+      test('Malformed data: handles invalid structure gracefully', () async {
+        final queryBuilder = FakeQueryBuilder();
+        final filterBuilder = FakeFilterBuilder<PostgrestList>(
+          () => Future.value([
+            {'bad': 'data'},
+          ]),
+        );
+
+        when(
+          () => mockClient.from('medication_reminders'),
+        ).thenAnswer((_) => queryBuilder);
+        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+
+        expect(
+          () => repository.fetchAllReminders(),
+          throwsA(anyOf(isA<TypeError>(), isA<Exception>())),
         );
       });
     });

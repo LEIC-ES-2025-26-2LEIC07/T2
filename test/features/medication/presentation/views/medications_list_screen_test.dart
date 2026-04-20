@@ -1,5 +1,6 @@
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 import 'package:clinic_go/features/medication/presentation/views/medications_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,9 @@ class _EmptyRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 class _LoadedRepo implements MedicationRepository {
@@ -46,6 +50,9 @@ class _LoadedRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 class _ErrorRepo implements MedicationRepository {
@@ -58,6 +65,9 @@ class _ErrorRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 // ── Helper ──────────────────────────────────────────────────────────

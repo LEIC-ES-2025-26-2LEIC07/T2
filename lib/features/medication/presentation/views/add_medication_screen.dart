@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 
 /// Full add-medication form pushed onto the stack from [MedicationsListScreen].
 ///
@@ -25,6 +27,8 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     super.initState();
     _viewModel = AddMedicationViewModel(
       repository: getIt<MedicationRepository>(),
+      notificationController: getIt<MissedDoseNotificationController>(),
+      schedulingService: getIt<DoseSchedulingService>(),
     );
     _viewModel.addListener(_onViewModelChanged);
   }

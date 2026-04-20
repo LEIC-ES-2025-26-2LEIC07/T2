@@ -108,6 +108,8 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(successMessage)));
+
+      Navigator.of(context).pop(true);
     } catch (_) {
       if (!context.mounted) {
         return;

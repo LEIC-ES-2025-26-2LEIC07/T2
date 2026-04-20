@@ -74,6 +74,18 @@ Data and backend requirements:
 - Failure handling: [DESCRIBE]
 - Sync/cache expectations: [DESCRIBE]
 
+ViewModel instantiation pattern:
+- Do NOT register ViewModels in getIt.
+- Instantiate ViewModels manually in the View's initState(), following
+  the pattern in MedicationsListScreen.
+- Never mix patterns — if you see both approaches in the repo, prefer
+  manual instantiation and flag the inconsistency in the summary.
+- Every ViewModel must accept its dependencies via constructor parameters,
+  not by calling getIt internally. This makes it testable without getIt.
+- Every Screen widget must accept an optional ViewModel parameter:
+    final HomeViewModel? viewModel; // if null, initState creates the default
+  This allows widget tests to inject a fake without modifying the widget.
+  
 Architecture expectations:
 - Put business logic outside large widget trees when reasonable.
 - Keep widgets focused and readable.

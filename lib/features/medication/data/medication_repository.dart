@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 
 /// Payload for the two-step medication + reminders insertion.
 class AddMedicationPayload {
@@ -51,4 +52,7 @@ abstract class MedicationRepository {
 
   /// Hard-deletes a medication by UUID (used internally for rollback).
   Future<void> deleteMedication(String id);
+
+  /// Fetches all reminders for the authenticated user.
+  Future<List<MedicationReminder>> fetchAllReminders();
 }
