@@ -31,8 +31,12 @@ void main() {
     medicationRepository = MockMedicationRepository();
 
     // Stub medication methods to return empty lists by default
-    when(() => medicationRepository.fetchMedications()).thenAnswer((_) async => []);
-    when(() => medicationRepository.fetchAllReminders()).thenAnswer((_) async => []);
+    when(
+      () => medicationRepository.fetchMedications(),
+    ).thenAnswer((_) async => []);
+    when(
+      () => medicationRepository.fetchAllReminders(),
+    ).thenAnswer((_) async => []);
 
     controller = MissedDoseNotificationController(
       notificationGateway: notificationGateway,
@@ -42,7 +46,9 @@ void main() {
 
     GetIt.I.registerSingleton<MedicationRepository>(medicationRepository);
     GetIt.I.registerSingleton<DoseLogRepository>(doseLogRepository);
-    GetIt.I.registerSingleton<DoseSchedulingService>(const DoseSchedulingService());
+    GetIt.I.registerSingleton<DoseSchedulingService>(
+      const DoseSchedulingService(),
+    );
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
   });

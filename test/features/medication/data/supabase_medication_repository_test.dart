@@ -224,7 +224,7 @@ void main() {
 
           // Should throw MedicationSaveException for the rollback
           expect(
-            () => repository.addMedication(payload),
+            repository.addMedication(payload),
             throwsA(
               isA<MedicationSaveException>().having(
                 (e) => e.message,

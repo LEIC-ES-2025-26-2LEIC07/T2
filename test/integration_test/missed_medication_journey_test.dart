@@ -1,5 +1,4 @@
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
-import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
@@ -155,7 +154,7 @@ void main() {
 
       // Verify we returned to Dashboard/MainScreen
       expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
-      
+
       // The dose for tomorrow should now be the "Upcoming" dose
       expect(find.text('Upcoming dose'), findsOneWidget);
       expect(find.text('Overdue dose'), findsNothing);

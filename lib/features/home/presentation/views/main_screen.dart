@@ -256,7 +256,11 @@ class _HomeContentState extends State<HomeContent> {
                           medicationId: 'med-123',
                           medicationName: 'Lisinopril',
                           dosage: '10mg',
-                          scheduledTime: DateTime(2026, 1, 1), // Date is ignored for overdue check usually
+                          scheduledTime: DateTime(
+                            2026,
+                            1,
+                            1,
+                          ), // Date is ignored for overdue check usually
                         ),
                         isOverdue: true,
                       ),

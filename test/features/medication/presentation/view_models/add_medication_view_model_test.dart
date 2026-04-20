@@ -13,6 +13,10 @@ class MockMissedDoseNotificationController extends Mock
 
 class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
 
+class FakeMedication extends Fake implements Medication {}
+
+class FakeMedicationReminder extends Fake implements MedicationReminder {}
+
 // ── Hand-rolled mock repositories ──────────────────────────────────
 
 class _SuccessRepo implements MedicationRepository {
@@ -70,21 +74,9 @@ class _NetworkErrorRepo implements MedicationRepository {
 // ── Tests ───────────────────────────────────────────────────────────
 
 void main() {
-  final mockController = MockMissedDoseNotificationController();
-  final mockScheduling = MockDoseSchedulingService();
-
-  // Stubbing for the happy-path logic
-  when(
-    () => mockScheduling.calculateUpcomingDoses(any(), any()),
-  ).thenReturn([]);
-
-  vmFactory({MedicationRepository? repo}) => AddMedicationViewModel(
-    repository: repo ?? _SuccessRepo(),
-    notificationController: mockController,
-    schedulingService: mockScheduling,
-  );
-
   setUpAll(() {
+    registerFallbackValue(FakeMedication());
+    registerFallbackValue(FakeMedicationReminder());
     registerFallbackValue(
       Medication(
         id: '',
@@ -96,6 +88,26 @@ void main() {
     );
     registerFallbackValue(<MedicationReminder>[]);
   });
+
+  late MockMissedDoseNotificationController mockController;
+  late MockDoseSchedulingService mockScheduling;
+
+  setUp(() {
+    mockController = MockMissedDoseNotificationController();
+    mockScheduling = MockDoseSchedulingService();
+
+    // Stubbing for the happy-path logic
+    when(
+      () => mockScheduling.calculateUpcomingDoses(any(), any()),
+    ).thenReturn([]);
+  });
+
+  AddMedicationViewModel vmFactory({MedicationRepository? repo}) =>
+      AddMedicationViewModel(
+        repository: repo ?? _SuccessRepo(),
+        notificationController: mockController,
+        schedulingService: mockScheduling,
+      );
 
   group('AddMedicationViewModel – validation', () {
     test('submit with empty name sets nameError', () async {
@@ -244,4 +256,7 @@ class _CapturingRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }

@@ -3,7 +3,6 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
-import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
@@ -23,7 +22,9 @@ import 'package:intl/intl.dart';
 import '../helpers/medication_mocks.dart';
 
 class MockMedicationRepository extends Mock implements MedicationRepository {}
+
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockAuthService extends Mock implements AuthService {}
 
 void main() {
@@ -82,26 +83,46 @@ void main() {
           id: 'rem-1',
           medicationId: 'med-123',
           reminderTime: overdueStr,
-          daysOfWeek: const ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+          daysOfWeek: const [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+          ],
         );
 
-        when(() => mockMedRepo.fetchMedications()).thenAnswer((_) async => [med]);
-        when(() => mockMedRepo.fetchAllReminders()).thenAnswer((_) async => [reminder]);
+        when(
+          () => mockMedRepo.fetchMedications(),
+        ).thenAnswer((_) async => [med]);
+        when(
+          () => mockMedRepo.fetchAllReminders(),
+        ).thenAnswer((_) async => [reminder]);
 
         final getIt = GetIt.instance;
         final navigatorKey = GlobalKey<NavigatorState>();
 
         final mockAuth = MockAuthService();
-        when(() => mockAuth.authStateChanges).thenAnswer((_) => Stream.fromIterable([true]));
+        when(
+          () => mockAuth.authStateChanges,
+        ).thenAnswer((_) => Stream.fromIterable([true]));
         when(() => mockAuth.isLoggedIn).thenReturn(true);
 
         getIt.registerSingleton<AuthService>(mockAuth);
         getIt.registerSingleton<SupabaseClient>(MockSupabaseClient());
         getIt.registerSingleton<MedicationRepository>(mockMedRepo);
         getIt.registerSingleton<DoseLogRepository>(mockLogRepo);
-        getIt.registerLazySingleton<PendingNotificationStore>(() => const PendingNotificationStore());
-        getIt.registerLazySingleton<DoseSchedulingService>(() => const DoseSchedulingService());
-        getIt.registerSingleton<LocalNotificationGateway>(const NoopLocalNotificationGateway());
+        getIt.registerLazySingleton<PendingNotificationStore>(
+          () => const PendingNotificationStore(),
+        );
+        getIt.registerLazySingleton<DoseSchedulingService>(
+          () => const DoseSchedulingService(),
+        );
+        getIt.registerSingleton<LocalNotificationGateway>(
+          const NoopLocalNotificationGateway(),
+        );
         getIt.registerSingleton<MissedDoseNotificationController>(
           MissedDoseNotificationController(
             notificationGateway: getIt<LocalNotificationGateway>(),
@@ -118,7 +139,10 @@ void main() {
 
         // Verify we are on the Home screen
         expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
-        expect(find.text('Upcoming dose'), findsNothing); // It's overdue, not "upcoming"
+        expect(
+          find.text('Upcoming dose'),
+          findsNothing,
+        ); // It's overdue, not "upcoming"
         expect(find.text('Overdue dose'), findsOneWidget);
 
         // Find the button that simulates opening an overdue dose (notification behavior)
@@ -138,7 +162,10 @@ void main() {
         expect(find.text('Dose Logging'), findsOneWidget);
 
         // Verify the "Overdue" status is shown
-        expect(find.textContaining(RegExp('overdue', caseSensitive: false)), findsWidgets);
+        expect(
+          find.textContaining(RegExp('overdue', caseSensitive: false)),
+          findsWidgets,
+        );
       },
     );
   });
