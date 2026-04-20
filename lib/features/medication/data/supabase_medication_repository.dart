@@ -85,4 +85,14 @@ class SupabaseMedicationRepository implements MedicationRepository {
   Future<void> deleteMedication(String id) async {
     await _client.from('medications').delete().eq('id', id);
   }
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async {
+    final response = await _client.from('medication_reminders').select();
+
+    return (response as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .map(MedicationReminder.fromJson)
+        .toList();
+  }
 }

@@ -1,9 +1,18 @@
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 import 'package:clinic_go/features/medication/presentation/views/add_medication_screen.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockMissedDoseNotificationController extends Mock
+    implements MissedDoseNotificationController {}
+
+class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
 
 // ── Mock repository ─────────────────────────────────────────────────
 
@@ -24,12 +33,24 @@ class _MockMedicationRepository implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
-Widget _buildScreen(_MockMedicationRepository repo) {
+Widget _buildScreen(MedicationRepository repo) {
   GetIt.I.registerSingleton<MedicationRepository>(repo);
+
+  final mockController = MockMissedDoseNotificationController();
+  final mockService = MockDoseSchedulingService();
+
+  when(() => mockService.calculateUpcomingDoses(any(), any())).thenReturn([]);
+
+  GetIt.I.registerSingleton<MissedDoseNotificationController>(mockController);
+  GetIt.I.registerSingleton<DoseSchedulingService>(mockService);
+
   return const MaterialApp(home: AddMedicationScreen());
 }
 
@@ -73,7 +94,7 @@ void main() {
     final slowRepo = _SlowRepo();
     GetIt.I.registerSingleton<MedicationRepository>(slowRepo);
 
-    await tester.pumpWidget(const MaterialApp(home: AddMedicationScreen()));
+    await tester.pumpWidget(_buildScreen(slowRepo));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextField, 'name'), 'Aspirin');
@@ -127,4 +148,7 @@ class _SlowRepo implements MedicationRepository {
 
   @override
   Future<void> deleteMedication(String id) async {}
+
+  @override
+  Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }

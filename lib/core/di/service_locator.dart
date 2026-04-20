@@ -6,12 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/data/supabase_auth_service.dart';
 import 'package:clinic_go/features/medication/data/supabase_dose_log_repository.dart';
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/supabase_medication_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/flutter_local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 
 final getIt = GetIt.instance;
@@ -26,7 +28,7 @@ Future<NotificationPayload?> setupServiceLocator(
   getIt.registerLazySingleton<AuthService>(() => SupabaseAuthService());
 
   // Dose Log Repository
-  getIt.registerLazySingleton<SupabaseDoseLogRepository>(
+  getIt.registerLazySingleton<DoseLogRepository>(
     () => SupabaseDoseLogRepository(getIt<SupabaseClient>()),
   );
 
@@ -38,6 +40,11 @@ Future<NotificationPayload?> setupServiceLocator(
   // Pending Notification Store
   getIt.registerLazySingleton<PendingNotificationStore>(
     () => const PendingNotificationStore(),
+  );
+
+  // Dose Scheduling Service
+  getIt.registerLazySingleton<DoseSchedulingService>(
+    () => const DoseSchedulingService(),
   );
 
   // Notification Gateway Bootstrap
@@ -67,7 +74,7 @@ Future<NotificationPayload?> setupServiceLocator(
   getIt.registerSingleton<MissedDoseNotificationController>(
     MissedDoseNotificationController(
       notificationGateway: getIt<LocalNotificationGateway>(),
-      doseLogRepository: getIt<SupabaseDoseLogRepository>(),
+      doseLogRepository: getIt<DoseLogRepository>(),
       pendingNotificationStore: getIt<PendingNotificationStore>(),
     ),
   );
