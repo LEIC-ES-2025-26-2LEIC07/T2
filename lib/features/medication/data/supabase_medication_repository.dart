@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:clinic_go/features/medication/models/medication.dart';
@@ -52,17 +53,15 @@ class SupabaseMedicationRepository implements MedicationRepository {
           .toList();
 
       await _client.from('medication_reminders').insert(reminderRows);
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint('Error saving reminders: $e\n$stackTrace');
       // ── Rollback: remove the orphaned medication ──────────────────
       try {
         await deleteMedication(newMedicationId);
-      } catch (_) {
-        // Best-effort; ignore secondary failures.
+      } catch (rollbackError) {
+        debugPrint('Rollback failed: $rollbackError');
       }
-      throw const MedicationSaveException(
-        'Reminders could not be saved and the medication was rolled back. '
-        'Please try again.',
-      );
+      throw MedicationSaveException('Reminders could not be saved: $e');
     }
 
     return newMedicationId;

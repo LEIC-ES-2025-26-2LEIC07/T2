@@ -160,8 +160,10 @@ class AddMedicationViewModel extends ChangeNotifier {
       isSuccess = true;
       isDirty = false;
     } on MedicationSaveException catch (e) {
+      debugPrint('MedicationSaveException: ${e.message}');
       errorMessage = e.message;
-    } catch (_) {
+    } catch (e, stackTrace) {
+      debugPrint('Error saving medication: $e\n$stackTrace');
       errorMessage = 'Could not save medication. Please try again.';
     } finally {
       isLoading = false;
