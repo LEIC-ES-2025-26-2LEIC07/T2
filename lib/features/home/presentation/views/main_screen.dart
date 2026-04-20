@@ -43,6 +43,10 @@ class _MainScreenState extends State<MainScreen> {
         setState(() => _currentIndex = 0); // return to Profile on logout
       }
     });
+
+    // We'll use a temporary HomeViewModel instance just to get the singleton-like logic if needed,
+    // but the actual listener should be on the one used in the HomeContent.
+    // Actually, it's better to add the listener inside HomeContent where the ViewModel is created.
   }
 
   @override
@@ -112,14 +116,30 @@ class _HomeContentState extends State<HomeContent> {
           repository: getIt<MedicationRepository>(),
           schedulingService: getIt<DoseSchedulingService>(),
           logRepository: getIt<DoseLogRepository>(),
+          notificationController: getIt<MissedDoseNotificationController>(),
         );
     if (widget.viewModel == null) {
       _viewModel.loadNextDose();
+    }
+
+    _viewModel.addListener(_onViewModelChange);
+  }
+
+  void _onViewModelChange() {
+    if (_viewModel.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_viewModel.errorMessage!),
+          backgroundColor: const Color(0xFFE53935),
+        ),
+      );
+      _viewModel.clearError();
     }
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_onViewModelChange);
     if (widget.viewModel == null) {
       _viewModel.dispose();
     }
@@ -145,130 +165,172 @@ class _HomeContentState extends State<HomeContent> {
             : Colors.black87;
 
         return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 120),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Welcome to ClinicGO!'),
-                const SizedBox(height: 24),
-                if (nextDose == null)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    child: const Text(
-                      'No upcoming doses. Good job!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Welcome to ClinicGO!'),
+                  const SizedBox(height: 24),
+                  if (nextDose == null)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.88),
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      child: const Text(
+                        'No upcoming doses. Good job!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  else ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.88),
+                        borderRadius: BorderRadius.circular(28),
+                        border: isOverdue
+                            ? Border.all(
+                                color: const Color(0xFFFFECEC),
+                                width: 2,
+                              )
+                            : null,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                isOverdue ? 'Overdue dose' : 'Upcoming dose',
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      color: isOverdue
+                                          ? const Color(0xFFC62828)
+                                          : null,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              if (isOverdue)
+                                const Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Color(0xFFC62828),
+                                  size: 20,
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            '${nextDose.medicationName} • ${nextDose.dosage}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Scheduled for $scheduledTimeLabel',
+                            style: TextStyle(color: statusColor),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: FilledButton(
+                                  onPressed: () => _viewModel.logDose(
+                                    nextDose,
+                                    DoseLogStatus.taken,
+                                  ),
+                                  style: isOverdue
+                                      ? FilledButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFFE53935,
+                                          ),
+                                        )
+                                      : null,
+                                  child: const Text('Take'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _viewModel.logDose(
+                                    nextDose,
+                                    DoseLogStatus.skipped,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: isOverdue
+                                        ? const BorderSide(
+                                            color: Color(0xFFE53935),
+                                          )
+                                        : null,
+                                    foregroundColor: isOverdue
+                                        ? const Color(0xFFE53935)
+                                        : null,
+                                  ),
+                                  child: const Text('Skip'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Center(
+                            child: TextButton(
+                              onPressed: () async {
+                                final result = await Navigator.of(context)
+                                    .pushNamed(
+                                      MissedDoseNotificationController.buildDoseLoggingRoute(
+                                        nextDose,
+                                        isOverdue: isOverdue,
+                                      ),
+                                    );
+                                if (result == true) {
+                                  _viewModel.loadNextDose();
+                                }
+                              },
+                              child: const Text('View Details'),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  )
-                else ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(28),
-                      border: isOverdue
-                          ? Border.all(color: const Color(0xFFFFECEC), width: 2)
-                          : null,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              isOverdue ? 'Overdue dose' : 'Upcoming dose',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    color: isOverdue
-                                        ? const Color(0xFFC62828)
-                                        : null,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            if (isOverdue)
-                              const Icon(
-                                Icons.warning_amber_rounded,
-                                color: Color(0xFFC62828),
-                                size: 20,
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          '${nextDose.medicationName} • ${nextDose.dosage}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                  ],
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      // Logic to simulate opening an overdue dose for testing
+                      // Matches Lisbonipril • 10mg demo data in notification_flow_test
+                      Navigator.of(context).pushNamed(
+                        MissedDoseNotificationController.buildDoseLoggingRoute(
+                          ScheduledDose(
+                            id: 'demo-overdue-123',
+                            medicationId: 'med-123',
+                            medicationName: 'Lisinopril',
+                            dosage: '10mg',
+                            scheduledTime: DateTime(
+                              2026,
+                              1,
+                              1,
+                            ), // Date is ignored for overdue check usually
                           ),
+                          isOverdue: true,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Scheduled for $scheduledTimeLabel',
-                          style: TextStyle(color: statusColor),
-                        ),
-                        const SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: () async {
-                            final result = await Navigator.of(context).pushNamed(
-                              MissedDoseNotificationController.buildDoseLoggingRoute(
-                                nextDose,
-                                isOverdue: isOverdue,
-                              ),
-                            );
-                            if (result == true) {
-                              _viewModel.loadNextDose(); // refresh on success
-                            }
-                          },
-                          style: isOverdue
-                              ? FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE53935),
-                                )
-                              : null,
-                          child: Text(
-                            isOverdue ? 'Log Overdue Dose' : 'Log Dose',
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
+                    child: const Text('Open overdue dose'),
                   ),
                 ],
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    // Logic to simulate opening an overdue dose for testing
-                    // Matches Lisbonipril • 10mg demo data in notification_flow_test
-                    Navigator.of(context).pushNamed(
-                      MissedDoseNotificationController.buildDoseLoggingRoute(
-                        ScheduledDose(
-                          id: 'demo-overdue-123',
-                          medicationId: 'med-123',
-                          medicationName: 'Lisinopril',
-                          dosage: '10mg',
-                          scheduledTime: DateTime(
-                            2026,
-                            1,
-                            1,
-                          ), // Date is ignored for overdue check usually
-                        ),
-                        isOverdue: true,
-                      ),
-                    );
-                  },
-                  child: const Text('Open overdue dose'),
-                ),
-              ],
+              ),
             ),
           ),
         );

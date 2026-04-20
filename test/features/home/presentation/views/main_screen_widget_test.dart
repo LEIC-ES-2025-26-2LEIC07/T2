@@ -84,7 +84,9 @@ void main() {
 
         expect(find.text('Upcoming dose'), findsOneWidget);
         expect(find.text('Aspirin • 100mg'), findsOneWidget);
-        expect(find.text('Log Dose'), findsOneWidget);
+        expect(find.text('Take'), findsOneWidget);
+        expect(find.text('Skip'), findsOneWidget);
+        expect(find.text('View Details'), findsOneWidget);
       },
     );
 
@@ -107,12 +109,14 @@ void main() {
 
         expect(find.text('Overdue dose'), findsOneWidget);
         expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
-        expect(find.text('Log Overdue Dose'), findsOneWidget);
+        expect(find.text('Take'), findsOneWidget);
+        expect(find.text('Skip'), findsOneWidget);
+        expect(find.text('View Details'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'User interactions: [Scenario] → tapping Log Dose triggers navigation',
+      'User interactions: [Scenario] → tapping View Details triggers navigation',
       (tester) async {
         final dose = ScheduledDose(
           id: 'd1',
@@ -127,7 +131,9 @@ void main() {
 
         await tester.pumpWidget(createWidgetUnderTest());
 
-        await tester.tap(find.text('Log Dose'));
+        expect(find.text('Take'), findsOneWidget);
+        expect(find.text('Skip'), findsOneWidget);
+        await tester.tap(find.text('View Details'));
         await tester.pumpAndSettle();
 
         // Verify that a route was pushed

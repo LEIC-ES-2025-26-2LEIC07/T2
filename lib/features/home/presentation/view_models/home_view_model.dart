@@ -1,3 +1,4 @@
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -9,21 +10,31 @@ class HomeViewModel extends ChangeNotifier {
     required MedicationRepository repository,
     required DoseSchedulingService schedulingService,
     required DoseLogRepository logRepository,
+    required MissedDoseNotificationController notificationController,
   }) : _repository = repository,
        _schedulingService = schedulingService,
-       _logRepository = logRepository;
+       _logRepository = logRepository,
+       _notificationController = notificationController;
 
   final MedicationRepository _repository;
   final DoseSchedulingService _schedulingService;
   final DoseLogRepository _logRepository;
+  final MissedDoseNotificationController _notificationController;
 
   ScheduledDose? _nextDose;
   bool _isOverdue = false;
   bool _isLoading = true;
+  String? _errorMessage;
 
   ScheduledDose? get nextDose => _nextDose;
   bool get isOverdue => _isOverdue;
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
 
   Future<void> loadNextDose() async {
     _isLoading = true;
@@ -65,11 +76,33 @@ class HomeViewModel extends ChangeNotifier {
         _nextDose = null;
         _isOverdue = false;
       }
-    } catch (e) {
-      debugPrint('Error loading next dose in HomeViewModel: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> logDose(ScheduledDose dose, DoseLogStatus status) async {
+    // Optimistic update
+    final previousNextDose = _nextDose;
+    final previousIsOverdue = _isOverdue;
+
+    _nextDose = null;
+    _isOverdue = false;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _notificationController.logDose(dose: dose, status: status);
+      // Success: we just need to load the *actual* next dose now to be sure
+      await loadNextDose();
+    } catch (e) {
+      // Rollback
+      _nextDose = previousNextDose;
+      _isOverdue = previousIsOverdue;
+      _errorMessage = 'Failed to log dose. Please try again.';
+      notifyListeners();
+      rethrow;
     }
   }
 }

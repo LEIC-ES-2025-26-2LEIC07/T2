@@ -141,8 +141,8 @@ void main() {
       expect(find.text('Overdue dose'), findsOneWidget);
       expect(find.text('Lisinopril • 10mg'), findsOneWidget);
 
-      // Tap Log Overdue Dose
-      await tester.tap(find.text('Log Overdue Dose'));
+      // Tap View Details (to go to DoseLoggingScreen)
+      await tester.tap(find.text('View Details'));
       await tester.pumpAndSettle();
 
       // Verify we are on DoseLoggingScreen
