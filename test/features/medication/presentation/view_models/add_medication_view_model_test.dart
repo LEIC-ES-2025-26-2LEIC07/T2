@@ -70,159 +70,162 @@ class _NetworkErrorRepo implements MedicationRepository {
 // ── Tests ───────────────────────────────────────────────────────────
 
 void main() {
-    final mockController = MockMissedDoseNotificationController();
-    final mockScheduling = MockDoseSchedulingService();
+  final mockController = MockMissedDoseNotificationController();
+  final mockScheduling = MockDoseSchedulingService();
 
-    // Stubbing for the happy-path logic
-    when(() => mockScheduling.calculateUpcomingDoses(any(), any()))
-        .thenReturn([]);
+  // Stubbing for the happy-path logic
+  when(
+    () => mockScheduling.calculateUpcomingDoses(any(), any()),
+  ).thenReturn([]);
 
-    vmFactory({MedicationRepository? repo}) => AddMedicationViewModel(
-      repository: repo ?? _SuccessRepo(),
-      notificationController: mockController,
-      schedulingService: mockScheduling,
-    );
+  vmFactory({MedicationRepository? repo}) => AddMedicationViewModel(
+    repository: repo ?? _SuccessRepo(),
+    notificationController: mockController,
+    schedulingService: mockScheduling,
+  );
 
-    setUpAll(() {
-      registerFallbackValue(Medication(
+  setUpAll(() {
+    registerFallbackValue(
+      Medication(
         id: '',
         userId: '',
         name: '',
         color: Colors.black,
         createdAt: DateTime(2000),
-      ));
-      registerFallbackValue(<MedicationReminder>[]);
+      ),
+    );
+    registerFallbackValue(<MedicationReminder>[]);
+  });
+
+  group('AddMedicationViewModel – validation', () {
+    test('submit with empty name sets nameError', () async {
+      final vm = vmFactory();
+      vm.setDosage('10mg');
+      await vm.submit();
+
+      expect(vm.nameError, isNotNull);
+      expect(vm.isSuccess, isFalse);
+      expect(vm.isLoading, isFalse);
     });
 
-    group('AddMedicationViewModel – validation', () {
-      test('submit with empty name sets nameError', () async {
-        final vm = vmFactory();
-        vm.setDosage('10mg');
-        await vm.submit();
+    test('submit with empty dosage sets dosageError', () async {
+      final vm = vmFactory();
+      vm.setName('Lisinopril');
+      await vm.submit();
 
-        expect(vm.nameError, isNotNull);
-        expect(vm.isSuccess, isFalse);
-        expect(vm.isLoading, isFalse);
-      });
-
-      test('submit with empty dosage sets dosageError', () async {
-        final vm = vmFactory();
-        vm.setName('Lisinopril');
-        await vm.submit();
-
-        expect(vm.dosageError, isNotNull);
-        expect(vm.isSuccess, isFalse);
-      });
-
-      test('submit with both blank fields sets both errors', () async {
-        final vm = vmFactory();
-        await vm.submit();
-
-        expect(vm.nameError, isNotNull);
-        expect(vm.dosageError, isNotNull);
-      });
-
-      test('setName clears nameError', () async {
-        final vm = vmFactory();
-        await vm.submit(); // triggers nameError
-        expect(vm.nameError, isNotNull);
-        vm.setName('Aspirin');
-        expect(vm.nameError, isNull);
-      });
+      expect(vm.dosageError, isNotNull);
+      expect(vm.isSuccess, isFalse);
     });
 
-    group('AddMedicationViewModel – happy path', () {
-      test('sets isSuccess after successful submit', () async {
-        final repo = _SuccessRepo();
-        final vm = vmFactory(repo: repo);
-        vm.setName('Lisinopril');
-        vm.setDosage('10 mg');
-        await vm.submit();
+    test('submit with both blank fields sets both errors', () async {
+      final vm = vmFactory();
+      await vm.submit();
 
-        expect(vm.isSuccess, isTrue);
-        expect(vm.errorMessage, isNull);
-        expect(repo.addCalled, isTrue);
-      });
-
-      test('isDirty becomes false after successful submit', () async {
-        final vm = vmFactory();
-        vm.setName('Med');
-        vm.setDosage('5mg');
-        expect(vm.isDirty, isTrue);
-        await vm.submit();
-        expect(vm.isDirty, isFalse);
-      });
-
-      test('payload contains selected colour', () async {
-        AddMedicationPayload? captured;
-        final repo = _CapturingRepo((p) => captured = p);
-        final vm = vmFactory(repo: repo);
-        vm.setName('Med');
-        vm.setDosage('5mg');
-        vm.setColor(const Color(0xFFE53935));
-        await vm.submit();
-
-        expect(captured?.color, equals(const Color(0xFFE53935)));
-      });
+      expect(vm.nameError, isNotNull);
+      expect(vm.dosageError, isNotNull);
     });
 
-    group('AddMedicationViewModel – rollback path', () {
-      test('sets errorMessage when MedicationSaveException is thrown', () async {
-        final vm = vmFactory(repo: _RollbackRepo());
-        vm.setName('Med');
-        vm.setDosage('5mg');
-        await vm.submit();
+    test('setName clears nameError', () async {
+      final vm = vmFactory();
+      await vm.submit(); // triggers nameError
+      expect(vm.nameError, isNotNull);
+      vm.setName('Aspirin');
+      expect(vm.nameError, isNull);
+    });
+  });
 
-        expect(vm.isSuccess, isFalse);
-        expect(vm.errorMessage, contains('rolled back'));
-      });
+  group('AddMedicationViewModel – happy path', () {
+    test('sets isSuccess after successful submit', () async {
+      final repo = _SuccessRepo();
+      final vm = vmFactory(repo: repo);
+      vm.setName('Lisinopril');
+      vm.setDosage('10 mg');
+      await vm.submit();
 
-      test('sets generic errorMessage on unknown exception', () async {
-        final vm = vmFactory(repo: _NetworkErrorRepo());
-        vm.setName('Med');
-        vm.setDosage('5mg');
-        await vm.submit();
-
-        expect(vm.errorMessage, isNotNull);
-        expect(vm.isSuccess, isFalse);
-      });
+      expect(vm.isSuccess, isTrue);
+      expect(vm.errorMessage, isNull);
+      expect(repo.addCalled, isTrue);
     });
 
-    group('AddMedicationViewModel – colour picker', () {
-      test('setColor updates selectedColor', () {
-        final vm = vmFactory();
-        vm.setColor(const Color(0xFFE53935));
-        expect(vm.selectedColor, equals(const Color(0xFFE53935)));
-      });
-
-      test('setColor marks form as dirty', () {
-        final vm = vmFactory();
-        expect(vm.isDirty, isFalse);
-        vm.setColor(const Color(0xFF43A047));
-        expect(vm.isDirty, isTrue);
-      });
+    test('isDirty becomes false after successful submit', () async {
+      final vm = vmFactory();
+      vm.setName('Med');
+      vm.setDosage('5mg');
+      expect(vm.isDirty, isTrue);
+      await vm.submit();
+      expect(vm.isDirty, isFalse);
     });
 
-    group('AddMedicationViewModel – reminder slots', () {
-      test('Twice daily produces two reminder slots', () {
-        final vm = vmFactory();
-        vm.setFrequency('Twice daily');
-        expect(vm.reminderTimes.length, 2);
-      });
+    test('payload contains selected colour', () async {
+      AddMedicationPayload? captured;
+      final repo = _CapturingRepo((p) => captured = p);
+      final vm = vmFactory(repo: repo);
+      vm.setName('Med');
+      vm.setDosage('5mg');
+      vm.setColor(const Color(0xFFE53935));
+      await vm.submit();
 
-      test('Three times daily produces three slots', () {
-        final vm = vmFactory();
-        vm.setFrequency('Three times daily');
-        expect(vm.reminderTimes.length, 3);
-      });
-
-      test('switching back to Once daily reduces to one slot', () {
-        final vm = vmFactory();
-        vm.setFrequency('Three times daily');
-        vm.setFrequency('Once daily');
-        expect(vm.reminderTimes.length, 1);
-      });
+      expect(captured?.color, equals(const Color(0xFFE53935)));
     });
+  });
+
+  group('AddMedicationViewModel – rollback path', () {
+    test('sets errorMessage when MedicationSaveException is thrown', () async {
+      final vm = vmFactory(repo: _RollbackRepo());
+      vm.setName('Med');
+      vm.setDosage('5mg');
+      await vm.submit();
+
+      expect(vm.isSuccess, isFalse);
+      expect(vm.errorMessage, contains('rolled back'));
+    });
+
+    test('sets generic errorMessage on unknown exception', () async {
+      final vm = vmFactory(repo: _NetworkErrorRepo());
+      vm.setName('Med');
+      vm.setDosage('5mg');
+      await vm.submit();
+
+      expect(vm.errorMessage, isNotNull);
+      expect(vm.isSuccess, isFalse);
+    });
+  });
+
+  group('AddMedicationViewModel – colour picker', () {
+    test('setColor updates selectedColor', () {
+      final vm = vmFactory();
+      vm.setColor(const Color(0xFFE53935));
+      expect(vm.selectedColor, equals(const Color(0xFFE53935)));
+    });
+
+    test('setColor marks form as dirty', () {
+      final vm = vmFactory();
+      expect(vm.isDirty, isFalse);
+      vm.setColor(const Color(0xFF43A047));
+      expect(vm.isDirty, isTrue);
+    });
+  });
+
+  group('AddMedicationViewModel – reminder slots', () {
+    test('Twice daily produces two reminder slots', () {
+      final vm = vmFactory();
+      vm.setFrequency('Twice daily');
+      expect(vm.reminderTimes.length, 2);
+    });
+
+    test('Three times daily produces three slots', () {
+      final vm = vmFactory();
+      vm.setFrequency('Three times daily');
+      expect(vm.reminderTimes.length, 3);
+    });
+
+    test('switching back to Once daily reduces to one slot', () {
+      final vm = vmFactory();
+      vm.setFrequency('Three times daily');
+      vm.setFrequency('Once daily');
+      expect(vm.reminderTimes.length, 1);
+    });
+  });
 }
 
 // Helper capturing repo

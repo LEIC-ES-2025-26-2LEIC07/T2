@@ -1,3 +1,6 @@
+import 'package:clinic_go/features/medication/data/medication_repository.dart';
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
@@ -7,25 +10,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mocktail/mocktail.dart';
 import 'helpers/mocks.dart';
 import 'helpers/medication_mocks.dart';
+
+class MockMedicationRepository extends Mock implements MedicationRepository {}
 
 void main() {
   late MemoryNotificationGateway notificationGateway;
   late InMemoryDoseLogRepository doseLogRepository;
+  late MockMedicationRepository medicationRepository;
   late MissedDoseNotificationController controller;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await GetIt.I.reset();
+
     notificationGateway = MemoryNotificationGateway();
     doseLogRepository = InMemoryDoseLogRepository();
+    medicationRepository = MockMedicationRepository();
+
+    // Stub medication methods to return empty lists by default
+    when(() => medicationRepository.fetchMedications()).thenAnswer((_) async => []);
+    when(() => medicationRepository.fetchAllReminders()).thenAnswer((_) async => []);
+
     controller = MissedDoseNotificationController(
       notificationGateway: notificationGateway,
       doseLogRepository: doseLogRepository,
       pendingNotificationStore: const PendingNotificationStore(),
     );
 
+    GetIt.I.registerSingleton<MedicationRepository>(medicationRepository);
+    GetIt.I.registerSingleton<DoseLogRepository>(doseLogRepository);
+    GetIt.I.registerSingleton<DoseSchedulingService>(const DoseSchedulingService());
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
   });
@@ -50,6 +67,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
+      await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.text('What do you need?'), findsOneWidget);
       expect(find.text('Open overdue dose'), findsOneWidget);
@@ -59,6 +77,7 @@ void main() {
       'deep-links to the dose logging screen with overdue messaging',
       (WidgetTester tester) async {
         await tester.pumpWidget(const ClinicGO());
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Open overdue dose'));
         await tester.pumpAndSettle();
         expect(find.text('Dose Logging'), findsOneWidget);
@@ -84,6 +103,7 @@ void main() {
       GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
 
       await tester.pumpWidget(const ClinicGO());
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Open overdue dose'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Mark as Taken'));
