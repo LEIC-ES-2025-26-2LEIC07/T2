@@ -145,14 +145,15 @@ class _HomeContentState extends State<HomeContent> {
             ? const Color(0xFFE53935)
             : Colors.black87;
 
-        return Center(
+        return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('Welcome to ClinicGO!'),
-                const SizedBox(height: 24),
+                const SizedBox(height: 80),
                 if (nextDose == null)
                   Container(
                     width: double.infinity,

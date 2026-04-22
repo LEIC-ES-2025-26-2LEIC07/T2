@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:clinic_go/core/di/service_locator.dart';
-import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
+
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -91,7 +91,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: doses.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            separatorBuilder: (_, _) => const SizedBox(height: 12),
             itemBuilder: (context, i) {
               final item = doses[i];
               final scheduledLabel = TimeOfDay.fromDateTime(
@@ -145,27 +145,27 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                 onPressed: item.isSubmitting
                                     ? null
                                     : () async {
+                                        final messenger = ScaffoldMessenger.of(
+                                          context,
+                                        );
+                                        final navigator = Navigator.of(context);
                                         try {
                                           await _viewModel.logDose(
                                             dose: item.dose,
                                             status: DoseLogStatus.taken,
                                           );
                                           if (!mounted) return;
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
+                                          messenger.showSnackBar(
                                             const SnackBar(
                                               content: Text(
                                                 'Dose marked as taken.',
                                               ),
                                             ),
                                           );
-                                          Navigator.of(context).pop(true);
+                                          navigator.pop(true);
                                         } catch (e) {
                                           if (!mounted) return;
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
+                                          messenger.showSnackBar(
                                             const SnackBar(
                                               content: Text(
                                                 'Network error. Please try again.',
@@ -190,27 +190,27 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                               onPressed: item.isSubmitting
                                   ? null
                                   : () async {
+                                      final messenger = ScaffoldMessenger.of(
+                                        context,
+                                      );
+                                      final navigator = Navigator.of(context);
                                       try {
                                         await _viewModel.logDose(
                                           dose: item.dose,
                                           status: DoseLogStatus.skipped,
                                         );
                                         if (!mounted) return;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
+                                        messenger.showSnackBar(
                                           const SnackBar(
                                             content: Text(
                                               'Dose marked as skipped.',
                                             ),
                                           ),
                                         );
-                                        Navigator.of(context).pop(true);
+                                        navigator.pop(true);
                                       } catch (e) {
                                         if (!mounted) return;
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
+                                        messenger.showSnackBar(
                                           const SnackBar(
                                             content: Text(
                                               'Network error. Please try again.',
