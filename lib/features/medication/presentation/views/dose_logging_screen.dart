@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
@@ -22,6 +24,8 @@ class DoseLoggingScreen extends StatefulWidget {
 
 class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
   bool _isSubmitting = false;
+  DoseLogStatus? _completedStatus;
+  DateTime? _completedAt;
 
   @override
   Widget build(BuildContext context) {
@@ -57,33 +61,63 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
             const SizedBox(height: 8),
             Text('${widget.dose.dosage} scheduled for $scheduledLabel'),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : () => _logDose(
-                      context,
-                      status: DoseLogStatus.taken,
-                      successMessage: 'Dose marked as taken.',
+            if (_completedStatus == null) ...[
+              FilledButton(
+                onPressed: _isSubmitting
+                    ? null
+                    : () => _logDose(
+                        context,
+                        status: DoseLogStatus.taken,
+                        successMessage: 'Dose marked as taken.',
+                      ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Mark as Taken'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton(
+                onPressed: _isSubmitting
+                    ? null
+                    : () => _logDose(
+                        context,
+                        status: DoseLogStatus.skipped,
+                        successMessage: 'Dose marked as skipped.',
+                      ),
+                child: const Text('Skip Dose'),
+              ),
+            ] else ...[
+              Row(
+                children: [
+                  Icon(
+                    _completedStatus == DoseLogStatus.taken
+                        ? Icons.check_circle_outline
+                        : Icons.block,
+                    color: _completedStatus == DoseLogStatus.taken ? Colors.green : Colors.orange,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _completedStatus == DoseLogStatus.taken
+                          ? 'Marked as taken at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}'
+                          : 'Marked as skipped at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Mark as Taken'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : () => _logDose(
-                      context,
-                      status: DoseLogStatus.skipped,
-                      successMessage: 'Dose marked as skipped.',
-                    ),
-              child: const Text('Skip Dose'),
-            ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Done'),
+              ),
+            ],
           ],
         ),
       ),
@@ -95,39 +129,45 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
     required DoseLogStatus status,
     required String successMessage,
   }) async {
+    // Optimistic UI: mark completed locally immediately
+    final now = DateTime.now();
     setState(() {
+      _completedStatus = status;
+      _completedAt = now;
       _isSubmitting = true;
     });
 
     try {
-      await widget.controller.logDose(dose: widget.dose, status: status);
-      if (!context.mounted) {
-        return;
-      }
+      await widget.controller.logDose(dose: widget.dose, status: status, loggedAt: now);
+      if (!context.mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(successMessage)));
-
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(successMessage)));
       Navigator.of(context).pop(true);
-    } catch (_) {
-      if (!context.mounted) {
-        return;
+    } catch (e, st) {
+      // rollback optimistic update
+      if (!context.mounted) return;
+      setState(() {
+        _completedStatus = null;
+        _completedAt = null;
+        _isSubmitting = false;
+      });
+
+      // Provide more specific feedback for common failures
+      String message = 'We could not save this dose right now. Please try again.';
+      if (e is StateError && e.message.contains('Authentication')) {
+        message = 'You must be signed in to log doses.';
+      } else if (e is SocketException) {
+        message = 'Network error. Please check your connection and try again.';
       }
+
+      debugPrint('DoseLoggingScreen._logDose error: $e');
+      debugPrintStack(stackTrace: st);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'We could not save this dose right now. Please try again.',
-          ),
+        SnackBar(
+          content: Text(message),
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
     }
   }
 }
