@@ -22,11 +22,13 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = widget.viewModel ?? DailyDosesViewModel(
-      repository: getIt<MedicationRepository>(),
-      schedulingService: getIt<DoseSchedulingService>(),
-      logRepository: getIt<DoseLogRepository>(),
-    );
+    _viewModel =
+        widget.viewModel ??
+        DailyDosesViewModel(
+          repository: getIt<MedicationRepository>(),
+          schedulingService: getIt<DoseSchedulingService>(),
+          logRepository: getIt<DoseLogRepository>(),
+        );
 
     if (widget.viewModel == null) {
       _viewModel.loadTodayDoses();
@@ -74,7 +76,11 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.event_available_outlined, size: 64, color: Colors.black38),
+                  const Icon(
+                    Icons.event_available_outlined,
+                    size: 64,
+                    color: Colors.black38,
+                  ),
                   const SizedBox(height: 12),
                   const Text('No scheduled doses for today.'),
                 ],
@@ -88,13 +94,17 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, i) {
               final item = doses[i];
-              final scheduledLabel = TimeOfDay.fromDateTime(item.dose.scheduledTime).format(context);
+              final scheduledLabel = TimeOfDay.fromDateTime(
+                item.dose.scheduledTime,
+              ).format(context);
 
               final completed = item.status != null;
 
               return Card(
                 color: completed ? Colors.grey.shade200 : Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
@@ -106,9 +116,17 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(item.dose.medicationName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                Text(
+                                  item.dose.medicationName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
-                                Text('${item.dose.dosage} • $scheduledLabel', style: const TextStyle(color: Colors.black54)),
+                                Text(
+                                  '${item.dose.dosage} • $scheduledLabel',
+                                  style: const TextStyle(color: Colors.black54),
+                                ),
                               ],
                             ),
                           ),
@@ -128,17 +146,42 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                     ? null
                                     : () async {
                                         try {
-                                          await _viewModel.logDose(dose: item.dose, status: DoseLogStatus.taken);
+                                          await _viewModel.logDose(
+                                            dose: item.dose,
+                                            status: DoseLogStatus.taken,
+                                          );
                                           if (!mounted) return;
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dose marked as taken.')));
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Dose marked as taken.',
+                                              ),
+                                            ),
+                                          );
                                           Navigator.of(context).pop(true);
                                         } catch (e) {
                                           if (!mounted) return;
-                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Network error. Please try again.')));
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Network error. Please try again.',
+                                              ),
+                                            ),
+                                          );
                                         }
                                       },
                                 child: item.isSubmitting
-                                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
                                     : const Text('Take'),
                               ),
                             ),
@@ -148,13 +191,32 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                   ? null
                                   : () async {
                                       try {
-                                        await _viewModel.logDose(dose: item.dose, status: DoseLogStatus.skipped);
+                                        await _viewModel.logDose(
+                                          dose: item.dose,
+                                          status: DoseLogStatus.skipped,
+                                        );
                                         if (!mounted) return;
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dose marked as skipped.')));
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Dose marked as skipped.',
+                                            ),
+                                          ),
+                                        );
                                         Navigator.of(context).pop(true);
                                       } catch (e) {
                                         if (!mounted) return;
-                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Network error. Please try again.')));
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Network error. Please try again.',
+                                            ),
+                                          ),
+                                        );
                                       }
                                     },
                               child: const Text('Skip'),

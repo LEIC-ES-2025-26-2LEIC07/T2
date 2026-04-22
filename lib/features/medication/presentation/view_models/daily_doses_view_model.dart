@@ -31,9 +31,9 @@ class DailyDosesViewModel extends ChangeNotifier {
     required MedicationRepository repository,
     required DoseSchedulingService schedulingService,
     required DoseLogRepository logRepository,
-  })  : _repository = repository,
-        _schedulingService = schedulingService,
-        _logRepository = logRepository;
+  }) : _repository = repository,
+       _schedulingService = schedulingService,
+       _logRepository = logRepository;
 
   final MedicationRepository _repository;
   final DoseSchedulingService _schedulingService;

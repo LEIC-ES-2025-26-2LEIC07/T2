@@ -5,7 +5,10 @@ class SupabaseConfig {
   static void validate() {
     final parsedUrl = Uri.tryParse(url);
 
-    if (url.isEmpty || parsedUrl == null || !parsedUrl.hasScheme || parsedUrl.host.isEmpty) {
+    if (url.isEmpty ||
+        parsedUrl == null ||
+        !parsedUrl.hasScheme ||
+        parsedUrl.host.isEmpty) {
       throw StateError(
         'Configuração do Supabase inválida: define SUPABASE_URL com o URL do projeto '
         '(ex.: https://teu-projeto.supabase.co).',

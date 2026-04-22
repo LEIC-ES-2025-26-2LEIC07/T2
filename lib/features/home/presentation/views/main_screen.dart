@@ -244,11 +244,12 @@ class _HomeContentState extends State<HomeContent> {
                         const SizedBox(height: 8),
                         FilledButton(
                           onPressed: () async {
-                            final result = await Navigator.of(context).push<bool>(
-                              MaterialPageRoute(
-                                builder: (_) => const DailyDosesScreen(),
-                              ),
-                            );
+                            final result = await Navigator.of(context)
+                                .push<bool>(
+                                  MaterialPageRoute(
+                                    builder: (_) => const DailyDosesScreen(),
+                                  ),
+                                );
                             if (result == true) {
                               _viewModel.loadNextDose();
                             }

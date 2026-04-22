@@ -96,7 +96,9 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                     _completedStatus == DoseLogStatus.taken
                         ? Icons.check_circle_outline
                         : Icons.block,
-                    color: _completedStatus == DoseLogStatus.taken ? Colors.green : Colors.orange,
+                    color: _completedStatus == DoseLogStatus.taken
+                        ? Colors.green
+                        : Colors.orange,
                     size: 28,
                   ),
                   const SizedBox(width: 12),
@@ -138,10 +140,16 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
     });
 
     try {
-      await widget.controller.logDose(dose: widget.dose, status: status, loggedAt: now);
+      await widget.controller.logDose(
+        dose: widget.dose,
+        status: status,
+        loggedAt: now,
+      );
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(successMessage)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(successMessage)));
       Navigator.of(context).pop(true);
     } catch (e, st) {
       // rollback optimistic update
@@ -153,7 +161,8 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
       });
 
       // Provide more specific feedback for common failures
-      String message = 'We could not save this dose right now. Please try again.';
+      String message =
+          'We could not save this dose right now. Please try again.';
       if (e is StateError && e.message.contains('Authentication')) {
         message = 'You must be signed in to log doses.';
       } else if (e is SocketException) {
@@ -163,11 +172,9 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
       debugPrint('DoseLoggingScreen._logDose error: $e');
       debugPrintStack(stackTrace: st);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 }
