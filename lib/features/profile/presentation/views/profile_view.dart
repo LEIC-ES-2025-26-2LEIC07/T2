@@ -69,10 +69,6 @@ class _ProfileViewState extends State<ProfileView> {
           width: double.infinity,
           height: double.infinity,
           margin: const EdgeInsets.only(bottom: 90),
-          decoration: BoxDecoration(
-            color: const Color(0xFF4E84E5),
-            borderRadius: BorderRadius.circular(36),
-          ),
           child: Center(
             child: AnimatedBuilder(
               animation: _viewModel,
