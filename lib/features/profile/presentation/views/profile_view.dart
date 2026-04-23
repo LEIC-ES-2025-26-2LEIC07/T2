@@ -6,6 +6,7 @@ import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -139,23 +140,6 @@ class _LoginForm extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const _SocialLoginButton(
-          icon: Icons.apple,
-          label: 'Continue with Apple',
-          iconColor: Colors.black,
-        ),
-        const SizedBox(height: 14),
-        const _SocialLoginButton(
-          label: 'Continue with Google',
-          customIconText: 'G',
-          customIconColor: Color(0xFFEA4335),
-        ),
-        const SizedBox(height: 14),
-        const _SocialLoginButton(
-          icon: Icons.facebook,
-          label: 'Continue with Facebook',
-          iconColor: Color(0xFF1877F2),
-        ),
         const SizedBox(height: 26),
         const _LoginDivider(),
         const SizedBox(height: 24),
@@ -256,7 +240,7 @@ class _LoggedInCard extends StatelessWidget {
           width: 195,
           height: 58,
           child: ElevatedButton(
-            onPressed: viewModel.isLoading ? null : onLogoutPressed,
+            onPressed: () {Navigator.of(context).pushNamed(AppRouter.login);},         
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: AppColors.primaryColor,

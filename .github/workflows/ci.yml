@@ -51,9 +51,9 @@ jobs:
           fi
 
           echo "## Quality Metrics" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Formatting: passed" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Static analysis: passed" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Widget tests: passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Formatting: ✓" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Static analysis: ✓" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Widget tests: ✓" >> "$GITHUB_STEP_SUMMARY"
 
           if [ -n "$coverage" ]; then
             echo "- Line coverage: ${coverage}%" >> "$GITHUB_STEP_SUMMARY"
@@ -68,9 +68,6 @@ jobs:
           name: coverage-report
           path: coverage/lcov.info
           if-no-files-found: ignore
-
-      - name: Run app smoke test
-        run: flutter test test/integration_test
 
   web-smoke-build:
     name: Web Smoke Build

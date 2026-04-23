@@ -6,22 +6,12 @@ import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/widgets/notification_lifecycle_wrapper.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
-
-// Credentials are injected at build time via --dart-define-from-file=.env
-// and must never be committed as plain strings.
-const _supabaseUrl = String.fromEnvironment(
-  'NEXT_PUBLIC_SUPABASE_URL',
-  defaultValue: 'https://test.supabase.co',
-);
-const _supabaseAnonKey = String.fromEnvironment(
-  'SB_PV_KEY',
-  defaultValue: 'test-anon-key',
-);
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(url: _supabaseUrl, anonKey: _supabaseAnonKey);
+  await dotenv.load(fileName: '.env');
+  await Supabase.initialize(url:dotenv.env['NEXT_PUBLIC_SUPABASE_URL']!, anonKey: dotenv.env['SB_PV_KEY']!);
 
   final navigatorKey = GlobalKey<NavigatorState>();
   final initialPayload = await setupServiceLocator(navigatorKey);
@@ -35,6 +25,7 @@ Future<void> main() async {
 }
 
 class ClinicGO extends StatefulWidget {
+  // routes: {}
   const ClinicGO({
     super.key,
     this.navigatorKey,
