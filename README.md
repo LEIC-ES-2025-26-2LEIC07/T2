@@ -354,10 +354,31 @@ You can find below information and references related to the project management 
     * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
 
 ### Sprint 1
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/efcaed02-e470-452a-be86-48606d606afd" />
 
+* **Did well:**
+    * **Database integration**.
+    * **:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase**.
+* **Do differently:**
+    * **Team Balance & Participation:** **Improve workload distribution.** During this sprint, the team did not function at its best as the vast majority of the work was carried out by only a few members. We need to ensure everyone is actively contributing to avoid bottlenecks.
+    * **Time Management:** Start iterations immediately to prevent "crunching" at the end of the sprint and to account for unexpected technical hurdles.
+    * **Git Workflow:** Strictly enforce the use of feature branches and pull requests for every task to maintain code quality and visibility.
+    * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
+
+* **Puzzles:**
+    * **Tech Stack Proficiency:** Getting the entire team up to speed with **Flutter** and **Supabase** to ensure everyone can contribute technically.
+    * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
+      
+<div align="center" justify="center">
+  <p>Start of Sprint 0</p>
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/efcaed02-e470-452a-be86-48606d606afd" />
+  <p>End of Sprint 0</p>
+<img width="1856" height="956" alt="image" src="https://github.com/user-attachments/assets/9943e5f3-a8f8-446e-90d9-24363cadec65" />
+</div>
 
 ### Sprint 2
+
+<img width="897" height="956" alt="image" src="https://github.com/user-attachments/assets/7381f93d-c03f-42e3-891f-c2463672c3b9" />
+
 
 ### Sprint 3
 
