@@ -48,7 +48,7 @@ class DoseSchedulingService {
         if (scheduledTime.isAfter(now) && scheduledTime.isBefore(end)) {
           doses.add(
             ScheduledDose(
-              id: _generateStableId(medication.id, scheduledTime),
+              id: _generateStableId(reminder.id!, scheduledTime),
               medicationId: medication.id,
               medicationName: medication.name,
               dosage: medication.dosage ?? '',
@@ -85,9 +85,9 @@ class DoseSchedulingService {
     }
   }
 
-  String _generateStableId(String medicationId, DateTime time) {
-    // Stable ID based on medication and exact time to avoid duplicates
+  String _generateStableId(String reminderId, DateTime time) {
+    // Stable ID based on reminder and exact time to avoid duplicates
     final timestamp = time.millisecondsSinceEpoch ~/ 1000;
-    return '${medicationId}_$timestamp';
+    return '${reminderId}_$timestamp';
   }
 }

@@ -28,7 +28,7 @@ class MedicationReminder {
 
   factory MedicationReminder.fromJson(Map<String, dynamic> json) =>
       MedicationReminder(
-        id: json['id'] as String?,
+        id: json['id']?.toString(),
         medicationId: json['medication_id'] as String,
         reminderTime: json['reminder_time'] as String,
         daysOfWeek: (json['days_of_week'] as List<dynamic>).cast<String>(),

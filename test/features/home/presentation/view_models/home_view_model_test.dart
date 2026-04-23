@@ -210,7 +210,7 @@ void main() {
           0,
         ).add(Duration(days: i));
         final timestamp = d.millisecondsSinceEpoch ~/ 1000;
-        final doseId = '${med.id}_$timestamp';
+        final doseId = '${reminders.first.id}_$timestamp';
         mockLogRepository.seedLoggedDose(doseId);
       }
 
