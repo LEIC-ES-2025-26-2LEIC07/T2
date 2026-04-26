@@ -14,7 +14,8 @@ import 'package:get_it/get_it.dart';
 
 class _EmptyRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async => [];
@@ -28,7 +29,8 @@ class _EmptyRepo implements MedicationRepository {
 
 class _LoadedRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async => [
@@ -61,7 +63,8 @@ class _LoadedRepo implements MedicationRepository {
 
 class _ErrorRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async =>

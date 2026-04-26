@@ -8,6 +8,11 @@ class SupabaseDoseLogRepository implements DoseLogRepository {
 
   final SupabaseClient _client;
 
+  static final _uuidPattern = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
+  static bool _isValidUuid(String s) => _uuidPattern.hasMatch(s);
+
   @override
   Future<void> insertDoseLog({
     required ScheduledDose dose,
@@ -16,6 +21,8 @@ class SupabaseDoseLogRepository implements DoseLogRepository {
   }) async {
     final lastUnderscore = dose.id.lastIndexOf('_');
     final reminderId = dose.id.substring(0, lastUnderscore);
+
+    if (!_isValidUuid(reminderId)) return;
 
     await _client.from('medication_logs').insert({
       'reminder_id': reminderId,
@@ -30,6 +37,9 @@ class SupabaseDoseLogRepository implements DoseLogRepository {
 
     final lastUnderscore = doseId.lastIndexOf('_');
     final reminderId = doseId.substring(0, lastUnderscore);
+
+    if (!_isValidUuid(reminderId)) return false;
+
     final epochSeconds = int.parse(doseId.substring(lastUnderscore + 1));
     final scheduledTime = DateTime.fromMillisecondsSinceEpoch(
       epochSeconds * 1000,

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ClinicGo"
+    namespace = "com.example.clinic_go"
     compileSdk = flutter.compileSdkVersion
 
     ndkVersion = "28.2.13676358"
@@ -23,7 +23,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.four_u_app"
+        applicationId = "com.example.clinic_go"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
