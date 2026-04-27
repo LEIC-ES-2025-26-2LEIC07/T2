@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/color_palette/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
@@ -60,6 +61,7 @@ class _ClinicGOState extends State<ClinicGO> {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+          textTheme: GoogleFonts.poppinsTextTheme(),
         ),
         onGenerateRoute: AppRouter.onGenerateRoute,
         home: const MainScreen(),

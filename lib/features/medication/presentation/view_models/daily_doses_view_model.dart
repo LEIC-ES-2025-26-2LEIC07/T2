@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
+import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 
 class DoseItem {
-  DoseItem({required this.dose});
+  DoseItem({required this.dose, this.medication});
 
   final ScheduledDose dose;
+  final Medication? medication;
   DoseLogStatus? status;
   DateTime? takenTime;
   bool isSubmitting = false;
@@ -18,7 +20,7 @@ class DoseItem {
     DateTime? takenTime,
     bool? isSubmitting,
   }) {
-    final out = DoseItem(dose: dose)
+    final out = DoseItem(dose: dose, medication: medication)
       ..status = status ?? this.status
       ..takenTime = takenTime ?? this.takenTime
       ..isSubmitting = isSubmitting ?? this.isSubmitting;
@@ -56,6 +58,8 @@ class DailyDosesViewModel extends ChangeNotifier {
       final medications = await _repository.fetchMedications();
       final reminders = await _repository.fetchAllReminders();
 
+      final medicationById = {for (final med in medications) med.id: med};
+
       final now = DateTime.now();
       final allUpcoming = <ScheduledDose>[];
 
@@ -75,7 +79,10 @@ class DailyDosesViewModel extends ChangeNotifier {
       for (final dose in allUpcoming) {
         final already = await _safeHasDoseLog(dose.id);
         if (!already) {
-          pending.add(DoseItem(dose: dose));
+          pending.add(DoseItem(
+            dose: dose,
+            medication: medicationById[dose.medicationId],
+          ));
         }
       }
 
