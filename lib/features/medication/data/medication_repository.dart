@@ -41,11 +41,23 @@ class MedicationSaveException implements Exception {
   String toString() => 'MedicationSaveException: $message';
 }
 
+/// Returned by [MedicationRepository.addMedication] — carries both the new
+/// medication UUID and the saved reminders (which now have Supabase-assigned IDs).
+class SavedMedicationResult {
+  const SavedMedicationResult({
+    required this.medicationId,
+    required this.reminders,
+  });
+
+  final String medicationId;
+  final List<MedicationReminder> reminders;
+}
+
 /// Abstract repository — keeps ViewModels and tests independent of Supabase.
 abstract class MedicationRepository {
   /// Inserts a medication + its reminders (with rollback on failure).
-  /// Returns the new medication's UUID on success.
-  Future<String> addMedication(AddMedicationPayload payload);
+  /// Returns the new medication UUID and saved reminders (with real IDs).
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload);
 
   /// Fetches all medications for the authenticated user (newest first).
   Future<List<Medication>> fetchMedications();

@@ -30,16 +30,16 @@ class Medication {
     id: json['id'] as String,
     userId: json['user_id'] as String,
     name: json['name'] as String,
-    dosage: json['dosage'] as String?,
-    frequency: json['frequency'] as String?,
-    color: colorFromHex(json['color'] as String? ?? '#4E84E5'),
+    dosage: json['dosage']?.toString(),
+    frequency: json['frequency']?.toString(),
+    color: colorFromHex(json['color']?.toString() ?? '#4E84E5'),
     startDate: json['start_date'] != null
         ? DateTime.parse(json['start_date'] as String)
         : null,
     endDate: json['end_date'] != null
         ? DateTime.parse(json['end_date'] as String)
         : null,
-    notes: json['notes'] as String?,
+    notes: json['notes']?.toString(),
     createdAt: DateTime.parse(json['created_at'] as String),
   );
 

@@ -11,7 +11,7 @@ class SupabaseMedicationRepository implements MedicationRepository {
   final SupabaseClient _client;
 
   @override
-  Future<String> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
     final user = _client.auth.currentUser;
     if (user == null) {
       throw const MedicationSaveException(
@@ -40,7 +40,7 @@ class SupabaseMedicationRepository implements MedicationRepository {
 
     final newMedicationId = medicationRow['id'] as String;
 
-    // ── Step 2: Bulk insert reminder rows ───────────────────────────
+    // ── Step 2: Bulk insert reminder rows and read back saved IDs ───
     try {
       final reminderRows = payload.reminderTimes
           .map(
@@ -52,7 +52,20 @@ class SupabaseMedicationRepository implements MedicationRepository {
           )
           .toList();
 
-      await _client.from('medication_reminders').insert(reminderRows);
+      final savedRows = await _client
+          .from('medication_reminders')
+          .insert(reminderRows)
+          .select();
+
+      final savedReminders = (savedRows as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map(MedicationReminder.fromJson)
+          .toList();
+
+      return SavedMedicationResult(
+        medicationId: newMedicationId,
+        reminders: savedReminders,
+      );
     } catch (e, stackTrace) {
       debugPrint('Error saving reminders: $e\n$stackTrace');
       // ── Rollback: remove the orphaned medication ──────────────────
@@ -63,8 +76,6 @@ class SupabaseMedicationRepository implements MedicationRepository {
       }
       throw MedicationSaveException('Reminders could not be saved: $e');
     }
-
-    return newMedicationId;
   }
 
   @override

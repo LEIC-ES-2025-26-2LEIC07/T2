@@ -1,7 +1,11 @@
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
+import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
+import 'package:clinic_go/features/medication/presentation/view_models/daily_doses_view_model.dart';
 import 'package:clinic_go/features/medication/presentation/views/medications_list_screen.dart';
+import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -10,7 +14,8 @@ import 'package:get_it/get_it.dart';
 
 class _EmptyRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async => [];
@@ -24,7 +29,8 @@ class _EmptyRepo implements MedicationRepository {
 
 class _LoadedRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async => [
@@ -57,7 +63,8 @@ class _LoadedRepo implements MedicationRepository {
 
 class _ErrorRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async => 'id';
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
+      const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
   Future<List<Medication>> fetchMedications() async =>
@@ -70,11 +77,33 @@ class _ErrorRepo implements MedicationRepository {
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
 }
 
+class _NoopDoseLogRepository implements DoseLogRepository {
+  @override
+  Future<bool> hasDoseLog(String doseId) async => false;
+
+  @override
+  Future<void> insertDoseLog({
+    required ScheduledDose dose,
+    required DoseLogStatus status,
+    required DateTime loggedAt,
+  }) async {}
+}
+
 // ── Helper ──────────────────────────────────────────────────────────
 
 Widget _buildScreen(MedicationRepository repo) {
   GetIt.I.registerSingleton<MedicationRepository>(repo);
-  return const MaterialApp(home: Scaffold(body: MedicationsListScreen()));
+  return MaterialApp(
+    home: Scaffold(
+      body: MedicationsListScreen(
+        dosesViewModel: DailyDosesViewModel(
+          repository: repo,
+          schedulingService: const DoseSchedulingService(),
+          logRepository: _NoopDoseLogRepository(),
+        ),
+      ),
+    ),
+  );
 }
 
 // ── Tests ───────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ import 'package:clinic_go/features/medication/services/dose_scheduling_service.d
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
 import 'package:intl/intl.dart';
 
@@ -144,14 +145,15 @@ class _HomeContentState extends State<HomeContent> {
             ? const Color(0xFFE53935)
             : Colors.black87;
 
-        return Center(
+        return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('Welcome to ClinicGO!'),
-                const SizedBox(height: 24),
+                const SizedBox(height: 80),
                 if (nextDose == null)
                   Container(
                     width: double.infinity,
@@ -239,6 +241,21 @@ class _HomeContentState extends State<HomeContent> {
                           child: Text(
                             isOverdue ? 'Log Overdue Dose' : 'Log Dose',
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        FilledButton(
+                          onPressed: () async {
+                            final result = await Navigator.of(context)
+                                .push<bool>(
+                                  MaterialPageRoute(
+                                    builder: (_) => const DailyDosesScreen(),
+                                  ),
+                                );
+                            if (result == true) {
+                              _viewModel.loadNextDose();
+                            }
+                          },
+                          child: const Text("Today's Schedule"),
                         ),
                       ],
                     ),

@@ -1,54 +1,56 @@
-name: Deploy
 
-on:
-  push:
-    branches:
-      - main
+# TOO EXPENSIVE TO RUN ON EVERY COMMIT :(
+# name: Deploy
 
-permissions:
-  contents: read
+# on:
+#   push:
+#     branches:
+#       - main
 
-concurrency:
-  group: deploy-production
-  cancel-in-progress: true
+# permissions:
+#   contents: read
 
-jobs:
-  android-artifact:
-    name: Android Release Artifact
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+# concurrency:
+#   group: deploy-production
+#   cancel-in-progress: true
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+# jobs:
+#   android-artifact:
+#     name: Android Release Artifact
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 30
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
+#     steps:
+#       - name: Check out repository
+#         uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
+#       - name: Set up Java
+#         uses: actions/setup-java@v4
+#         with:
+#           distribution: temurin
+#           java-version: "17"
 
-      - name: Install dependencies
-        run: flutter pub get
+#       - name: Set up Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           channel: stable
+#           cache: true
 
-      - name: Build release APK
-        env:
-          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
-        run: |
-          URL=$(echo "$SUPABASE_URL" | tr -d '\n\r')
-          KEY=$(echo "$SUPABASE_KEY" | tr -d '\n\r')
-          flutter build apk --release --dart-define="NEXT_PUBLIC_SUPABASE_URL=$URL" --dart-define="SB_PV_KEY=$KEY"
+#       - name: Install dependencies
+#         run: flutter pub get
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
+#       - name: Build release APK
+#         env:
+#           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+#           SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
+#         run: |
+#           URL=$(echo "$SUPABASE_URL" | tr -d '\n\r')
+#           KEY=$(echo "$SUPABASE_KEY" | tr -d '\n\r')
+#           flutter build apk --release --dart-define="NEXT_PUBLIC_SUPABASE_URL=$URL" --dart-define="SB_PV_KEY=$KEY"
+
+#       - name: Upload APK artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: android-release-apk
+#           path: build/app/outputs/flutter-apk/app-release.apk
+#           if-no-files-found: error

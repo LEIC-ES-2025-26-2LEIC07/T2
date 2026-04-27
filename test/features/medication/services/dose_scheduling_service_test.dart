@@ -67,7 +67,7 @@ void main() {
         expect(results.length, 2);
         expect(results[0].scheduledTime, DateTime(2026, 4, 20, 20, 0));
         expect(results[1].scheduledTime, DateTime(2026, 4, 21, 8, 0));
-        expect(results[0].id, contains('med-1_'));
+        expect(results[0].id, contains('rem-2_'));
       },
     );
 

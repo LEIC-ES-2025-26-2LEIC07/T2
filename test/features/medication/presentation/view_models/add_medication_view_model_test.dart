@@ -23,9 +23,9 @@ class _SuccessRepo implements MedicationRepository {
   bool addCalled = false;
 
   @override
-  Future<String> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
     addCalled = true;
-    return 'new-id-123';
+    return const SavedMedicationResult(medicationId: 'new-id-123', reminders: []);
   }
 
   @override
@@ -40,7 +40,7 @@ class _SuccessRepo implements MedicationRepository {
 
 class _RollbackRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload _) async =>
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload _) async =>
       throw const MedicationSaveException(
         'Reminders could not be saved and the medication was rolled back.',
       );
@@ -57,7 +57,7 @@ class _RollbackRepo implements MedicationRepository {
 
 class _NetworkErrorRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload _) async =>
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload _) async =>
       throw Exception('No internet');
 
   @override
@@ -246,9 +246,9 @@ class _CapturingRepo implements MedicationRepository {
   final void Function(AddMedicationPayload) onAdd;
 
   @override
-  Future<String> addMedication(AddMedicationPayload p) async {
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async {
     onAdd(p);
-    return 'id';
+    return const SavedMedicationResult(medicationId: 'id', reminders: []);
   }
 
   @override

@@ -3,7 +3,6 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
-import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 
 /// ViewModel for the Add Medication form.
 ///
@@ -150,7 +149,7 @@ class AddMedicationViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newMedicationId = await _repository.addMedication(
+      final result = await _repository.addMedication(
         AddMedicationPayload(
           name: name.trim(),
           dosage: dosage.trim(),
@@ -170,7 +169,7 @@ class AddMedicationViewModel extends ChangeNotifier {
       );
 
       // ── Step 2: Schedule notifications for the next 24 hours ────────
-      await _scheduleInitialNotifications(newMedicationId);
+      await _scheduleInitialNotifications(result);
 
       isSuccess = true;
       isDirty = false;
@@ -230,11 +229,10 @@ class AddMedicationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _scheduleInitialNotifications(String medicationId) async {
-    // Construct domain models from the current form state to avoid an extra fetch
+  Future<void> _scheduleInitialNotifications(SavedMedicationResult result) async {
     final medication = Medication(
-      id: medicationId,
-      userId: '', // Not needed for scheduling
+      id: result.medicationId,
+      userId: '',
       name: name.trim(),
       dosage: dosage.trim(),
       color: selectedColor,
@@ -244,20 +242,9 @@ class AddMedicationViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
     );
 
-    final reminders = reminderTimes
-        .map(
-          (t) => MedicationReminder(
-            medicationId: medicationId,
-            reminderTime:
-                '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:00',
-            daysOfWeek: daysOfWeek,
-          ),
-        )
-        .toList();
-
     final upcomingDoses = _schedulingService.calculateUpcomingDoses(
       medication,
-      reminders,
+      result.reminders,
     );
 
     for (final dose in upcomingDoses) {

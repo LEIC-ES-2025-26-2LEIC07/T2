@@ -13,6 +13,7 @@ class LoginViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   String? _errorMessage;
+  bool _success = false;
 
   /// Whether a network request is in flight.
   bool get isLoading => _isLoading;
@@ -20,6 +21,9 @@ class LoginViewModel extends ChangeNotifier {
   /// Non-null when the last sign-in attempt failed.
   /// Null on success or before any attempt.
   String? get errorMessage => _errorMessage;
+
+  /// True after a successful sign-in.
+  bool get success => _success;
 
   /// True once after a failed sign-in; the view must clear the password
   /// field when it observes this, then call [acknowledgePasswordClear].
@@ -60,7 +64,7 @@ class LoginViewModel extends ChangeNotifier {
 
     try {
       await _auth.signIn(email: cleanEmail, password: cleanPassword);
-      // Success — no error, no clear flag needed.
+      _success = true;
       _clearError();
     } on AuthException {
       // Always surface a generic message to avoid leaking Supabase internals.

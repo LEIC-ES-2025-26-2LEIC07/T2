@@ -25,11 +25,11 @@ class _MockMedicationRepository implements MedicationRepository {
   _MockMedicationRepository({this.shouldFail = false});
 
   @override
-  Future<String> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
     if (shouldFail) {
       throw const MedicationSaveException('Rollback occurred.');
     }
-    return 'mock-id';
+    return const SavedMedicationResult(medicationId: 'mock-id', reminders: []);
   }
 
   @override
@@ -155,9 +155,9 @@ void main() {
 // Slow mock — delays so the test can observe the loading spinner.
 class _SlowRepo implements MedicationRepository {
   @override
-  Future<String> addMedication(AddMedicationPayload p) async {
+  Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async {
     await Future.delayed(const Duration(milliseconds: 50));
-    return 'id';
+    return const SavedMedicationResult(medicationId: 'id', reminders: []);
   }
 
   @override

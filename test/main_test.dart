@@ -139,7 +139,7 @@ void main() {
       await pumpApp(tester);
       await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
-      expect(find.text('Continue with Apple'), findsOneWidget);
+      expect(find.text('Forgot password'), findsOneWidget);
     });
 
     testWidgets('Profile tab shows "Create account" link', (tester) async {
