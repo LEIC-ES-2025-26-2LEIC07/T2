@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
-import 'package:clinic_go/core/widgets/custom_search_bar.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
@@ -27,7 +26,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // Home as default
+  int _currentIndex = 2; 
 
   StreamSubscription<bool>? _authSubscription;
 
@@ -77,7 +76,6 @@ class _MainScreenState extends State<MainScreen> {
                     horizontal: 24.0,
                     vertical: 16.0,
                   ),
-                  child: CustomSearchBar(),
                 ),
               ),
 

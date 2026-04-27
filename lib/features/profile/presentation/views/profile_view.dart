@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
+import 'package:clinic_go/core/color_palette/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';

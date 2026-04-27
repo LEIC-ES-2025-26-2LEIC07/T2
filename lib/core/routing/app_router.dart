@@ -21,6 +21,7 @@ class AppRouter {
   /// Called by [MaterialApp.onGenerateRoute].
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final routeName = settings.name;
+    if (routeName == null) return null;
 
     if (routeName == home) {
       return MaterialPageRoute<void>(
@@ -43,13 +44,10 @@ class AppRouter {
       );
     }
 
-    if (routeName == null || !routeName.startsWith('/log-dose/')) return null;
 
     final uri = Uri.parse(routeName);
     final doseId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-    if (doseId == null) {
-      return null;
-    }
+    if (doseId == null) return null;
 
     final scheduledTime = DateTime.tryParse(
       uri.queryParameters['scheduledTime'] ?? '',

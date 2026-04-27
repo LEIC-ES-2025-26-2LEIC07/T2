@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
+import 'package:clinic_go/core/color_palette/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/widgets/notification_lifecycle_wrapper.dart';
