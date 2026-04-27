@@ -300,73 +300,6 @@ class _StatusMessage extends StatelessWidget {
   }
 }
 
-class _SocialLoginButton extends StatelessWidget {
-  const _SocialLoginButton({
-    required this.label,
-    this.icon,
-    this.iconColor,
-    this.customIconText,
-    this.customIconColor,
-  });
-
-  final String label;
-  final IconData? icon;
-  final Color? iconColor;
-  final String? customIconText;
-  final Color? customIconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE7E7E7),
-          foregroundColor: Colors.black87,
-          disabledBackgroundColor: const Color(0xFFE7E7E7),
-          disabledForegroundColor: Colors.black87,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 34,
-              child: Center(
-                child: customIconText != null
-                    ? Text(
-                        customIconText!,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: customIconColor,
-                        ),
-                      )
-                    : Icon(icon, color: iconColor, size: 30),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _LoginDivider extends StatelessWidget {
   const _LoginDivider();
 
@@ -413,7 +346,7 @@ class _LoginTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(
-          color: Color(0xFFB0B0B0),
+          color: AppColors.grey,
           fontWeight: FontWeight.w500,
         ),
         filled: true,

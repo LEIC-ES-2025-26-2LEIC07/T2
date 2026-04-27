@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/color_palette/app_colors.dart';
 
 class FloatingBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -19,12 +20,12 @@ class FloatingBottomNavBar extends StatelessWidget {
       child: Container(
         height: 70,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.85), // Glassmorphism base
+          color: AppColors.white.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(35),
-          border: Border.all(color: Colors.white, width: 2), // Clean outline
+          border: Border.all(color: AppColors.white, width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: AppColors.shadow,
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -49,9 +50,7 @@ class FloatingBottomNavBar extends StatelessWidget {
     return IconButton(
       icon: Icon(
         icon,
-        color: isSelected
-            ? Colors.black
-            : const Color(0xFFB0B0B0), // Grey for inactive, black for active
+        color: isSelected ? AppColors.primaryColor : AppColors.grey,
         size: 30,
       ),
       onPressed: () => onTap(index),

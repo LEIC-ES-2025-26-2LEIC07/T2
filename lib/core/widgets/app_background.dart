@@ -13,21 +13,14 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Colors.white;
-    final lineInitialColor = Colors.grey[100]!;
-
     return SizedBox.expand(
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: AppColors.white,
           image: DecorationImage(
             image: const AssetImage('assets/images/background_topography.png'),
             fit: BoxFit.cover,
             alignment: Alignment.center,
-            colorFilter: ColorFilter.mode(
-              lineInitialColor.withOpacity(linePresence),
-              BlendMode.modulate,
-            ),
           ),
         ),
         child: child,
