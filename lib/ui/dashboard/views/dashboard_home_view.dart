@@ -102,9 +102,7 @@ class _QuickActionsCard extends StatelessWidget {
             runSpacing: 12,
             children: [
               FilledButton.icon(
-                onPressed: currentUser
-                    ? () => context.push('/dashboard/log-symptom')
-                    : null,
+                onPressed: () => context.push('/dashboard/log-symptom'),
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppColors.ink,
@@ -117,9 +115,7 @@ class _QuickActionsCard extends StatelessWidget {
                 label: const Text('Log symptom'),
               ),
               OutlinedButton.icon(
-                onPressed: currentUser
-                    ? () => context.push('/dashboard/symptom-history')
-                    : null,
+                onPressed: () => context.push('/dashboard/symptom-history'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: BorderSide(color: Colors.white.withValues(alpha: 0.7)),

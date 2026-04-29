@@ -19,18 +19,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/dashboard',
     refreshListenable: GoRouterRefreshStream(authRepository.authStateChanges),
-    redirect: (context, state) {
-      final isProtected =
-          state.matchedLocation == '/dashboard/log-symptom' ||
-          state.matchedLocation == '/dashboard/symptom-history';
-      final isSignedIn = authRepository.currentUser != null;
-
-      if (isProtected && !isSignedIn) {
-        return '/dashboard';
-      }
-
-      return null;
-    },
     routes: [
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

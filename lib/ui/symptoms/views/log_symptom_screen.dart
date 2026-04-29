@@ -1,4 +1,3 @@
-import 'package:clinic_go/core/providers/supabase_providers.dart';
 import 'package:clinic_go/ui/core/themes/app_colors.dart';
 import 'package:clinic_go/ui/symptoms/view_models/symptom_form_controller.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +49,6 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
       }
     });
 
-    final currentUser = ref.watch(currentUserProvider);
     final state = ref.watch(symptomFormControllerProvider);
     final controller = ref.read(symptomFormControllerProvider.notifier);
     final severityColor = AppColors.severityColor(state.severity);
@@ -73,189 +71,185 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
           title: const Text('Log Symptom'),
           backgroundColor: Colors.transparent,
         ),
-        body: currentUser == null
-            ? const _AuthRequiredBody()
-            : SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (state.errorMessage != null) ...[
+                  _FormBanner(message: state.errorMessage!),
+                  const SizedBox(height: 16),
+                ],
+                _SectionCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (state.errorMessage != null) ...[
-                        _FormBanner(message: state.errorMessage!),
-                        const SizedBox(height: 16),
-                      ],
-                      _SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'How are you feeling?',
-                              style: Theme.of(context).textTheme.titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: controller.setSearchQuery,
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.search),
-                                hintText: 'Search symptoms',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                for (final symptom
-                                    in controller.filteredSymptoms)
-                                  ChoiceChip(
-                                    label: Text(_formatSymptom(symptom)),
-                                    selected: state.selectedSymptom == symptom,
-                                    onSelected: state.isLoading
-                                        ? null
-                                        : (_) =>
-                                              controller.selectSymptom(symptom),
-                                  ),
-                              ],
-                            ),
-                          ],
+                      Text(
+                        'How are you feeling?',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Severity ${state.severity}/10',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Move the slider to show how intense the symptom feels right now.',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(color: AppColors.muted),
-                            ),
-                            SliderTheme(
-                              data: SliderTheme.of(context).copyWith(
-                                activeTrackColor: severityColor,
-                                inactiveTrackColor: severityColor.withValues(
-                                  alpha: 0.18,
-                                ),
-                                thumbColor: severityColor,
-                                overlayColor: severityColor.withValues(
-                                  alpha: 0.12,
-                                ),
-                              ),
-                              child: Slider(
-                                value: state.severity.toDouble(),
-                                min: 1,
-                                max: 10,
-                                divisions: 9,
-                                label: '${state.severity}',
-                                onChanged: state.isLoading
-                                    ? null
-                                    : controller.setSeverity,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'When did it happen?',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 12),
-                            OutlinedButton.icon(
-                              onPressed: state.isLoading
-                                  ? null
-                                  : () => _pickOccurredAt(
-                                      context,
-                                      controller,
-                                      state.occurredAt,
-                                    ),
-                              icon: const Icon(Icons.schedule),
-                              label: Text(
-                                DateFormat(
-                                  'EEE, MMM d - h:mm a',
-                                ).format(state.occurredAt),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _SectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Additional notes',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _notesController,
-                              minLines: 4,
-                              maxLines: 6,
-                              onChanged: controller.setNotes,
-                              decoration: InputDecoration(
-                                hintText:
-                                    'Add context like triggers, timing, or anything that changed.',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: state.isLoading
-                              ? null
-                              : () => _submit(context, ref),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: severityColor,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _searchController,
+                        onChanged: controller.setSearchQuery,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.search),
+                          hintText: 'Search symptoms',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
                           ),
-                          child: state.isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.4,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text('Save symptom'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          for (final symptom in controller.filteredSymptoms)
+                            ChoiceChip(
+                              label: Text(_formatSymptom(symptom)),
+                              selected: state.selectedSymptom == symptom,
+                              onSelected: state.isLoading
+                                  ? null
+                                  : (_) => controller.selectSymptom(symptom),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Severity ${state.severity}/10',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Move the slider to show how intense the symptom feels right now.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.muted,
+                        ),
+                      ),
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: severityColor,
+                          inactiveTrackColor: severityColor.withValues(
+                            alpha: 0.18,
+                          ),
+                          thumbColor: severityColor,
+                          overlayColor: severityColor.withValues(alpha: 0.12),
+                        ),
+                        child: Slider(
+                          value: state.severity.toDouble(),
+                          min: 1,
+                          max: 10,
+                          divisions: 9,
+                          label: '${state.severity}',
+                          onChanged: state.isLoading
+                              ? null
+                              : controller.setSeverity,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'When did it happen?',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: state.isLoading
+                            ? null
+                            : () => _pickOccurredAt(
+                                context,
+                                controller,
+                                state.occurredAt,
+                              ),
+                        icon: const Icon(Icons.schedule),
+                        label: Text(
+                          DateFormat(
+                            'EEE, MMM d - h:mm a',
+                          ).format(state.occurredAt),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Additional notes',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _notesController,
+                        minLines: 4,
+                        maxLines: 6,
+                        onChanged: controller.setNotes,
+                        decoration: InputDecoration(
+                          hintText:
+                              'Add context like triggers, timing, or anything that changed.',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: state.isLoading
+                        ? null
+                        : () => _submit(context, ref),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: severityColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: state.isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.4,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Save symptom'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -387,42 +381,6 @@ class _FormBanner extends StatelessWidget {
         border: Border.all(color: const Color(0xFFFFCDC7)),
       ),
       child: Text(message, style: const TextStyle(color: Color(0xFF9F3428))),
-    );
-  }
-}
-
-class _AuthRequiredBody extends StatelessWidget {
-  const _AuthRequiredBody();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-          ),
-          child: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.lock_outline, size: 44),
-              SizedBox(height: 12),
-              Text(
-                'Sign in required',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'This screen is ready, but it requires an authenticated Supabase session before symptom logs can be saved.',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
