@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
@@ -51,6 +53,45 @@ class SupabaseAuthService implements AuthService {
     required String email,
     required Map<String, dynamic> metadata,
   }) async {
-    await _client.auth.updateUser(UserAttributes(email: email, data: metadata));
+    try {
+      await _client.auth.updateUser(
+        UserAttributes(email: email, data: metadata),
+      );
+    } on AuthException catch (error) {
+      throw AuthServiceException(_authFailureTypeFor(error), error.message);
+    } on TimeoutException {
+      throw const AuthServiceException(
+        AuthFailureType.network,
+        'The request timed out.',
+      );
+    } catch (error) {
+      final description = error.toString().toLowerCase();
+      if (description.contains('socket') ||
+          description.contains('network') ||
+          description.contains('connection')) {
+        throw const AuthServiceException(
+          AuthFailureType.network,
+          'Network connection failed.',
+        );
+      }
+
+      throw AuthServiceException(AuthFailureType.unknown, error.toString());
+    }
+  }
+
+  AuthFailureType _authFailureTypeFor(AuthException error) {
+    final statusCode = int.tryParse(error.statusCode ?? '');
+    if (statusCode != null && statusCode >= 400 && statusCode < 500) {
+      return AuthFailureType.validation;
+    }
+
+    final message = error.message.toLowerCase();
+    if (message.contains('network') ||
+        message.contains('timeout') ||
+        message.contains('connection')) {
+      return AuthFailureType.network;
+    }
+
+    return AuthFailureType.unknown;
   }
 }

@@ -39,3 +39,15 @@ abstract class AuthService {
     required Map<String, dynamic> metadata,
   });
 }
+
+enum AuthFailureType { validation, network, unknown }
+
+class AuthServiceException implements Exception {
+  const AuthServiceException(this.type, this.message);
+
+  final AuthFailureType type;
+  final String message;
+
+  @override
+  String toString() => 'AuthServiceException($type, $message)';
+}

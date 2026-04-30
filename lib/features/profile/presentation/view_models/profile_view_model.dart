@@ -23,24 +23,15 @@ class ProfileViewModel extends ChangeNotifier {
 
   String get displayName {
     final metadata = profileMetadata;
-    final value = metadata['name'] ?? metadata['full_name'];
-    return value is String && value.trim().isNotEmpty ? value.trim() : '';
+    final name = _metadataString(metadata, 'name');
+    return name.isNotEmpty ? name : _metadataString(metadata, 'full_name');
   }
 
-  String get birthDate {
-    final value = profileMetadata['birth_date'];
-    return value is String ? value : '';
-  }
+  String get birthDate => _metadataString(profileMetadata, 'birth_date');
 
-  String get phone {
-    final value = profileMetadata['phone'];
-    return value is String ? value : '';
-  }
+  String get phone => _metadataString(profileMetadata, 'phone');
 
-  String get preferences {
-    final value = profileMetadata['preferences'];
-    return value is String ? value : '';
-  }
+  String get preferences => _metadataString(profileMetadata, 'preferences');
 
   Future<void> signIn({required String email, required String password}) async {
     final cleanEmail = email.trim();
@@ -142,8 +133,10 @@ class ProfileViewModel extends ChangeNotifier {
         },
       );
       _infoMessage = 'Profile updated successfully.';
+    } on AuthServiceException catch (error) {
+      _errorMessage = _profileUpdateMessageFor(error);
     } catch (_) {
-      _errorMessage = 'Could not update profile.';
+      _errorMessage = 'Something went wrong while updating your profile.';
     } finally {
       _setLoading(false);
     }
@@ -168,5 +161,21 @@ class ProfileViewModel extends ChangeNotifier {
     _errorMessage = null;
     _infoMessage = null;
     if (notify) notifyListeners();
+  }
+
+  String _metadataString(Map<String, dynamic> metadata, String key) {
+    final value = metadata[key];
+    return value is String ? value.trim() : '';
+  }
+
+  String _profileUpdateMessageFor(AuthServiceException error) {
+    return switch (error.type) {
+      AuthFailureType.validation =>
+        'Please check your profile details and try again.',
+      AuthFailureType.network =>
+        'Could not update profile. Check your internet connection.',
+      AuthFailureType.unknown =>
+        'Something went wrong while updating your profile.',
+    };
   }
 }
