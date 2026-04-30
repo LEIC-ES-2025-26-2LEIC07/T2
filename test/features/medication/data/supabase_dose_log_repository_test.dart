@@ -113,7 +113,7 @@ void main() {
     });
 
     group('hasDoseLog', () {
-      FakeFilterBuilder<PostgrestList> _buildChainedFilter(
+      FakeFilterBuilder<PostgrestList> buildChainedFilter(
         Future<PostgrestList> Function() futureFn,
       ) {
         final filterBuilder = FakeFilterBuilder<PostgrestList>(futureFn);
@@ -136,7 +136,7 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(mockUser);
 
         final queryBuilder = FakeQueryBuilder();
-        final filterBuilder = _buildChainedFilter(
+        final filterBuilder = buildChainedFilter(
           () => Future.value([
             <String, dynamic>{'id': 'log-1'},
           ]),
@@ -168,7 +168,7 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(mockUser);
 
         final queryBuilder = FakeQueryBuilder();
-        final filterBuilder = _buildChainedFilter(
+        final filterBuilder = buildChainedFilter(
           () => Future.value([]),
         );
 
@@ -189,7 +189,7 @@ void main() {
           when(() => mockAuth.currentUser).thenReturn(mockUser);
 
           final queryBuilder = FakeQueryBuilder();
-          final filterBuilder = _buildChainedFilter(
+          final filterBuilder = buildChainedFilter(
             () => Future.error(
               const PostgrestException(message: 'Network error'),
             ),

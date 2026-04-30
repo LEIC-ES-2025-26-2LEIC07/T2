@@ -5,6 +5,9 @@ abstract class AuthService {
   /// The currently authenticated user's email, or null when unauthenticated.
   String? get currentUserEmail;
 
+  /// Editable metadata stored with the authenticated user.
+  Map<String, dynamic> get currentUserMetadata;
+
   /// Convenience check: true when a user session is active.
   bool get isLoggedIn;
 
@@ -29,4 +32,10 @@ abstract class AuthService {
 
   /// Send a password-reset e-mail to [email].
   Future<void> resetPassword(String email);
+
+  /// Update account email and profile metadata for the current user.
+  Future<void> updateProfile({
+    required String email,
+    required Map<String, dynamic> metadata,
+  });
 }

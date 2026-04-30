@@ -6,7 +6,6 @@ import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
-import 'package:clinic_go/core/routing/app_router.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -21,8 +20,14 @@ class _ProfileViewState extends State<ProfileView> {
   );
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _birthDateController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _preferencesController = TextEditingController();
 
   StreamSubscription<bool>? _authSubscription;
+  bool _isEditingProfile = false;
+  bool _profileControllersSynced = false;
 
   @override
   void initState() {
@@ -39,6 +44,10 @@ class _ProfileViewState extends State<ProfileView> {
     _authSubscription?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
+    _birthDateController.dispose();
+    _phoneController.dispose();
+    _preferencesController.dispose();
     _viewModel.dispose();
     super.dispose();
   }
@@ -61,6 +70,69 @@ class _ProfileViewState extends State<ProfileView> {
     await _viewModel.signOut();
   }
 
+  Future<void> _handleSaveProfile() async {
+    FocusScope.of(context).unfocus();
+
+    await _viewModel.updateProfile(
+      name: _nameController.text,
+      email: _emailController.text,
+      birthDate: _birthDateController.text,
+      phone: _phoneController.text,
+      preferences: _preferencesController.text,
+    );
+
+    if (mounted && _viewModel.errorMessage == null) {
+      setState(() => _isEditingProfile = false);
+    }
+  }
+
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    DateTime initialDate = DateTime(now.year - 25, now.month, now.day);
+
+    final savedDate = DateTime.tryParse(_birthDateController.text);
+    if (savedDate != null) {
+      initialDate = savedDate;
+    }
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: now,
+    );
+
+    if (pickedDate == null) return;
+
+    _birthDateController.text =
+        '${pickedDate.year.toString().padLeft(4, '0')}-'
+        '${pickedDate.month.toString().padLeft(2, '0')}-'
+        '${pickedDate.day.toString().padLeft(2, '0')}';
+  }
+
+  void _startEditingProfile() {
+    _syncProfileControllers(force: true);
+    setState(() => _isEditingProfile = true);
+  }
+
+  void _cancelEditingProfile() {
+    _syncProfileControllers(force: true);
+    _viewModel.clearMessages();
+    setState(() => _isEditingProfile = false);
+  }
+
+  void _syncProfileControllers({bool force = false}) {
+    if (!_viewModel.isLoggedIn || (_isEditingProfile && !force)) return;
+    if (_profileControllersSynced && !force) return;
+
+    _nameController.text = _viewModel.displayName;
+    _emailController.text = _viewModel.currentUserEmail ?? '';
+    _birthDateController.text = _viewModel.birthDate;
+    _phoneController.text = _viewModel.phone;
+    _preferencesController.text = _viewModel.preferences;
+    _profileControllersSynced = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -74,6 +146,12 @@ class _ProfileViewState extends State<ProfileView> {
             child: AnimatedBuilder(
               animation: _viewModel,
               builder: (context, _) {
+                if (_viewModel.isLoggedIn) {
+                  _syncProfileControllers();
+                } else {
+                  _profileControllersSynced = false;
+                }
+
                 return SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
@@ -87,19 +165,35 @@ class _ProfileViewState extends State<ProfileView> {
                       vertical: 34,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8F6F0),
-                      borderRadius: BorderRadius.circular(34),
-                      image: const DecorationImage(
-                        image: AssetImage(
-                          'assets/images/background_topography.png',
-                        ),
-                        fit: BoxFit.cover,
-                        opacity: 0.08,
+                      color: _viewModel.isLoggedIn
+                          ? Colors.white.withValues(alpha: 0.96)
+                          : const Color(0xFFF8F6F0),
+                      borderRadius: BorderRadius.circular(
+                        _viewModel.isLoggedIn ? 22 : 34,
                       ),
+                      image: _viewModel.isLoggedIn
+                          ? null
+                          : const DecorationImage(
+                              image: AssetImage(
+                                'assets/images/background_topography.png',
+                              ),
+                              fit: BoxFit.cover,
+                              opacity: 0.08,
+                            ),
                     ),
                     child: _viewModel.isLoggedIn
                         ? _LoggedInCard(
                             viewModel: _viewModel,
+                            isEditing: _isEditingProfile,
+                            nameController: _nameController,
+                            emailController: _emailController,
+                            birthDateController: _birthDateController,
+                            phoneController: _phoneController,
+                            preferencesController: _preferencesController,
+                            onEditPressed: _startEditingProfile,
+                            onCancelPressed: _cancelEditingProfile,
+                            onSavePressed: _handleSaveProfile,
+                            onBirthDatePressed: _pickBirthDate,
                             onLogoutPressed: _handleLogout,
                           )
                         : _LoginForm(
@@ -196,73 +290,317 @@ class _LoginForm extends StatelessWidget {
 }
 
 class _LoggedInCard extends StatelessWidget {
-  const _LoggedInCard({required this.viewModel, required this.onLogoutPressed});
+  const _LoggedInCard({
+    required this.viewModel,
+    required this.isEditing,
+    required this.nameController,
+    required this.emailController,
+    required this.birthDateController,
+    required this.phoneController,
+    required this.preferencesController,
+    required this.onEditPressed,
+    required this.onCancelPressed,
+    required this.onSavePressed,
+    required this.onBirthDatePressed,
+    required this.onLogoutPressed,
+  });
 
   final ProfileViewModel viewModel;
+  final bool isEditing;
+  final TextEditingController nameController;
+  final TextEditingController emailController;
+  final TextEditingController birthDateController;
+  final TextEditingController phoneController;
+  final TextEditingController preferencesController;
+  final VoidCallback onEditPressed;
+  final VoidCallback onCancelPressed;
+  final Future<void> Function() onSavePressed;
+  final Future<void> Function() onBirthDatePressed;
   final Future<void> Function() onLogoutPressed;
 
   @override
   Widget build(BuildContext context) {
+    final title = nameController.text.trim().isEmpty
+        ? 'USER_TEST'
+        : nameController.text.trim();
+
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.account_circle_rounded,
-          size: 84,
-          color: AppColors.primaryColor,
-        ),
-        const SizedBox(height: 18),
-        const Text(
-          'Signed in',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        Container(
+          width: 116,
+          height: 116,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFFE2E4E6),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                blurRadius: 8,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.account_circle_rounded,
+            size: 116,
+            color: Color(0xFFAEB4B8),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 34),
         Text(
-          viewModel.currentUserEmail ?? 'Utilizador autenticado',
+          title.toUpperCase(),
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black54,
-            fontWeight: FontWeight.w600,
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.w800,
+            color: Color(0xFF4A4A4A),
           ),
         ),
-        const SizedBox(height: 20),
-        _StatusMessage(
-          errorMessage: viewModel.errorMessage,
-          infoMessage: viewModel.infoMessage ?? 'Successfully signed in.',
-        ),
-        const SizedBox(height: 28),
-        SizedBox(
-          width: 195,
-          height: 58,
-          child: ElevatedButton(
-            onPressed: () {Navigator.of(context).pushNamed(AppRouter.login);},         
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.primaryColor,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
-                side: const BorderSide(color: AppColors.primaryColor),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _ProfileActionButton(
+                label: isEditing ? 'Save' : 'Edit',
+                icon: isEditing ? Icons.check_rounded : Icons.edit_outlined,
+                isLoading: viewModel.isLoading,
+                onPressed: isEditing ? onSavePressed : onEditPressed,
               ),
             ),
-            child: viewModel.isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text(
-                    'Sign out',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: _ProfileActionButton(
+                label: 'Logout',
+                icon: Icons.logout_rounded,
+                isLoading: viewModel.isLoading,
+                onPressed: onLogoutPressed,
+              ),
+            ),
+          ],
+        ),
+        if (isEditing) ...[
+          const SizedBox(height: 14),
+          SizedBox(
+            width: 120,
+            height: 42,
+            child: ElevatedButton(
+              onPressed: viewModel.isLoading ? null : onCancelPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFCFCFCF),
+                foregroundColor: Colors.white,
+                elevation: 5,
+                shadowColor: Colors.black.withValues(alpha: 0.18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
+        ],
+        const SizedBox(height: 22),
+        _StatusMessage(
+          errorMessage: viewModel.errorMessage,
+          infoMessage: viewModel.infoMessage,
+        ),
+        const SizedBox(height: 96),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final fields = [
+              _ProfileFieldData(
+                label: 'Nome',
+                controller: nameController,
+                icon: Icons.badge_outlined,
+              ),
+              _ProfileFieldData(
+                label: 'Email',
+                controller: emailController,
+                icon: Icons.mail_outline_rounded,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              _ProfileFieldData(
+                label: 'Nascimento',
+                controller: birthDateController,
+                icon: Icons.cake_outlined,
+                readOnly: true,
+                onTap: onBirthDatePressed,
+              ),
+              _ProfileFieldData(
+                label: 'Telefone',
+                controller: phoneController,
+                icon: Icons.phone_outlined,
+                keyboardType: TextInputType.phone,
+              ),
+              _ProfileFieldData(
+                label: 'Preferências',
+                controller: preferencesController,
+                icon: Icons.tune_rounded,
+              ),
+            ];
+
+            return Wrap(
+              spacing: 28,
+              runSpacing: 24,
+              alignment: WrapAlignment.center,
+              children: fields
+                  .map(
+                    (field) => SizedBox(
+                      width: constraints.maxWidth > 300
+                          ? (constraints.maxWidth - 28) / 2
+                          : constraints.maxWidth,
+                      child: _ProfileInfoField(
+                        data: field,
+                        isEditing: isEditing,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
         ),
       ],
+    );
+  }
+}
+
+class _ProfileActionButton extends StatelessWidget {
+  const _ProfileActionButton({
+    required this.label,
+    required this.icon,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool isLoading;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 42,
+      child: ElevatedButton.icon(
+        onPressed: isLoading ? null : onPressed,
+        icon: Icon(icon, size: 18),
+        label: isLoading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryColor,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: AppColors.primaryColor,
+          disabledForegroundColor: Colors.white,
+          elevation: 7,
+          shadowColor: Colors.black.withValues(alpha: 0.22),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileFieldData {
+  const _ProfileFieldData({
+    required this.label,
+    required this.controller,
+    required this.icon,
+    this.keyboardType,
+    this.readOnly = false,
+    this.onTap,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final IconData icon;
+  final TextInputType? keyboardType;
+  final bool readOnly;
+  final VoidCallback? onTap;
+}
+
+class _ProfileInfoField extends StatelessWidget {
+  const _ProfileInfoField({required this.data, required this.isEditing});
+
+  final _ProfileFieldData data;
+  final bool isEditing;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!isEditing) {
+      final value = data.controller.text.trim();
+
+      return Column(
+        children: [
+          Icon(data.icon, color: const Color(0xFFB0B0B0), size: 24),
+          const SizedBox(height: 8),
+          Text(
+            data.label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFF4F4F4F),
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value.isEmpty ? '-' : value,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF777777),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return TextField(
+      controller: data.controller,
+      keyboardType: data.keyboardType,
+      readOnly: data.readOnly,
+      onTap: data.onTap,
+      decoration: InputDecoration(
+        labelText: data.label,
+        prefixIcon: Icon(data.icon, size: 20),
+        filled: true,
+        fillColor: const Color(0xFFF7F7F7),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFFE3E3E3)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: Color(0xFFE3E3E3)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: AppColors.primaryColor),
+        ),
+      ),
     );
   }
 }
@@ -294,73 +632,6 @@ class _StatusMessage extends StatelessWidget {
         style: TextStyle(
           color: isError ? const Color(0xFFC62828) : const Color(0xFF2E7D32),
           fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-class _SocialLoginButton extends StatelessWidget {
-  const _SocialLoginButton({
-    required this.label,
-    this.icon,
-    this.iconColor,
-    this.customIconText,
-    this.customIconColor,
-  });
-
-  final String label;
-  final IconData? icon;
-  final Color? iconColor;
-  final String? customIconText;
-  final Color? customIconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE7E7E7),
-          foregroundColor: Colors.black87,
-          disabledBackgroundColor: const Color(0xFFE7E7E7),
-          disabledForegroundColor: Colors.black87,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 34,
-              child: Center(
-                child: customIconText != null
-                    ? Text(
-                        customIconText!,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: customIconColor,
-                        ),
-                      )
-                    : Icon(icon, color: iconColor, size: 30),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
         ),
       ),
     );

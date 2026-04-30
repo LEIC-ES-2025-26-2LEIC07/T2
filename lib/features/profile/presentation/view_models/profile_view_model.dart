@@ -19,6 +19,28 @@ class ProfileViewModel extends ChangeNotifier {
   String? get infoMessage => _infoMessage;
   String? get currentUserEmail => _auth.currentUserEmail;
   bool get isLoggedIn => _auth.isLoggedIn;
+  Map<String, dynamic> get profileMetadata => _auth.currentUserMetadata;
+
+  String get displayName {
+    final metadata = profileMetadata;
+    final value = metadata['name'] ?? metadata['full_name'];
+    return value is String && value.trim().isNotEmpty ? value.trim() : '';
+  }
+
+  String get birthDate {
+    final value = profileMetadata['birth_date'];
+    return value is String ? value : '';
+  }
+
+  String get phone {
+    final value = profileMetadata['phone'];
+    return value is String ? value : '';
+  }
+
+  String get preferences {
+    final value = profileMetadata['preferences'];
+    return value is String ? value : '';
+  }
 
   Future<void> signIn({required String email, required String password}) async {
     final cleanEmail = email.trim();
@@ -77,6 +99,51 @@ class ProfileViewModel extends ChangeNotifier {
       _infoMessage = 'Successfully signed out.';
     } catch (_) {
       _errorMessage = 'Could not sign out.';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String birthDate,
+    required String phone,
+    required String preferences,
+  }) async {
+    final cleanName = name.trim();
+    final cleanEmail = email.trim();
+    final cleanBirthDate = birthDate.trim();
+    final cleanPhone = phone.trim();
+    final cleanPreferences = preferences.trim();
+
+    if (cleanName.isEmpty) {
+      _setError('Please enter your name.');
+      return;
+    }
+
+    if (cleanEmail.isEmpty || !cleanEmail.contains('@')) {
+      _setError('Enter a valid email.');
+      return;
+    }
+
+    _setLoading(true);
+    _clearMessages(notify: false);
+
+    try {
+      await _auth.updateProfile(
+        email: cleanEmail,
+        metadata: {
+          ...profileMetadata,
+          'name': cleanName,
+          'birth_date': cleanBirthDate,
+          'phone': cleanPhone,
+          'preferences': cleanPreferences,
+        },
+      );
+      _infoMessage = 'Profile updated successfully.';
+    } catch (_) {
+      _errorMessage = 'Could not update profile.';
     } finally {
       _setLoading(false);
     }

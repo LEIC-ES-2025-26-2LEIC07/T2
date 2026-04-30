@@ -15,6 +15,10 @@ class SupabaseAuthService implements AuthService {
   String? get currentUserEmail => _client.auth.currentUser?.email;
 
   @override
+  Map<String, dynamic> get currentUserMetadata =>
+      _client.auth.currentUser?.userMetadata ?? const {};
+
+  @override
   bool get isLoggedIn => _client.auth.currentUser != null;
 
   @override
@@ -40,5 +44,13 @@ class SupabaseAuthService implements AuthService {
   @override
   Future<void> resetPassword(String email) async {
     await _client.auth.resetPasswordForEmail(email);
+  }
+
+  @override
+  Future<void> updateProfile({
+    required String email,
+    required Map<String, dynamic> metadata,
+  }) async {
+    await _client.auth.updateUser(UserAttributes(email: email, data: metadata));
   }
 }
