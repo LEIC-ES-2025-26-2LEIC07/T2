@@ -11,7 +11,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  await Supabase.initialize(url:dotenv.env['NEXT_PUBLIC_SUPABASE_URL']!, anonKey: dotenv.env['SB_PV_KEY']!);
+  await Supabase.initialize(
+    url: dotenv.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    anonKey: dotenv.env['SB_PV_KEY']!,
+  );
 
   final navigatorKey = GlobalKey<NavigatorState>();
   final initialPayload = await setupServiceLocator(navigatorKey);

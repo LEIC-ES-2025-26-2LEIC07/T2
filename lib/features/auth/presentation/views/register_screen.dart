@@ -38,7 +38,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _onViewModelChanged() {
     if (_viewModel.success && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRouter.home, (_) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false);
     }
   }
 
@@ -131,7 +133,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(
                         height: 58,
                         child: ElevatedButton(
-                          onPressed: _viewModel.isLoading ? null : _handleRegister,
+                          onPressed: _viewModel.isLoading
+                              ? null
+                              : _handleRegister,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             foregroundColor: Colors.white,

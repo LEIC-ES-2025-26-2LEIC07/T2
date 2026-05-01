@@ -142,8 +142,7 @@ void main() {
         ).thenThrow(const AuthException('Email already in use'));
 
         expect(
-          () =>
-              service.signUp(email: 'existing@example.com', password: 'pass'),
+          () => service.signUp(email: 'existing@example.com', password: 'pass'),
           throwsA(isA<AuthException>()),
         );
       });
@@ -171,10 +170,7 @@ void main() {
           () => mockAuth.resetPasswordForEmail(any()),
         ).thenAnswer((_) async {});
 
-        await expectLater(
-          service.resetPassword('user@example.com'),
-          completes,
-        );
+        await expectLater(service.resetPassword('user@example.com'), completes);
       });
 
       test('resetPassword: AuthException thrown → propagates', () {

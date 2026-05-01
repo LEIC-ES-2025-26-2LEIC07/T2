@@ -40,7 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
       _viewModel.acknowledgePasswordClear();
     }
     if (_viewModel.success && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(AppRouter.home, (_) => false);
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false);
     }
   }
 
@@ -99,7 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: TextButton(
                           onPressed: _viewModel.isLoading
                               ? null
-                              : () => _viewModel.resetPassword(_emailController.text),
+                              : () => _viewModel.resetPassword(
+                                  _emailController.text,
+                                ),
                           child: const Text(
                             'Forgot password?',
                             style: TextStyle(color: Color(0xFF7F7F7F)),
@@ -170,8 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: Color(0xFF7F7F7F)),
                           ),
                           TextButton(
-                            onPressed: () =>
-                                Navigator.of(context).pushNamed(AppRouter.register),
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pushNamed(AppRouter.register),
                             child: const Text(
                               'Create one',
                               style: TextStyle(fontWeight: FontWeight.bold),

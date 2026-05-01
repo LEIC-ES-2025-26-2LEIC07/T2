@@ -11,7 +11,9 @@ class SupabaseMedicationRepository implements MedicationRepository {
   final SupabaseClient _client;
 
   @override
-  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(
+    AddMedicationPayload payload,
+  ) async {
     final user = _client.auth.currentUser;
     if (user == null) {
       throw const MedicationSaveException(
@@ -80,10 +82,17 @@ class SupabaseMedicationRepository implements MedicationRepository {
 
   @override
   Future<List<Medication>> fetchMedications() async {
-    // RLS ensures only the current user's rows are returned.
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      throw const MedicationSaveException(
+        'Authentication is required to fetch medications.',
+      );
+    }
+
     final response = await _client
         .from('medications')
         .select()
+        .eq('user_id', user.id)
         .order('created_at', ascending: false);
 
     return (response as List<dynamic>)
