@@ -30,6 +30,9 @@ jobs:
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
+      - name: Create .env file
+        run: touch .env
+
       - name: Run static analysis
         run: flutter analyze
 
@@ -57,8 +60,16 @@ jobs:
 
           if [ -n "$coverage" ]; then
             echo "- Line coverage: ${coverage}%" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$(echo "$coverage < 60" | bc -l)" = "1" ]; then
+              echo "- Coverage gate: ✗ (${coverage}% < 60%)" >> "$GITHUB_STEP_SUMMARY"
+              echo "Coverage ${coverage}% is below the required 60% threshold."
+              exit 1
+            fi
+            echo "- Coverage gate: ✓" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "- Line coverage: unavailable" >> "$GITHUB_STEP_SUMMARY"
+            echo "Coverage data unavailable — cannot verify threshold."
+            exit 1
           fi
 
       - name: Upload coverage artifact
@@ -87,6 +98,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create .env file
+        run: touch .env
 
       - name: Build web application
         env:

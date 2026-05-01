@@ -25,7 +25,9 @@ class _MockMedicationRepository implements MedicationRepository {
   _MockMedicationRepository({this.shouldFail = false});
 
   @override
-  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(
+    AddMedicationPayload payload,
+  ) async {
     if (shouldFail) {
       throw const MedicationSaveException('Rollback occurred.');
     }

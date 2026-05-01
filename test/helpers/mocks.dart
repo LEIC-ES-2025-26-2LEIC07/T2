@@ -9,6 +9,9 @@ class AlwaysSuccessAuth implements AuthService {
   String? get currentUserEmail => null;
 
   @override
+  Map<String, dynamic> get currentUserMetadata => const {};
+
+  @override
   bool get isLoggedIn => false;
 
   @override
@@ -31,6 +34,12 @@ class AlwaysSuccessAuth implements AuthService {
 
   @override
   Future<void> resetPassword(String email) async {}
+
+  @override
+  Future<void> updateProfile({
+    required String email,
+    required Map<String, dynamic> metadata,
+  }) async {}
 }
 
 class AlwaysFailAuth implements AuthService {
@@ -41,6 +50,9 @@ class AlwaysFailAuth implements AuthService {
   String? get currentUserEmail => null;
 
   @override
+  Map<String, dynamic> get currentUserMetadata => const {};
+
+  @override
   bool get isLoggedIn => false;
 
   @override
@@ -63,4 +75,10 @@ class AlwaysFailAuth implements AuthService {
 
   @override
   Future<void> resetPassword(String email) async {}
+
+  @override
+  Future<void> updateProfile({
+    required String email,
+    required Map<String, dynamic> metadata,
+  }) async => throw error;
 }

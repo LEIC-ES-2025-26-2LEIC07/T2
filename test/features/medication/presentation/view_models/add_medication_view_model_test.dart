@@ -23,9 +23,14 @@ class _SuccessRepo implements MedicationRepository {
   bool addCalled = false;
 
   @override
-  Future<SavedMedicationResult> addMedication(AddMedicationPayload payload) async {
+  Future<SavedMedicationResult> addMedication(
+    AddMedicationPayload payload,
+  ) async {
     addCalled = true;
-    return const SavedMedicationResult(medicationId: 'new-id-123', reminders: []);
+    return const SavedMedicationResult(
+      medicationId: 'new-id-123',
+      reminders: [],
+    );
   }
 
   @override

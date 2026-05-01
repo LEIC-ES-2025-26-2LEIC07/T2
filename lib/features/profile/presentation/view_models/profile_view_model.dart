@@ -19,6 +19,19 @@ class ProfileViewModel extends ChangeNotifier {
   String? get infoMessage => _infoMessage;
   String? get currentUserEmail => _auth.currentUserEmail;
   bool get isLoggedIn => _auth.isLoggedIn;
+  Map<String, dynamic> get profileMetadata => _auth.currentUserMetadata;
+
+  String get displayName {
+    final metadata = profileMetadata;
+    final name = _metadataString(metadata, 'name');
+    return name.isNotEmpty ? name : _metadataString(metadata, 'full_name');
+  }
+
+  String get birthDate => _metadataString(profileMetadata, 'birth_date');
+
+  String get phone => _metadataString(profileMetadata, 'phone');
+
+  String get preferences => _metadataString(profileMetadata, 'preferences');
 
   Future<void> signIn({required String email, required String password}) async {
     final cleanEmail = email.trim();
@@ -82,6 +95,53 @@ class ProfileViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String birthDate,
+    required String phone,
+    required String preferences,
+  }) async {
+    final cleanName = name.trim();
+    final cleanEmail = email.trim();
+    final cleanBirthDate = birthDate.trim();
+    final cleanPhone = phone.trim();
+    final cleanPreferences = preferences.trim();
+
+    if (cleanName.isEmpty) {
+      _setError('Please enter your name.');
+      return;
+    }
+
+    if (cleanEmail.isEmpty || !cleanEmail.contains('@')) {
+      _setError('Enter a valid email.');
+      return;
+    }
+
+    _setLoading(true);
+    _clearMessages(notify: false);
+
+    try {
+      await _auth.updateProfile(
+        email: cleanEmail,
+        metadata: {
+          ...profileMetadata,
+          'name': cleanName,
+          'birth_date': cleanBirthDate,
+          'phone': cleanPhone,
+          'preferences': cleanPreferences,
+        },
+      );
+      _infoMessage = 'Profile updated successfully.';
+    } on AuthServiceException catch (error) {
+      _errorMessage = _profileUpdateMessageFor(error);
+    } catch (_) {
+      _errorMessage = 'Something went wrong while updating your profile.';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   void clearMessages() => _clearMessages();
 
   void refreshSession() => notifyListeners();
@@ -101,5 +161,21 @@ class ProfileViewModel extends ChangeNotifier {
     _errorMessage = null;
     _infoMessage = null;
     if (notify) notifyListeners();
+  }
+
+  String _metadataString(Map<String, dynamic> metadata, String key) {
+    final value = metadata[key];
+    return value is String ? value.trim() : '';
+  }
+
+  String _profileUpdateMessageFor(AuthServiceException error) {
+    return switch (error.type) {
+      AuthFailureType.validation =>
+        'Please check your profile details and try again.',
+      AuthFailureType.network =>
+        'Could not update profile. Check your internet connection.',
+      AuthFailureType.unknown =>
+        'Something went wrong while updating your profile.',
+    };
   }
 }
