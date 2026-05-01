@@ -22,8 +22,7 @@ class FakeFilterBuilder<T> extends Mock implements PostgrestFilterBuilder<T> {
   Future<R> then<R>(
     FutureOr<R> Function(T value) onValue, {
     Function? onError,
-  }) =>
-      _futureFn().then(onValue, onError: onError);
+  }) => _futureFn().then(onValue, onError: onError);
 }
 
 // doseId format: '<reminderId>_<epochSeconds>'
@@ -113,7 +112,7 @@ void main() {
     });
 
     group('hasDoseLog', () {
-      FakeFilterBuilder<PostgrestList> _buildChainedFilter(
+      FakeFilterBuilder<PostgrestList> buildChainedFilter(
         Future<PostgrestList> Function() futureFn,
       ) {
         final filterBuilder = FakeFilterBuilder<PostgrestList>(futureFn);
@@ -126,9 +125,7 @@ void main() {
         when(
           () => filterBuilder.lt(any(), any()),
         ).thenAnswer((_) => filterBuilder);
-        when(
-          () => filterBuilder.limit(any()),
-        ).thenAnswer((_) => filterBuilder);
+        when(() => filterBuilder.limit(any())).thenAnswer((_) => filterBuilder);
         return filterBuilder;
       }
 
@@ -136,7 +133,7 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(mockUser);
 
         final queryBuilder = FakeQueryBuilder();
-        final filterBuilder = _buildChainedFilter(
+        final filterBuilder = buildChainedFilter(
           () => Future.value([
             <String, dynamic>{'id': 'log-1'},
           ]),
@@ -145,9 +142,7 @@ void main() {
         when(
           () => mockClient.from('medication_logs'),
         ).thenAnswer((_) => queryBuilder);
-        when(
-          () => queryBuilder.select('id'),
-        ).thenAnswer((_) => filterBuilder);
+        when(() => queryBuilder.select('id')).thenAnswer((_) => filterBuilder);
 
         final result = await repository.hasDoseLog(_validDoseId);
         expect(result, isTrue);
@@ -168,46 +163,36 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(mockUser);
 
         final queryBuilder = FakeQueryBuilder();
-        final filterBuilder = _buildChainedFilter(
-          () => Future.value([]),
-        );
+        final filterBuilder = buildChainedFilter(() => Future.value([]));
 
         when(
           () => mockClient.from('medication_logs'),
         ).thenAnswer((_) => queryBuilder);
-        when(
-          () => queryBuilder.select('id'),
-        ).thenAnswer((_) => filterBuilder);
+        when(() => queryBuilder.select('id')).thenAnswer((_) => filterBuilder);
 
         final result = await repository.hasDoseLog(_validDoseId);
         expect(result, isFalse);
       });
 
-      test(
-        'hasDoseLog: network failure → throws PostgrestException',
-        () async {
-          when(() => mockAuth.currentUser).thenReturn(mockUser);
+      test('hasDoseLog: network failure → throws PostgrestException', () async {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
 
-          final queryBuilder = FakeQueryBuilder();
-          final filterBuilder = _buildChainedFilter(
-            () => Future.error(
-              const PostgrestException(message: 'Network error'),
-            ),
-          );
+        final queryBuilder = FakeQueryBuilder();
+        final filterBuilder = buildChainedFilter(
+          () =>
+              Future.error(const PostgrestException(message: 'Network error')),
+        );
 
-          when(
-            () => mockClient.from('medication_logs'),
-          ).thenAnswer((_) => queryBuilder);
-          when(
-            () => queryBuilder.select('id'),
-          ).thenAnswer((_) => filterBuilder);
+        when(
+          () => mockClient.from('medication_logs'),
+        ).thenAnswer((_) => queryBuilder);
+        when(() => queryBuilder.select('id')).thenAnswer((_) => filterBuilder);
 
-          expect(
-            () => repository.hasDoseLog(_validDoseId),
-            throwsA(isA<PostgrestException>()),
-          );
-        },
-      );
+        expect(
+          () => repository.hasDoseLog(_validDoseId),
+          throwsA(isA<PostgrestException>()),
+        );
+      });
     });
   });
 }

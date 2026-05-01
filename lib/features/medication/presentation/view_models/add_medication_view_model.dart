@@ -229,7 +229,9 @@ class AddMedicationViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _scheduleInitialNotifications(SavedMedicationResult result) async {
+  Future<void> _scheduleInitialNotifications(
+    SavedMedicationResult result,
+  ) async {
     final medication = Medication(
       id: result.medicationId,
       userId: '',

@@ -57,3 +57,5 @@ app.*.map.json
 /ios/Runner/GeneratedPluginRegistrant.m
 
 .env
+.claude
+.codex

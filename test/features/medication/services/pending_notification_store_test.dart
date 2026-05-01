@@ -58,23 +58,17 @@ void main() {
           expect(result, hasLength(1));
           expect(result.first.dose.id, 'dose-1');
           expect(result.first.notificationId, 42);
-          expect(
-            result.first.scheduledTime,
-            DateTime(2026, 4, 16, 8, 30),
-          );
+          expect(result.first.scheduledTime, DateTime(2026, 4, 16, 8, 30));
         },
       );
 
-      test(
-        'loadPending: malformed JSON in prefs → throws',
-        () async {
-          SharedPreferences.setMockInitialValues({
-            _storageKey: ['not valid json {{{{'],
-          });
+      test('loadPending: malformed JSON in prefs → throws', () async {
+        SharedPreferences.setMockInitialValues({
+          _storageKey: ['not valid json {{{{'],
+        });
 
-          expect(() => store.loadPending(), throwsA(anything));
-        },
-      );
+        expect(() => store.loadPending(), throwsA(anything));
+      });
     });
 
     group('upsert', () {
@@ -107,18 +101,15 @@ void main() {
         },
       );
 
-      test(
-        'upsert: different doseId → both entries coexist',
-        () async {
-          await store.upsert(_demoNotification);
-          await store.upsert(_otherNotification);
+      test('upsert: different doseId → both entries coexist', () async {
+        await store.upsert(_demoNotification);
+        await store.upsert(_otherNotification);
 
-          final result = await store.loadPending();
-          expect(result, hasLength(2));
-          final ids = result.map((n) => n.dose.id).toSet();
-          expect(ids, containsAll(['dose-1', 'dose-2']));
-        },
-      );
+        final result = await store.loadPending();
+        expect(result, hasLength(2));
+        final ids = result.map((n) => n.dose.id).toSet();
+        expect(ids, containsAll(['dose-1', 'dose-2']));
+      });
     });
 
     group('removeByDoseId', () {

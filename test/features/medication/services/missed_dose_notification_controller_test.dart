@@ -147,6 +147,9 @@ class _MockAuthService implements AuthService {
   String? get currentUserEmail => null;
 
   @override
+  Map<String, dynamic> get currentUserMetadata => const {};
+
+  @override
   bool get isLoggedIn => false;
 
   @override
@@ -169,4 +172,10 @@ class _MockAuthService implements AuthService {
 
   @override
   Future<void> signOut() async {}
+
+  @override
+  Future<void> updateProfile({
+    required String email,
+    required Map<String, dynamic> metadata,
+  }) async {}
 }

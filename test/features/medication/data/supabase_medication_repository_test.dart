@@ -114,15 +114,21 @@ void main() {
           final remFilterBuilder = FakeFilterBuilder<PostgrestList>(
             () => Future.value([]),
           );
+          final remTransformBuilder = FakeTransformBuilder<PostgrestList>(
+            () => Future.value([]),
+          );
           when(
             () => mockClient.from('medication_reminders'),
           ).thenAnswer((_) => remBuilder);
           when(
             () => remBuilder.insert(any<List<Map<String, dynamic>>>()),
           ).thenAnswer((_) => remFilterBuilder);
+          when(
+            () => remFilterBuilder.select(),
+          ).thenAnswer((_) => remTransformBuilder);
 
           final result = await repository.addMedication(payload);
-          expect(result, 'med-123');
+          expect(result.medicationId, 'med-123');
         },
       );
 
@@ -204,12 +210,20 @@ void main() {
               const PostgrestException(message: 'Reminders failed'),
             ),
           );
+          final remTransformBuilder = FakeTransformBuilder<PostgrestList>(
+            () => Future.error(
+              const PostgrestException(message: 'Reminders failed'),
+            ),
+          );
           when(
             () => mockClient.from('medication_reminders'),
           ).thenAnswer((_) => remBuilder);
           when(
             () => remBuilder.insert(any<List<Map<String, dynamic>>>()),
           ).thenAnswer((_) => remFilterBuilder);
+          when(
+            () => remFilterBuilder.select(),
+          ).thenAnswer((_) => remTransformBuilder);
 
           // Rollback mock
           final deleteFilterBuilder = FakeFilterBuilder<dynamic>(
@@ -239,6 +253,8 @@ void main() {
 
     group('fetchMedications', () {
       test('Happy path: successfully returns list of medications', () async {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+
         final queryBuilder = FakeQueryBuilder();
         final filterBuilder = FakeFilterBuilder<PostgrestList>(
           () => Future.value([
@@ -259,6 +275,9 @@ void main() {
         ).thenAnswer((_) => queryBuilder);
         when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
         when(
+          () => filterBuilder.eq('user_id', 'user-123'),
+        ).thenAnswer((_) => filterBuilder);
+        when(
           () => filterBuilder.order('created_at', ascending: false),
         ).thenAnswer((_) => filterBuilder);
 
@@ -269,6 +288,8 @@ void main() {
       });
 
       test('Empty result: returns empty list safely', () async {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+
         final queryBuilder = FakeQueryBuilder();
         final filterBuilder = FakeFilterBuilder<PostgrestList>(
           () => Future.value([]),
@@ -279,6 +300,9 @@ void main() {
         ).thenAnswer((_) => queryBuilder);
         when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
         when(
+          () => filterBuilder.eq('user_id', 'user-123'),
+        ).thenAnswer((_) => filterBuilder);
+        when(
           () => filterBuilder.order('created_at', ascending: false),
         ).thenAnswer((_) => filterBuilder);
 
@@ -287,6 +311,8 @@ void main() {
       });
 
       test('Network failure: throws PostgrestException', () async {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+
         final queryBuilder = FakeQueryBuilder();
         final filterBuilder = FakeFilterBuilder<PostgrestList>(
           () =>
@@ -298,6 +324,9 @@ void main() {
         ).thenAnswer((_) => queryBuilder);
         when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
         when(
+          () => filterBuilder.eq('user_id', 'user-123'),
+        ).thenAnswer((_) => filterBuilder);
+        when(
           () => filterBuilder.order('created_at', ascending: false),
         ).thenAnswer((_) => filterBuilder);
 
@@ -308,6 +337,8 @@ void main() {
       });
 
       test('Malformed data: throws on invalid json shape', () async {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+
         final queryBuilder = FakeQueryBuilder();
         final filterBuilder = FakeFilterBuilder<PostgrestList>(
           () => Future.value([
@@ -319,6 +350,9 @@ void main() {
           () => mockClient.from('medications'),
         ).thenAnswer((_) => queryBuilder);
         when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+        when(
+          () => filterBuilder.eq('user_id', 'user-123'),
+        ).thenAnswer((_) => filterBuilder);
         when(
           () => filterBuilder.order('created_at', ascending: false),
         ).thenAnswer((_) => filterBuilder);

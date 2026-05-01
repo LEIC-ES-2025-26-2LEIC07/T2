@@ -109,6 +109,8 @@ void main() {
           () => mockAuth.authStateChanges,
         ).thenAnswer((_) => Stream.fromIterable([true]));
         when(() => mockAuth.isLoggedIn).thenReturn(true);
+        when(() => mockAuth.currentUserEmail).thenReturn('user@example.com');
+        when(() => mockAuth.currentUserMetadata).thenReturn(const {});
 
         getIt.registerSingleton<AuthService>(mockAuth);
         getIt.registerSingleton<SupabaseClient>(MockSupabaseClient());
