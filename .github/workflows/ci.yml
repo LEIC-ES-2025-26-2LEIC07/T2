@@ -30,6 +30,9 @@ jobs:
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
+      - name: Create .env file
+        run: touch .env
+
       - name: Run static analysis
         run: flutter analyze
 
