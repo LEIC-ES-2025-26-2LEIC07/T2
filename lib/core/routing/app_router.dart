@@ -5,6 +5,7 @@ import 'package:clinic_go/features/auth/presentation/views/register_screen.dart'
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
+import 'package:clinic_go/features/medication/presentation/views/monthly_summary_screen.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 
 /// Centralized route factory for the ClinicGO app.
@@ -17,6 +18,7 @@ class AppRouter {
   static const String home = '/home';
   static const String login = '/login';
   static const String register = '/register';
+  static const String summary = '/summary';
 
   /// Called by [MaterialApp.onGenerateRoute].
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -40,6 +42,13 @@ class AppRouter {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (_) => const RegisterScreen(),
+      );
+    }
+
+    if (routeName == summary) {
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => const MonthlySummaryScreen(),
       );
     }
 

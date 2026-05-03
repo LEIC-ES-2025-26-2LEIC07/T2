@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
@@ -55,17 +56,21 @@ class _ClinicGOState extends State<ClinicGO> {
 
   @override
   Widget build(BuildContext context) {
-    return NotificationLifecycleWrapper(
-      child: MaterialApp(
-        title: 'ClinicGO',
-        debugShowCheckedModeBanner: false,
-        navigatorKey: widget.navigatorKey,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+    return ProviderScope(
+      child: NotificationLifecycleWrapper(
+        child: MaterialApp(
+          title: 'ClinicGO',
+          debugShowCheckedModeBanner: false,
+          navigatorKey: widget.navigatorKey,
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primaryColor,
+            ),
+          ),
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          home: const MainScreen(),
         ),
-        onGenerateRoute: AppRouter.onGenerateRoute,
-        home: const MainScreen(),
       ),
     );
   }
