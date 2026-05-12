@@ -22,8 +22,7 @@ class FakeFilterBuilder<T> extends Mock implements PostgrestFilterBuilder<T> {
   Future<R> then<R>(
     FutureOr<R> Function(T value) onValue, {
     Function? onError,
-  }) =>
-      _futureFn().then(onValue, onError: onError);
+  }) => _futureFn().then(onValue, onError: onError);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

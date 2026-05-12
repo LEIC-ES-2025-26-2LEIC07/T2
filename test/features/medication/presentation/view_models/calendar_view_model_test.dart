@@ -45,8 +45,8 @@ class _CompleterCalendarRepo implements CalendarRepository {
 
 class _FakeMedRepo implements MedicationRepository {
   _FakeMedRepo({List<Medication>? meds, List<MedicationReminder>? reminders})
-      : _meds = meds ?? [],
-        _reminders = reminders ?? [];
+    : _meds = meds ?? [],
+      _reminders = reminders ?? [];
 
   final List<Medication> _meds;
   final List<MedicationReminder> _reminders;
@@ -67,27 +67,25 @@ class _FakeMedRepo implements MedicationRepository {
 CalendarViewModel _vm({
   CalendarRepository? calRepo,
   MedicationRepository? medRepo,
-}) =>
-    CalendarViewModel(
-      calendarRepository: calRepo ?? _FakeCalendarRepo(),
-      medRepository: medRepo ?? _FakeMedRepo(),
-      schedulingService: const DoseSchedulingService(),
-    );
+}) => CalendarViewModel(
+  calendarRepository: calRepo ?? _FakeCalendarRepo(),
+  medRepository: medRepo ?? _FakeMedRepo(),
+  schedulingService: const DoseSchedulingService(),
+);
 
 DoseLogEntry _entry({
   required DateTime scheduledTime,
   DoseLogStatus status = DoseLogStatus.taken,
   String id = 'log-1',
-}) =>
-    DoseLogEntry(
-      id: id,
-      status: status,
-      scheduledTime: scheduledTime,
-      takenTime: scheduledTime,
-      medicationId: 'med-1',
-      medicationName: 'Aspirin',
-      dosage: '100mg',
-    );
+}) => DoseLogEntry(
+  id: id,
+  status: status,
+  scheduledTime: scheduledTime,
+  takenTime: scheduledTime,
+  medicationId: 'med-1',
+  medicationName: 'Aspirin',
+  dosage: '100mg',
+);
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -122,20 +120,23 @@ void main() {
       expect(s.status, DaySummaryStatus.partial);
     });
 
-    test('partial when a taken log exists alongside pending scheduled doses', () {
-      final s = DaySummary(date: DateTime(2025, 1, 1));
-      s.logs.add(_entry(scheduledTime: DateTime(2025, 1, 1, 9)));
-      s.scheduled.add(
-        ScheduledDose(
-          id: 'sd-1',
-          medicationId: 'med-1',
-          medicationName: 'Aspirin',
-          dosage: '100mg',
-          scheduledTime: DateTime(2025, 1, 1, 18),
-        ),
-      );
-      expect(s.status, DaySummaryStatus.partial);
-    });
+    test(
+      'partial when a taken log exists alongside pending scheduled doses',
+      () {
+        final s = DaySummary(date: DateTime(2025, 1, 1));
+        s.logs.add(_entry(scheduledTime: DateTime(2025, 1, 1, 9)));
+        s.scheduled.add(
+          ScheduledDose(
+            id: 'sd-1',
+            medicationId: 'med-1',
+            medicationName: 'Aspirin',
+            dosage: '100mg',
+            scheduledTime: DateTime(2025, 1, 1, 18),
+          ),
+        );
+        expect(s.status, DaySummaryStatus.partial);
+      },
+    );
 
     test('missed when no doses taken on a past day', () {
       final past = DateTime(2000, 6, 15);
@@ -177,7 +178,9 @@ void main() {
 
     test('maps a log entry to the correct day summary', () async {
       final logDay = DateTime(2026, 5, 15, 10);
-      final vm = _vm(calRepo: _FakeCalendarRepo([_entry(scheduledTime: logDay)]));
+      final vm = _vm(
+        calRepo: _FakeCalendarRepo([_entry(scheduledTime: logDay)]),
+      );
       await vm.loadMonth(may2026);
 
       final summary = vm.daySummaryFor(DateTime(2026, 5, 15));
@@ -224,8 +227,13 @@ void main() {
       );
       // Daily reminder at 08:00 covering every day of the week
       final allDays = const [
-        'monday', 'tuesday', 'wednesday', 'thursday',
-        'friday', 'saturday', 'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+        'sunday',
       ];
       final reminder = MedicationReminder(
         id: 'rem-1',
@@ -262,12 +270,15 @@ void main() {
       expect(vm.currentMonth, DateTime(2026, 4, 1));
     });
 
-    test('goToNextMonth wraps December into January of the following year', () async {
-      final vm = _vm();
-      await vm.loadMonth(DateTime(2026, 12, 1));
-      vm.goToNextMonth();
-      expect(vm.currentMonth, DateTime(2027, 1, 1));
-    });
+    test(
+      'goToNextMonth wraps December into January of the following year',
+      () async {
+        final vm = _vm();
+        await vm.loadMonth(DateTime(2026, 12, 1));
+        vm.goToNextMonth();
+        expect(vm.currentMonth, DateTime(2027, 1, 1));
+      },
+    );
   });
 
   // ── daySummaryFor ──────────────────────────────────────────────────────────

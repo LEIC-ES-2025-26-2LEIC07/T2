@@ -76,22 +76,23 @@ Widget _wrap(CalendarViewModel vm) =>
 DoseLogEntry _entry({
   required DateTime scheduledTime,
   DoseLogStatus status = DoseLogStatus.taken,
-}) =>
-    DoseLogEntry(
-      id: 'log-1',
-      status: status,
-      scheduledTime: scheduledTime,
-      takenTime: scheduledTime,
-      medicationId: 'med-1',
-      medicationName: 'Aspirin',
-      dosage: '100mg',
-    );
+}) => DoseLogEntry(
+  id: 'log-1',
+  status: status,
+  scheduledTime: scheduledTime,
+  takenTime: scheduledTime,
+  medicationId: 'med-1',
+  medicationName: 'Aspirin',
+  dosage: '100mg',
+);
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
   group('CalendarScreen – loading state', () {
-    testWidgets('shows CircularProgressIndicator while loading', (tester) async {
+    testWidgets('shows CircularProgressIndicator while loading', (
+      tester,
+    ) async {
       final c = Completer<List<DoseLogEntry>>();
       final vm = CalendarViewModel(
         calendarRepository: _CompleterCalendarRepo(c),
@@ -181,10 +182,7 @@ void main() {
       await tester.tap(find.text('3'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('No medication activity for this day.'),
-        findsOneWidget,
-      );
+      expect(find.text('No medication activity for this day.'), findsOneWidget);
     });
 
     testWidgets('shows log entry details in the bottom sheet', (tester) async {
