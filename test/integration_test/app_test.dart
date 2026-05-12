@@ -1,4 +1,5 @@
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/medication/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
@@ -83,6 +84,7 @@ void main() {
           pendingNotificationStore: getIt<PendingNotificationStore>(),
         ),
       );
+      getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
 
       final navigatorKey = GlobalKey<NavigatorState>();
       await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));

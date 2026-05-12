@@ -23,11 +23,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = widget.viewModel ?? CalendarViewModel(
-      calendarRepository: getIt<CalendarRepository>(),
-      medRepository: getIt<MedicationRepository>(),
-      schedulingService: getIt<DoseSchedulingService>(),
-    );
+    _viewModel =
+        widget.viewModel ??
+        CalendarViewModel(
+          calendarRepository: getIt<CalendarRepository>(),
+          medRepository: getIt<MedicationRepository>(),
+          schedulingService: getIt<DoseSchedulingService>(),
+        );
     if (widget.viewModel == null) {
       _viewModel.loadMonth(DateTime.now());
     }
@@ -46,8 +48,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, _) {
-          if (_viewModel.isLoading) return const Center(child: CircularProgressIndicator());
-          if (_viewModel.error != null) return Center(child: Text(_viewModel.error!));
+          if (_viewModel.isLoading)
+            return const Center(child: CircularProgressIndicator());
+          if (_viewModel.error != null)
+            return Center(child: Text(_viewModel.error!));
 
           final month = _viewModel.currentMonth;
           final header = DateFormat.yMMMM().format(month);
@@ -55,12 +59,31 @@ class _CalendarScreenState extends State<CalendarScreen> {
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
-                    IconButton(onPressed: _viewModel.goToPreviousMonth, icon: const Icon(Icons.chevron_left)),
-                    Expanded(child: Center(child: Text(header, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))),
-                    IconButton(onPressed: _viewModel.goToNextMonth, icon: const Icon(Icons.chevron_right)),
+                    IconButton(
+                      onPressed: _viewModel.goToPreviousMonth,
+                      icon: const Icon(Icons.chevron_left),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          header,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _viewModel.goToNextMonth,
+                      icon: const Icon(Icons.chevron_right),
+                    ),
                   ],
                 ),
               ),
@@ -92,7 +115,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget _buildGrid() {
     final summaries = _viewModel.summaries;
     final month = _viewModel.currentMonth;
-    final firstWeekday = DateTime(month.year, month.month, 1).weekday; // 1 = Mon
+    final firstWeekday = DateTime(
+      month.year,
+      month.month,
+      1,
+    ).weekday; // 1 = Mon
     final daysInMonth = summaries.length;
 
     final rows = <Widget>[];
@@ -105,7 +132,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
           children.add(Expanded(child: Container()));
         } else {
           final summary = summaries[dayIndex - 1];
-          children.add(Expanded(child: _DayCell(summary: summary, onTap: _onDayTap)));
+          children.add(
+            Expanded(
+              child: _DayCell(summary: summary, onTap: _onDayTap),
+            ),
+          );
         }
         dayIndex++;
       }
@@ -124,28 +155,47 @@ class _CalendarScreenState extends State<CalendarScreen> {
       builder: (_) {
         final all = <Widget>[];
         if (summary.scheduled.isEmpty && summary.logs.isEmpty) {
-          all.add(const Padding(padding: EdgeInsets.all(16), child: Text('No medication activity for this day.')));
+          all.add(
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('No medication activity for this day.'),
+            ),
+          );
         } else {
           for (final s in summary.scheduled) {
-            all.add(ListTile(
-              leading: const Icon(Icons.schedule),
-              title: Text('${s.medicationName} • ${s.dosage}'),
-              subtitle: Text('Scheduled: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}'),
-            ));
+            all.add(
+              ListTile(
+                leading: const Icon(Icons.schedule),
+                title: Text('${s.medicationName} • ${s.dosage}'),
+                subtitle: Text(
+                  'Scheduled: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}',
+                ),
+              ),
+            );
           }
           for (final l in summary.logs) {
-            all.add(ListTile(
-              leading: Icon(
-                l.status == DoseLogStatus.taken ? Icons.check_circle : Icons.block,
-                color: l.status == DoseLogStatus.taken ? Colors.green : Colors.orange,
+            all.add(
+              ListTile(
+                leading: Icon(
+                  l.status == DoseLogStatus.taken
+                      ? Icons.check_circle
+                      : Icons.block,
+                  color: l.status == DoseLogStatus.taken
+                      ? Colors.green
+                      : Colors.orange,
+                ),
+                title: Text(l.medicationName ?? ''),
+                subtitle: Text(
+                  'Logged: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})',
+                ),
               ),
-              title: Text(l.medicationName ?? ''),
-              subtitle: Text('Logged: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})'),
-            ));
+            );
           }
         }
 
-        return SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: all));
+        return SafeArea(
+          child: Column(mainAxisSize: MainAxisSize.min, children: all),
+        );
       },
     );
   }
@@ -160,7 +210,10 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final day = summary.date.day;
     final today = DateTime.now();
-    final isToday = summary.date.year == today.year && summary.date.month == today.month && summary.date.day == today.day;
+    final isToday =
+        summary.date.year == today.year &&
+        summary.date.month == today.month &&
+        summary.date.day == today.day;
 
     Color? bg;
     switch (summary.status) {
@@ -193,10 +246,17 @@ class _DayCell extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(day.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              day.toString(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 6),
             if (summary.status != DaySummaryStatus.none)
-              Icon(_iconFor(summary.status), size: 18, color: _colorFor(summary.status)),
+              Icon(
+                _iconFor(summary.status),
+                size: 18,
+                color: _colorFor(summary.status),
+              ),
           ],
         ),
       ),
@@ -241,6 +301,19 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))), const SizedBox(width: 6), Text(label)]);
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
   }
 }

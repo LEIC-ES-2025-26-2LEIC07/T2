@@ -10,17 +10,20 @@ class SupabaseCalendarRepository implements CalendarRepository {
   final SupabaseClient _client;
 
   @override
-  Future<List<DoseLogEntry>> fetchDoseLogs({required DateTime from, required DateTime to}) async {
+  Future<List<DoseLogEntry>> fetchDoseLogs({
+    required DateTime from,
+    required DateTime to,
+  }) async {
     final user = _client.auth.currentUser;
     if (user == null) {
       throw StateError('Authentication is required to fetch calendar data.');
     }
     try {
       // medication_logs schema: id, reminder_id, taken_at, was_taken
-        // medication_logs table does not store user_id; reminders -> medications
-        // link to the owning medication which has user_id. Query logs for the
-        // date range (no user filter) and later filter by medication ownership.
-        final response = await _client
+      // medication_logs table does not store user_id; reminders -> medications
+      // link to the owning medication which has user_id. Query logs for the
+      // date range (no user filter) and later filter by medication ownership.
+      final response = await _client
           .from('medication_logs')
           .select('id, reminder_id, taken_at, was_taken')
           .gte('taken_at', from.toIso8601String())
@@ -38,27 +41,37 @@ class SupabaseCalendarRepository implements CalendarRepository {
       Map<String, Map<String, dynamic>> remindersMap = {};
       if (reminderIds.isNotEmpty) {
         final remResp = await _client
-          .from('medication_reminders')
-          .select('id, medication_id')
-          .filter('id', 'in', '(${reminderIds.map((s) => "\"$s\"").join(',')})');
+            .from('medication_reminders')
+            .select('id, medication_id')
+            .filter(
+              'id',
+              'in',
+              '(${reminderIds.map((s) => "\"$s\"").join(',')})',
+            );
         for (final r in (remResp as List<dynamic>)) {
           final idVal = r['id'];
-          if (idVal != null) remindersMap[idVal.toString()] = r as Map<String, dynamic>;
+          if (idVal != null)
+            remindersMap[idVal.toString()] = r as Map<String, dynamic>;
         }
       }
 
       // Fetch medication details for medication_ids (RLS will ensure we only
       // receive medications for the current user)
-      final medIds = remindersMap.values.map((m) => (m['medication_id'] ?? '').toString()).where((id) => id.isNotEmpty).toSet().toList();
+      final medIds = remindersMap.values
+          .map((m) => (m['medication_id'] ?? '').toString())
+          .where((id) => id.isNotEmpty)
+          .toSet()
+          .toList();
       final medsMap = <String, Map<String, dynamic>>{};
       if (medIds.isNotEmpty) {
         final medsResp = await _client
-          .from('medications')
-          .select('id, name, dosage')
-          .filter('id', 'in', '(${medIds.map((s) => "\"$s\"").join(',')})');
+            .from('medications')
+            .select('id, name, dosage')
+            .filter('id', 'in', '(${medIds.map((s) => "\"$s\"").join(',')})');
         for (final m in (medsResp as List<dynamic>)) {
           final idVal = m['id'];
-          if (idVal != null) medsMap[idVal.toString()] = m as Map<String, dynamic>;
+          if (idVal != null)
+            medsMap[idVal.toString()] = m as Map<String, dynamic>;
         }
       }
 
@@ -67,9 +80,13 @@ class SupabaseCalendarRepository implements CalendarRepository {
       final out = <DoseLogEntry>[];
       for (final r in rows) {
         final reminderIdRaw = r['reminder_id'];
-        final reminderId = reminderIdRaw != null ? reminderIdRaw.toString() : null;
+        final reminderId = reminderIdRaw != null
+            ? reminderIdRaw.toString()
+            : null;
         final rem = reminderId != null ? remindersMap[reminderId] : null;
-        final med = rem != null ? medsMap[(rem['medication_id'] ?? '').toString()] : null;
+        final med = rem != null
+            ? medsMap[(rem['medication_id'] ?? '').toString()]
+            : null;
         if (med == null) continue; // not this user's medication
 
         final takenAtRaw = r['taken_at'];
@@ -79,22 +96,28 @@ class SupabaseCalendarRepository implements CalendarRepository {
         } else if (takenAtRaw is int) {
           takenAt = DateTime.fromMillisecondsSinceEpoch(takenAtRaw * 1000);
         } else if (takenAtRaw is double) {
-          takenAt = DateTime.fromMillisecondsSinceEpoch((takenAtRaw * 1000).toInt());
+          takenAt = DateTime.fromMillisecondsSinceEpoch(
+            (takenAtRaw * 1000).toInt(),
+          );
         }
 
         final idVal = r['id'];
         final idStr = idVal != null ? idVal.toString() : '';
 
-        out.add(DoseLogEntry(
-          id: idStr,
-          status: (r['was_taken'] as bool?) == true ? DoseLogStatus.taken : DoseLogStatus.skipped,
-          // No scheduled_time stored in medication_logs; use takenAt as the anchor
-          scheduledTime: takenAt ?? DateTime.now(),
-          takenTime: takenAt,
-          medicationId: med['id']?.toString(),
-          medicationName: med['name']?.toString(),
-          dosage: med['dosage']?.toString(),
-        ));
+        out.add(
+          DoseLogEntry(
+            id: idStr,
+            status: (r['was_taken'] as bool?) == true
+                ? DoseLogStatus.taken
+                : DoseLogStatus.skipped,
+            // No scheduled_time stored in medication_logs; use takenAt as the anchor
+            scheduledTime: takenAt ?? DateTime.now(),
+            takenTime: takenAt,
+            medicationId: med['id']?.toString(),
+            medicationName: med['name']?.toString(),
+            dosage: med['dosage']?.toString(),
+          ),
+        );
       }
 
       return out;

@@ -88,7 +88,9 @@ class CalendarViewModel extends ChangeNotifier {
 
       final scheduled = <ScheduledDose>[];
       for (final med in meds) {
-        final medReminders = reminders.where((r) => r.medicationId == med.id).toList();
+        final medReminders = reminders
+            .where((r) => r.medicationId == med.id)
+            .toList();
         scheduled.addAll(
           schedulingService.calculateUpcomingDoses(
             med,
@@ -104,16 +106,27 @@ class CalendarViewModel extends ChangeNotifier {
 
       DaySummary ensure(DateTime d) {
         final key = _keyFor(d);
-        return map.putIfAbsent(key, () => DaySummary(date: DateTime(d.year, d.month, d.day)));
+        return map.putIfAbsent(
+          key,
+          () => DaySummary(date: DateTime(d.year, d.month, d.day)),
+        );
       }
 
       for (final s in scheduled) {
-        final day = DateTime(s.scheduledTime.year, s.scheduledTime.month, s.scheduledTime.day);
+        final day = DateTime(
+          s.scheduledTime.year,
+          s.scheduledTime.month,
+          s.scheduledTime.day,
+        );
         ensure(day).scheduled.add(s);
       }
 
       for (final l in logs) {
-        final day = DateTime(l.scheduledTime.year, l.scheduledTime.month, l.scheduledTime.day);
+        final day = DateTime(
+          l.scheduledTime.year,
+          l.scheduledTime.month,
+          l.scheduledTime.day,
+        );
         ensure(day).logs.add(l);
       }
 

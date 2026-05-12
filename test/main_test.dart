@@ -1,3 +1,4 @@
+import 'package:clinic_go/features/medication/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -51,6 +52,7 @@ void main() {
     );
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
+    GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
   });
 
   tearDown(() async {
