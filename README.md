@@ -192,8 +192,8 @@ Example:
   <img src="https://github.com/FEUP-LEIC-ES-2022-23/templates/blob/main/images/DomainModel.png"/>
 </p>
 -->
+<img width="1493" height="804" alt="image" src="https://github.com/user-attachments/assets/0e53e2b7-62d6-47e2-a836-240879959088" />
 
-<img src="docs/diagrams/main.png">
 
 The ClinicGO domain is centred around the **User** (patient), who has a personal
 health profile containing their name, date of birth, and contact information.
@@ -234,7 +234,8 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
 -->
 <div align="center" justify="center">
-  <img src="docs/diagrams/ViewLogical.png">
+  <img width="1045" height="721" alt="image" src="https://github.com/user-attachments/assets/f1be4e62-f915-4e45-a2c2-6edd25ec6fdf" />
+
 </div>
 <br>
 The logical architecture represents the high-level structure of the ClinicGO application, illustrating 
@@ -319,7 +320,7 @@ You can find below information and references related to the project management 
 * * **Release Management:** Version tracking begins with [v0](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0), followed by v1, v2, v3...
 * **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
 * **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1lBXRWSGOGwlCaAO6XVjdQlxRd8Vy1xQ2nmZJSPKH9LQ/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
-* **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANELOG.md)).
+* **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANGELOG.md)).
 * **Git Workflow:** We follow a feature-branch workflow branching off `main`. Each feature or bug fix is developed on its own dedicated branch and integrated via a Pull Request (PR). Code reviews are mandatory and enforced using branch protection rules to ensure code quality and consistency.
 * **CI/CD (GitHub Actions):** Every Pull Request automatically triggers a GitHub Actions workflow that verifies code formatting and enforces linting rules. This helps maintain a consistent codebase and prevents errors from reaching the main branch.
 
@@ -350,34 +351,49 @@ You can find below information and references related to the project management 
     * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
 
 * **Puzzles:**
-    * **Tech Stack Proficiency:** Getting the entire team up to speed with **Flutter** and **Supabase** to ensure everyone can contribute technically.
     * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
+
 
 ### Sprint 1
+---
 
-* **Did well:**
-    * **Database integration**.
-    * **:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase**.
-* **Do differently:**
-    * **Team Balance & Participation:** **Improve workload distribution.** During this sprint, the team did not function at its best as the vast majority of the work was carried out by only a few members. We need to ensure everyone is actively contributing to avoid bottlenecks.
-    * **Time Management:** Start iterations immediately to prevent "crunching" at the end of the sprint and to account for unexpected technical hurdles.
-    * **Git Workflow:** Strictly enforce the use of feature branches and pull requests for every task to maintain code quality and visibility.
-    * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
-
-* **Puzzles:**
-    * **Tech Stack Proficiency:** Getting the entire team up to speed with **Flutter** and **Supabase** to ensure everyone can contribute technically.
-    * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
-      
 <div align="center" justify="center">
-  <p>Start of Sprint 0</p>
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/efcaed02-e470-452a-be86-48606d606afd" />
-  <p>End of Sprint 0</p>
+  <p>Start of Sprint 1</p>
 <img width="1856" height="956" alt="image" src="https://github.com/user-attachments/assets/9943e5f3-a8f8-446e-90d9-24363cadec65" />
+  <p>End of Sprint 1</p>
 </div>
 
-### Sprint 2
+* **Did well:**
+  * The main user stories planned for the sprint were successfully completed, covering the core functionality of the application, including medication management, authentication improvements, and notification handling.
+* **Do differently:**
+  * **End-of-Sprint Pressure:** Several features were finalized close to the deadline, which led to tighter integration time and less opportunity for refinement and testing.
+  * **Git Workflow Consistency:** Reinforce the consistent use of feature branches and pull requests for all changes to improve code review quality and reduce integration issues.
+* **Puzzles:**
+  * **Tech Stack Proficiency:** Ensuring the entire team becomes fully comfortable with **Flutter** and **Supabase**, in order to improve development speed and enable more balanced contribution across members.
 
+
+### Sprint 2
+---
+
+<div align="center" justify="center">
 <img width="897" height="956" alt="image" src="https://github.com/user-attachments/assets/7381f93d-c03f-42e3-891f-c2463672c3b9" />
+  <p>Start of Sprint 2</p>
+<img width="542" height="872" alt="image" src="https://github.com/user-attachments/assets/8264f90e-e56f-4bdd-852f-1ba0de9cf022" />
+  <p>End of Sprint 2</p>
+  </div>
+  
+* **Did well:**
+    * **:** Balanced Workload: Significant improvement in team participation.
+    * Task distribution was more equitable, ensuring that knowledge was shared and burnout was avoided.
+    * **Enhanced Peer Review Culture:** The introduction of mandatory Pull Requests (PRs) was a success. Team members actively reviewed each other's code, leading to fewer bugs and a more unified coding style.
+* **Do differently:**
+  * **Persistent Time Management Issues:** We failed to avoid the "end-of-sprint crunch." Tasks were backloaded to the final days, causing unnecessary pressure and preventing thorough testing of the final features.
+
+  * **Delayed Problem Signaling:** Because we didn't have the scheduled syncs, technical hurdles were often kept private for too long, creating bottlenecks that could have been solved through collaboration.
+
+* **Puzzles:**
+  * **Weekly Sync Session:** We will implement one 60-minute session per week dedicated to pair programming and progress alignment.
 
 
 ### Sprint 3
