@@ -7,6 +7,8 @@ import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
 import 'package:clinic_go/features/medication/presentation/views/monthly_summary_screen.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/symptoms/presentation/views/log_symptom_screen.dart';
+import 'package:clinic_go/features/symptoms/presentation/views/symptom_history_screen.dart';
 
 /// Centralized route factory for the ClinicGO app.
 ///
@@ -19,6 +21,8 @@ class AppRouter {
   static const String login = '/login';
   static const String register = '/register';
   static const String summary = '/summary';
+  static const String logSymptom = '/log-symptom';
+  static const String symptomHistory = '/symptom-history';
 
   /// Called by [MaterialApp.onGenerateRoute].
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -28,6 +32,20 @@ class AppRouter {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (_) => const MainScreen(),
+      );
+    }
+
+    if (routeName == logSymptom) {
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => const LogSymptomScreen(),
+      );
+    }
+
+    if (routeName == symptomHistory) {
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => const SymptomHistoryScreen(),
       );
     }
 

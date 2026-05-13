@@ -16,6 +16,7 @@ import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
 import 'package:clinic_go/features/medication/presentation/views/calendar_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:intl/intl.dart';
 
 class MainScreen extends StatefulWidget {
@@ -265,8 +266,6 @@ class _HomeContentState extends State<HomeContent> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    // Logic to simulate opening an overdue dose for testing
-                    // Matches Lisbonipril • 10mg demo data in notification_flow_test
                     Navigator.of(context).pushNamed(
                       MissedDoseNotificationController.buildDoseLoggingRoute(
                         ScheduledDose(
@@ -274,17 +273,36 @@ class _HomeContentState extends State<HomeContent> {
                           medicationId: 'med-123',
                           medicationName: 'Lisinopril',
                           dosage: '10mg',
-                          scheduledTime: DateTime(
-                            2026,
-                            1,
-                            1,
-                          ), // Date is ignored for overdue check usually
+                          scheduledTime: DateTime(2026, 1, 1),
                         ),
                         isOverdue: true,
                       ),
                     );
                   },
                   child: const Text('Open overdue dose'),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRouter.logSymptom),
+                        icon: const Icon(Icons.add_circle_outline),
+                        label: const Text('Log Symptom'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).pushNamed(AppRouter.symptomHistory),
+                        icon: const Icon(Icons.history),
+                        label: const Text('Symptom History'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
