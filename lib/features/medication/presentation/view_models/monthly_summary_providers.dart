@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/monthly_summary_repository.dart';
 import 'package:clinic_go/features/medication/models/monthly_medication_log.dart';
 
@@ -57,7 +58,7 @@ final selectedMonthProvider = NotifierProvider<SelectedMonthNotifier, DateTime>(
 final monthlySummaryRepositoryProvider = Provider<MonthlySummaryRepository>((
   ref,
 ) {
-  return MonthlySummaryRepository(Supabase.instance.client);
+  return MonthlySummaryRepository(getIt<SupabaseClient>());
 });
 
 final monthlyLogsProvider = FutureProvider.family<MonthlySummary, DateTime>((

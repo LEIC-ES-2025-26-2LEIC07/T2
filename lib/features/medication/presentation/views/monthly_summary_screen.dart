@@ -6,19 +6,8 @@ import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/models/monthly_medication_log.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/monthly_summary_providers.dart';
 
-class MonthlySummaryScreen extends StatelessWidget {
+class MonthlySummaryScreen extends ConsumerWidget {
   const MonthlySummaryScreen({super.key, this.showAppBar = true});
-
-  final bool showAppBar;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProviderScope(child: _MonthlySummaryContent(showAppBar: showAppBar));
-  }
-}
-
-class _MonthlySummaryContent extends ConsumerWidget {
-  const _MonthlySummaryContent({required this.showAppBar});
 
   final bool showAppBar;
 
