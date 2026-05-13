@@ -102,6 +102,38 @@ class SupabaseMedicationRepository implements MedicationRepository {
   }
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {
+    // 1. Update main medication row
+    await _client
+        .from('medications')
+        .update({
+          'name': payload.name,
+          'dosage': payload.dosage,
+          'frequency': payload.frequency,
+          'color': Medication.colorToHex(payload.color),
+          'start_date': payload.startDate?.toIso8601String().substring(0, 10),
+          'end_date': payload.endDate?.toIso8601String().substring(0, 10),
+          'notes': payload.notes,
+        })
+        .eq('id', payload.medicationId);
+
+    // 2. Upsert modified / new reminders
+    if (payload.remindersToUpsert.isNotEmpty) {
+      await _client
+          .from('medication_reminders')
+          .upsert(payload.remindersToUpsert);
+    }
+
+    // 3. Delete removed reminders
+    if (payload.remindersToDelete.isNotEmpty) {
+      await _client
+          .from('medication_reminders')
+          .delete()
+          .inFilter('id', payload.remindersToDelete);
+    }
+  }
+
+  @override
   Future<void> deleteMedication(String id) async {
     await _client.from('medications').delete().eq('id', id);
   }
@@ -109,6 +141,21 @@ class SupabaseMedicationRepository implements MedicationRepository {
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async {
     final response = await _client.from('medication_reminders').select();
+
+    return (response as List<dynamic>)
+        .cast<Map<String, dynamic>>()
+        .map(MedicationReminder.fromJson)
+        .toList();
+  }
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async {
+    final response = await _client
+        .from('medication_reminders')
+        .select()
+        .eq('medication_id', medicationId);
 
     return (response as List<dynamic>)
         .cast<Map<String, dynamic>>()

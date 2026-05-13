@@ -4,6 +4,7 @@ import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 
 class DoseItem {
   const DoseItem({
@@ -37,13 +38,16 @@ class DailyDosesViewModel extends ChangeNotifier {
     required MedicationRepository repository,
     required DoseSchedulingService schedulingService,
     required DoseLogRepository logRepository,
+    MissedDoseNotificationController? notificationController,
   }) : _repository = repository,
        _schedulingService = schedulingService,
-       _logRepository = logRepository;
+       _logRepository = logRepository,
+       _notificationController = notificationController;
 
   final MedicationRepository _repository;
   final DoseSchedulingService _schedulingService;
   final DoseLogRepository _logRepository;
+  final MissedDoseNotificationController? _notificationController;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -109,20 +113,30 @@ class DailyDosesViewModel extends ChangeNotifier {
     final prev = _doses[index];
     final previousState = prev.copyWith();
 
+    final loggedAt = DateTime.now();
+
     // Optimistic update
     _doses[index] = prev.copyWith(
       status: status,
-      takenTime: DateTime.now(),
+      takenTime: loggedAt,
       isSubmitting: true,
     );
     notifyListeners();
 
     try {
-      await _logRepository.insertDoseLog(
-        dose: dose,
-        status: status,
-        loggedAt: DateTime.now(),
-      );
+      if (_notificationController != null) {
+        await _notificationController.logDose(
+          dose: dose,
+          status: status,
+          loggedAt: loggedAt,
+        );
+      } else {
+        await _logRepository.insertDoseLog(
+          dose: dose,
+          status: status,
+          loggedAt: loggedAt,
+        );
+      }
 
       // mark not submitting
       _doses[index] = _doses[index].copyWith(isSubmitting: false);

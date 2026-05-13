@@ -102,7 +102,7 @@ class AppRouter {
 
     final controller = getIt<MissedDoseNotificationController>();
 
-    return MaterialPageRoute<void>(
+    return MaterialPageRoute<bool>(
       settings: settings,
       builder: (_) => DoseLoggingScreen(
         dose: dose,

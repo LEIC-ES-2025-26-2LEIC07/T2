@@ -16,6 +16,11 @@ class DaySummary {
   final List<ScheduledDose> scheduled = [];
 
   DaySummaryStatus get status {
+    // Today is always neutral — only colour it once the day has ended.
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (date == today) return DaySummaryStatus.none;
+
     if (logs.isEmpty && scheduled.isEmpty) return DaySummaryStatus.none;
 
     final taken = logs.where((l) => l.status == DoseLogStatus.taken).length;
@@ -26,11 +31,8 @@ class DaySummary {
     if (taken == totalScheduled) return DaySummaryStatus.allTaken;
     if (taken > 0) return DaySummaryStatus.partial;
 
-    // none taken
-    final now = DateTime.now();
-    if (date.isBefore(DateTime(now.year, now.month, now.day))) {
-      return DaySummaryStatus.missed;
-    }
+    // none taken — past day → missed
+    if (date.isBefore(today)) return DaySummaryStatus.missed;
     return DaySummaryStatus.upcoming;
   }
 }

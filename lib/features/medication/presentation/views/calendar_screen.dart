@@ -241,7 +241,7 @@ class _DayCell extends StatelessWidget {
         margin: const EdgeInsets.all(6),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
-          color: isToday ? Colors.yellow.shade100 : bg ?? Colors.transparent,
+          color: isToday ? Colors.grey.shade300 : bg ?? Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey.shade300),
         ),

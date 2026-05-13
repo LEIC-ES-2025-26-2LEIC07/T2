@@ -255,6 +255,9 @@ class _EmptyMedicationRepo implements MedicationRepository {
       const SavedMedicationResult(medicationId: 'id', reminders: []);
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<void> deleteMedication(String id) async {}
 
   @override
@@ -262,6 +265,11 @@ class _EmptyMedicationRepo implements MedicationRepository {
 
   @override
   Future<List<Medication>> fetchMedications() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 class _MockSupabaseClient extends Mock implements SupabaseClient {}
