@@ -43,9 +43,7 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
       if (_searchController.text != next.searchQuery) {
         _searchController.value = TextEditingValue(
           text: next.searchQuery,
-          selection: TextSelection.collapsed(
-            offset: next.searchQuery.length,
-          ),
+          selection: TextSelection.collapsed(offset: next.searchQuery.length),
         );
       }
     });
@@ -267,9 +265,8 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
       lastDate: DateTime.now().add(const Duration(days: 1)),
     );
 
-    if (date == null || !mounted) {
-      return;
-    }
+    if (date == null) return;
+    if (!context.mounted) return;
 
     final time = await showTimePicker(
       context: context,

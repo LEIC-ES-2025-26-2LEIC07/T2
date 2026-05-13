@@ -36,7 +36,7 @@ class SymptomHistoryScreen extends ConsumerWidget {
             return ListView.separated(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               itemCount: logs.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 14),
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
               itemBuilder: (context, index) {
                 return _SymptomTimelineCard(log: logs[index]);
               },
