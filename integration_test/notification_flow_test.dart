@@ -20,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:intl/intl.dart';
 
-import '../helpers/medication_mocks.dart';
+import '../test/helpers/medication_mocks.dart';
 
 class MockMedicationRepository extends Mock implements MedicationRepository {}
 

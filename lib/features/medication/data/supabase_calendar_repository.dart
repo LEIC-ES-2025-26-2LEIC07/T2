@@ -50,8 +50,9 @@ class SupabaseCalendarRepository implements CalendarRepository {
             );
         for (final r in (remResp as List<dynamic>)) {
           final idVal = r['id'];
-          if (idVal != null)
+          if (idVal != null) {
             remindersMap[idVal.toString()] = r as Map<String, dynamic>;
+          }
         }
       }
 
@@ -70,8 +71,9 @@ class SupabaseCalendarRepository implements CalendarRepository {
             .filter('id', 'in', '(${medIds.map((s) => "\"$s\"").join(',')})');
         for (final m in (medsResp as List<dynamic>)) {
           final idVal = m['id'];
-          if (idVal != null)
+          if (idVal != null) {
             medsMap[idVal.toString()] = m as Map<String, dynamic>;
+          }
         }
       }
 
@@ -80,9 +82,7 @@ class SupabaseCalendarRepository implements CalendarRepository {
       final out = <DoseLogEntry>[];
       for (final r in rows) {
         final reminderIdRaw = r['reminder_id'];
-        final reminderId = reminderIdRaw != null
-            ? reminderIdRaw.toString()
-            : null;
+        final reminderId = reminderIdRaw?.toString();
         final rem = reminderId != null ? remindersMap[reminderId] : null;
         final med = rem != null
             ? medsMap[(rem['medication_id'] ?? '').toString()]

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/data/supabase_auth_service.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -16,6 +17,10 @@ void main() {
   late MockUser mockUser;
   late SupabaseAuthService service;
 
+  setUpAll(() {
+    registerFallbackValue(UserAttributes());
+  });
+
   setUp(() {
     mockClient = MockSupabaseClient();
     mockAuth = MockGoTrueClient();
@@ -23,6 +28,7 @@ void main() {
 
     when(() => mockClient.auth).thenReturn(mockAuth);
     when(() => mockUser.email).thenReturn('user@example.com');
+    when(() => mockUser.userMetadata).thenReturn(const {'name': 'Test'});
 
     service = SupabaseAuthService(client: mockClient);
   });
@@ -183,6 +189,154 @@ void main() {
           throwsA(isA<AuthException>()),
         );
       });
+    });
+
+    group('currentUserMetadata', () {
+      test('returns user metadata when user is logged in', () {
+        when(() => mockAuth.currentUser).thenReturn(mockUser);
+        expect(service.currentUserMetadata, {'name': 'Test'});
+      });
+
+      test('returns empty map when no user', () {
+        when(() => mockAuth.currentUser).thenReturn(null);
+        expect(service.currentUserMetadata, isEmpty);
+      });
+    });
+
+    group('updateProfile', () {
+      test('happy path → completes without error', () async {
+        when(() => mockAuth.updateUser(any())).thenAnswer(
+          (_) async => UserResponse.fromJson({
+            'id': 'test-id',
+            'created_at': '2026-01-01T00:00:00.000Z',
+            'app_metadata': <String, dynamic>{},
+            'aud': 'authenticated',
+          }),
+        );
+
+        await expectLater(
+          service.updateProfile(
+            email: 'user@example.com',
+            metadata: {'name': 'Test'},
+          ),
+          completes,
+        );
+      });
+
+      test(
+        'AuthException with 4xx status → throws validation AuthServiceException',
+        () async {
+          when(() => mockAuth.updateUser(any())).thenThrow(
+            const AuthException('Email already taken', statusCode: '422'),
+          );
+
+          await expectLater(
+            service.updateProfile(email: 'taken@example.com', metadata: {}),
+            throwsA(
+              isA<AuthServiceException>().having(
+                (e) => e.type,
+                'type',
+                AuthFailureType.validation,
+              ),
+            ),
+          );
+        },
+      );
+
+      test(
+        'AuthException with "network" message → throws network AuthServiceException',
+        () async {
+          when(
+            () => mockAuth.updateUser(any()),
+          ).thenThrow(const AuthException('network error occurred'));
+
+          await expectLater(
+            service.updateProfile(email: 'user@example.com', metadata: {}),
+            throwsA(
+              isA<AuthServiceException>().having(
+                (e) => e.type,
+                'type',
+                AuthFailureType.network,
+              ),
+            ),
+          );
+        },
+      );
+
+      test(
+        'AuthException with no keyword match → throws unknown AuthServiceException',
+        () async {
+          when(() => mockAuth.updateUser(any())).thenThrow(
+            const AuthException('Internal server error', statusCode: '500'),
+          );
+
+          await expectLater(
+            service.updateProfile(email: 'user@example.com', metadata: {}),
+            throwsA(
+              isA<AuthServiceException>().having(
+                (e) => e.type,
+                'type',
+                AuthFailureType.unknown,
+              ),
+            ),
+          );
+        },
+      );
+
+      test('TimeoutException → throws network AuthServiceException', () async {
+        when(
+          () => mockAuth.updateUser(any()),
+        ).thenThrow(TimeoutException('Request timed out'));
+
+        await expectLater(
+          service.updateProfile(email: 'user@example.com', metadata: {}),
+          throwsA(
+            isA<AuthServiceException>()
+                .having((e) => e.type, 'type', AuthFailureType.network)
+                .having((e) => e.message, 'message', 'The request timed out.'),
+          ),
+        );
+      });
+
+      test(
+        'generic socket error → throws network AuthServiceException',
+        () async {
+          when(
+            () => mockAuth.updateUser(any()),
+          ).thenThrow(Exception('socket connection refused'));
+
+          await expectLater(
+            service.updateProfile(email: 'user@example.com', metadata: {}),
+            throwsA(
+              isA<AuthServiceException>().having(
+                (e) => e.type,
+                'type',
+                AuthFailureType.network,
+              ),
+            ),
+          );
+        },
+      );
+
+      test(
+        'generic unknown error → throws unknown AuthServiceException',
+        () async {
+          when(
+            () => mockAuth.updateUser(any()),
+          ).thenThrow(Exception('something unexpected'));
+
+          await expectLater(
+            service.updateProfile(email: 'user@example.com', metadata: {}),
+            throwsA(
+              isA<AuthServiceException>().having(
+                (e) => e.type,
+                'type',
+                AuthFailureType.unknown,
+              ),
+            ),
+          );
+        },
+      );
     });
   });
 }

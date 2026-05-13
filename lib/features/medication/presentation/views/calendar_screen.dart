@@ -48,10 +48,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, _) {
-          if (_viewModel.isLoading)
+          if (_viewModel.isLoading) {
             return const Center(child: CircularProgressIndicator());
-          if (_viewModel.error != null)
+          }
+          if (_viewModel.error != null) {
             return Center(child: Text(_viewModel.error!));
+          }
 
           final month = _viewModel.currentMonth;
           final header = DateFormat.yMMMM().format(month);
