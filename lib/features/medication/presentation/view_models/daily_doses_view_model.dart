@@ -6,23 +6,29 @@ import 'package:clinic_go/features/medication/services/dose_scheduling_service.d
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 
 class DoseItem {
-  DoseItem({required this.dose});
+  const DoseItem({
+    required this.dose,
+    this.status,
+    this.takenTime,
+    this.isSubmitting = false,
+  });
 
   final ScheduledDose dose;
-  DoseLogStatus? status;
-  DateTime? takenTime;
-  bool isSubmitting = false;
+  final DoseLogStatus? status;
+  final DateTime? takenTime;
+  final bool isSubmitting;
 
   DoseItem copyWith({
     DoseLogStatus? status,
     DateTime? takenTime,
     bool? isSubmitting,
   }) {
-    final out = DoseItem(dose: dose)
-      ..status = status ?? this.status
-      ..takenTime = takenTime ?? this.takenTime
-      ..isSubmitting = isSubmitting ?? this.isSubmitting;
-    return out;
+    return DoseItem(
+      dose: dose,
+      status: status ?? this.status,
+      takenTime: takenTime ?? this.takenTime,
+      isSubmitting: isSubmitting ?? this.isSubmitting,
+    );
   }
 }
 

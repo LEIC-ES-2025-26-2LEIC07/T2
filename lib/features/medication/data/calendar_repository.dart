@@ -6,6 +6,7 @@ class DoseLogEntry {
     required this.status,
     required this.scheduledTime,
     this.takenTime,
+    this.reminderId,
     this.medicationId,
     this.medicationName,
     this.dosage,
@@ -15,6 +16,7 @@ class DoseLogEntry {
   final DoseLogStatus status;
   final DateTime scheduledTime;
   final DateTime? takenTime;
+  final String? reminderId;
   final String? medicationId;
   final String? medicationName;
   final String? dosage;

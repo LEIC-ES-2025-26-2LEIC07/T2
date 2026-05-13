@@ -101,6 +101,14 @@ class SupabaseCalendarRepository implements CalendarRepository {
           );
         }
 
+        if (takenAt == null) {
+          debugPrint(
+            'SupabaseCalendarRepository: skipping log ${r['id']} '
+            'with unparseable taken_at: $takenAtRaw',
+          );
+          continue;
+        }
+
         final idVal = r['id'];
         final idStr = idVal != null ? idVal.toString() : '';
 
@@ -110,9 +118,9 @@ class SupabaseCalendarRepository implements CalendarRepository {
             status: (r['was_taken'] as bool?) == true
                 ? DoseLogStatus.taken
                 : DoseLogStatus.skipped,
-            // No scheduled_time stored in medication_logs; use takenAt as the anchor
-            scheduledTime: takenAt ?? DateTime.now(),
+            scheduledTime: takenAt,
             takenTime: takenAt,
+            reminderId: reminderId,
             medicationId: med['id']?.toString(),
             medicationName: med['name']?.toString(),
             dosage: med['dosage']?.toString(),

@@ -112,22 +112,29 @@ class CalendarViewModel extends ChangeNotifier {
         );
       }
 
-      for (final s in scheduled) {
-        final day = DateTime(
-          s.scheduledTime.year,
-          s.scheduledTime.month,
-          s.scheduledTime.day,
-        );
-        ensure(day).scheduled.add(s);
-      }
-
+      // Track which reminder IDs already have a log so we don't double-count
+      // scheduled doses that the user has already logged.
+      final loggedReminderIds = <String>{};
       for (final l in logs) {
+        if (l.reminderId != null) loggedReminderIds.add(l.reminderId!);
         final day = DateTime(
           l.scheduledTime.year,
           l.scheduledTime.month,
           l.scheduledTime.day,
         );
         ensure(day).logs.add(l);
+      }
+
+      for (final s in scheduled) {
+        // Skip doses whose reminder already has a log entry for this month —
+        // they appear in logs and must not be double-counted in scheduled.
+        if (loggedReminderIds.contains(s.id)) continue;
+        final day = DateTime(
+          s.scheduledTime.year,
+          s.scheduledTime.month,
+          s.scheduledTime.day,
+        );
+        ensure(day).scheduled.add(s);
       }
 
       // fill cache for month days
@@ -137,10 +144,10 @@ class CalendarViewModel extends ChangeNotifier {
         final key = _keyFor(dt);
         _cache[key] = map[key] ?? DaySummary(date: dt);
       }
-    } catch (e) {
+    } catch (e, st) {
       _error = 'Failed to load calendar data: ${e.toString()}';
       debugPrint('CalendarViewModel.loadMonth error: $e');
-      debugPrintStack();
+      debugPrintStack(stackTrace: st);
     } finally {
       _isLoading = false;
       notifyListeners();
