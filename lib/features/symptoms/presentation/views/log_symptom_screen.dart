@@ -285,7 +285,6 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
   Future<void> _submit(BuildContext context, WidgetRef ref) async {
     final controller = ref.read(symptomFormControllerProvider.notifier);
     final success = await controller.submitSymptomLog();
-    final state = ref.read(symptomFormControllerProvider);
 
     if (!context.mounted) {
       return;
@@ -297,12 +296,6 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
       );
       Navigator.of(context).pop();
       return;
-    }
-
-    if (state.errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
     }
   }
 
