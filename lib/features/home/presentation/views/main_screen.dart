@@ -14,7 +14,7 @@ import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
-import 'package:clinic_go/features/medication/presentation/views/monthly_summary_screen.dart';
+import 'package:clinic_go/features/medication/presentation/views/calendar_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
 import 'package:intl/intl.dart';
 
@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
       const ProfileView(),
       const MedicationsListScreen(),
       HomeContent(viewModel: widget.homeViewModel),
-      const MonthlySummaryScreen(showAppBar: false),
+      const CalendarScreen(),
       const Center(child: Text('Definições')),
     ];
 

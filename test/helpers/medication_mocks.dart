@@ -1,3 +1,4 @@
+import 'package:clinic_go/features/medication/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
@@ -39,6 +40,14 @@ class InMemoryDoseLogRepository implements DoseLogRepository {
 
   /// Convenience helper: pre-seed a logged dose for sync tests.
   void seedLoggedDose(String doseId) => loggedDoseIds.add(doseId);
+}
+
+class EmptyCalendarRepository implements CalendarRepository {
+  @override
+  Future<List<DoseLogEntry>> fetchDoseLogs({
+    required DateTime from,
+    required DateTime to,
+  }) async => [];
 }
 
 class FailingDoseLogRepository implements DoseLogRepository {
