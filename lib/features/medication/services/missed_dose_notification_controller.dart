@@ -79,18 +79,17 @@ class MissedDoseNotificationController {
     );
 
     try {
+      await _notificationGateway.cancel(primaryNotificationIdForDose(dose.id));
       await cancelMissedDoseNotification(dose.id);
     } catch (error, stackTrace) {
-      debugPrint(
-        'Failed to cancel missed notification for dose ${dose.id}: $error',
-      );
+      debugPrint('Failed to cancel notifications for dose ${dose.id}: $error');
       FlutterError.reportError(
         FlutterErrorDetails(
           exception: error,
           stack: stackTrace,
           library: 'missed_dose_notification_controller',
           context: ErrorDescription(
-            'while canceling a pending missed medication notification',
+            'while canceling pending medication notifications',
           ),
         ),
       );

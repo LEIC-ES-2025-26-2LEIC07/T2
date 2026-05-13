@@ -13,6 +13,8 @@ import 'package:clinic_go/features/medication/services/dose_scheduling_service.d
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/data/calendar_repository.dart';
+import 'package:clinic_go/features/medication/presentation/view_models/calendar_view_model.dart';
 import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
 import 'package:clinic_go/features/medication/presentation/views/calendar_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
@@ -29,38 +31,77 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 2; // Home as default
+  int _currentIndex = 2;
+
+  late final CalendarViewModel _calendarViewModel;
+  late final HomeViewModel _homeViewModel;
 
   StreamSubscription<bool>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
+
+    _calendarViewModel = CalendarViewModel(
+      calendarRepository: getIt<CalendarRepository>(),
+      medRepository: getIt<MedicationRepository>(),
+      schedulingService: getIt<DoseSchedulingService>(),
+    );
+
+    _calendarViewModel.loadMonth(DateTime.now());
+
+    _homeViewModel =
+        widget.homeViewModel ??
+        HomeViewModel(
+          repository: getIt<MedicationRepository>(),
+          schedulingService: getIt<DoseSchedulingService>(),
+          logRepository: getIt<DoseLogRepository>(),
+          notificationController: getIt<MissedDoseNotificationController>(),
+        );
+
+    if (widget.homeViewModel == null) {
+      _homeViewModel.loadNextDose();
+    }
+
     _authSubscription = getIt<AuthService>().authStateChanges.listen((
       isSignedIn,
     ) {
       if (!mounted) return;
-      if (isSignedIn) {
-        setState(() => _currentIndex = 2); // jump to Home on login
-      } else {
-        setState(() => _currentIndex = 0); // return to Profile on logout
-      }
+
+      setState(() {
+        _currentIndex = isSignedIn ? 2 : 0;
+      });
     });
   }
 
   @override
   void dispose() {
     _authSubscription?.cancel();
+    _calendarViewModel.dispose();
+
+    if (widget.homeViewModel == null) {
+      _homeViewModel.dispose();
+    }
+
     super.dispose();
+  }
+
+  void _onDoseLogged() {
+    _calendarViewModel.loadMonth(_calendarViewModel.currentMonth);
+  }
+
+  void _onMedicationChanged() {
+    _homeViewModel.loadNextDose();
+    _calendarViewModel.loadMonth(_calendarViewModel.currentMonth);
   }
 
   @override
   Widget build(BuildContext context) {
     final screens = [
       const ProfileView(),
-      const MedicationsListScreen(),
-      HomeContent(viewModel: widget.homeViewModel),
-      const CalendarScreen(),
+      MedicationsListScreen(onChanged: _onMedicationChanged),
+      HomeContent(viewModel: _homeViewModel, onDoseLogged: _onDoseLogged),
+      CalendarScreen(viewModel: _calendarViewModel),
       const Center(child: Text('Definições')),
     ];
 
@@ -71,21 +112,21 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             IndexedStack(index: _currentIndex, children: screens),
 
-            // Search bar pinned to top on the Home tab only
             if (_currentIndex == 2)
               const SafeArea(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16.0,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: CustomSearchBar(),
                 ),
               ),
 
             FloatingBottomNavBar(
               currentIndex: _currentIndex,
-              onTap: (index) => setState(() => _currentIndex = index),
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
             ),
           ],
         ),
@@ -95,9 +136,10 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class HomeContent extends StatefulWidget {
-  const HomeContent({super.key, this.viewModel});
+  const HomeContent({super.key, this.viewModel, this.onDoseLogged});
 
   final HomeViewModel? viewModel;
+  final VoidCallback? onDoseLogged;
 
   @override
   State<HomeContent> createState() => _HomeContentState();
@@ -109,13 +151,16 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
+
     _viewModel =
         widget.viewModel ??
         HomeViewModel(
           repository: getIt<MedicationRepository>(),
           schedulingService: getIt<DoseSchedulingService>(),
           logRepository: getIt<DoseLogRepository>(),
+          notificationController: getIt<MissedDoseNotificationController>(),
         );
+
     if (widget.viewModel == null) {
       _viewModel.loadNextDose();
     }
@@ -126,7 +171,17 @@ class _HomeContentState extends State<HomeContent> {
     if (widget.viewModel == null) {
       _viewModel.dispose();
     }
+
     super.dispose();
+  }
+
+  Future<void> _onDoseLoggingResult(Object? result) async {
+    if (result == true) {
+      _viewModel.doseLogged();
+      _viewModel.loadNextDose();
+
+      widget.onDoseLogged?.call();
+    }
   }
 
   @override
@@ -138,11 +193,13 @@ class _HomeContentState extends State<HomeContent> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final nextDose = _viewModel.nextDose;
-        final isOverdue = _viewModel.isOverdue;
+        final ScheduledDose? nextDose = _viewModel.nextDose;
+        final bool isOverdue = _viewModel.isOverdue;
+
         final scheduledTimeLabel = nextDose != null
             ? DateFormat.Hm().format(nextDose.scheduledTime)
             : '';
+
         final statusColor = isOverdue
             ? const Color(0xFFE53935)
             : Colors.black87;
@@ -155,7 +212,9 @@ class _HomeContentState extends State<HomeContent> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text('Welcome to ClinicGO!'),
+
                 const SizedBox(height: 80),
+
                 if (nextDose == null)
                   Container(
                     width: double.infinity,
@@ -164,10 +223,12 @@ class _HomeContentState extends State<HomeContent> {
                       color: Colors.white.withValues(alpha: 0.88),
                       borderRadius: BorderRadius.circular(28),
                     ),
-                    child: const Text(
-                      'No upcoming doses. Good job!',
+                    child: Text(
+                      _viewModel.hadDosesToday
+                          ? 'All done for today!'
+                          : 'No upcoming doses.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                         fontWeight: FontWeight.w500,
@@ -201,6 +262,7 @@ class _HomeContentState extends State<HomeContent> {
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
+
                             if (isOverdue)
                               const Icon(
                                 Icons.warning_amber_rounded,
@@ -209,7 +271,9 @@ class _HomeContentState extends State<HomeContent> {
                               ),
                           ],
                         ),
+
                         const SizedBox(height: 12),
+
                         Text(
                           '${nextDose.medicationName} • ${nextDose.dosage}',
                           style: const TextStyle(
@@ -217,34 +281,96 @@ class _HomeContentState extends State<HomeContent> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+
                         const SizedBox(height: 4),
+
                         Text(
                           'Scheduled for $scheduledTimeLabel',
                           style: TextStyle(color: statusColor),
                         ),
+
                         const SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: () async {
-                            final result = await Navigator.of(context).pushNamed(
-                              MissedDoseNotificationController.buildDoseLoggingRoute(
-                                nextDose,
-                                isOverdue: isOverdue,
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: _viewModel.isLoggingDose
+                                    ? null
+                                    : () async {
+                                        try {
+                                          await _viewModel.logDose(
+                                            dose: nextDose,
+                                            status: DoseLogStatus.taken,
+                                          );
+                                        } catch (_) {
+                                          if (!context.mounted) return;
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Could not save. Please try again.',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                style: isOverdue
+                                    ? FilledButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFE53935,
+                                        ),
+                                      )
+                                    : null,
+                                child: _viewModel.isLoggingDose
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('Take'),
                               ),
-                            );
-                            if (result == true) {
-                              _viewModel.loadNextDose(); // refresh on success
-                            }
-                          },
-                          style: isOverdue
-                              ? FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE53935),
-                                )
-                              : null,
-                          child: Text(
-                            isOverdue ? 'Log Overdue Dose' : 'Log Dose',
-                          ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: _viewModel.isLoggingDose
+                                    ? null
+                                    : () async {
+                                        try {
+                                          await _viewModel.logDose(
+                                            dose: nextDose,
+                                            status: DoseLogStatus.skipped,
+                                          );
+                                        } catch (_) {
+                                          if (!context.mounted) return;
+
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Could not save. Please try again.',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                child: const Text('Skip'),
+                              ),
+                            ),
+                          ],
                         ),
+
                         const SizedBox(height: 8),
+
                         FilledButton(
                           onPressed: () async {
                             final result = await Navigator.of(context)
@@ -253,9 +379,8 @@ class _HomeContentState extends State<HomeContent> {
                                     builder: (_) => const DailyDosesScreen(),
                                   ),
                                 );
-                            if (result == true) {
-                              _viewModel.loadNextDose();
-                            }
+
+                            await _onDoseLoggingResult(result);
                           },
                           child: const Text("Today's Schedule"),
                         ),
@@ -263,41 +388,30 @@ class _HomeContentState extends State<HomeContent> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      MissedDoseNotificationController.buildDoseLoggingRoute(
-                        ScheduledDose(
-                          id: 'demo-overdue-123',
-                          medicationId: 'med-123',
-                          medicationName: 'Lisinopril',
-                          dosage: '10mg',
-                          scheduledTime: DateTime(2026, 1, 1),
-                        ),
-                        isOverdue: true,
-                      ),
-                    );
-                  },
-                  child: const Text('Open overdue dose'),
-                ),
+
+                const SizedBox(height: 24),
+
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(
-                          context,
-                        ).pushNamed(AppRouter.logSymptom),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(AppRouter.logSymptom);
+                        },
                         icon: const Icon(Icons.add_circle_outline),
                         label: const Text('Log Symptom'),
                       ),
                     ),
+
                     const SizedBox(width: 12),
+
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => Navigator.of(
-                          context,
-                        ).pushNamed(AppRouter.symptomHistory),
+                        onPressed: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamed(AppRouter.symptomHistory);
+                        },
                         icon: const Icon(Icons.history),
                         label: const Text('Symptom History'),
                       ),

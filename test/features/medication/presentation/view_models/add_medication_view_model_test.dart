@@ -34,6 +34,9 @@ class _SuccessRepo implements MedicationRepository {
   }
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<List<Medication>> fetchMedications() async => [];
 
   @override
@@ -41,6 +44,11 @@ class _SuccessRepo implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 class _RollbackRepo implements MedicationRepository {
@@ -51,6 +59,9 @@ class _RollbackRepo implements MedicationRepository {
       );
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<List<Medication>> fetchMedications() async => [];
 
   @override
@@ -58,12 +69,20 @@ class _RollbackRepo implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 class _NetworkErrorRepo implements MedicationRepository {
   @override
   Future<SavedMedicationResult> addMedication(AddMedicationPayload _) async =>
       throw Exception('No internet');
+
+  @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
 
   @override
   Future<List<Medication>> fetchMedications() async =>
@@ -74,6 +93,11 @@ class _NetworkErrorRepo implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 // ── Tests ───────────────────────────────────────────────────────────
@@ -257,6 +281,9 @@ class _CapturingRepo implements MedicationRepository {
   }
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<List<Medication>> fetchMedications() async => [];
 
   @override
@@ -264,4 +291,9 @@ class _CapturingRepo implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }

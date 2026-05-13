@@ -35,6 +35,9 @@ class _MockMedicationRepository implements MedicationRepository {
   }
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<List<Medication>> fetchMedications() async => [];
 
   @override
@@ -42,6 +45,11 @@ class _MockMedicationRepository implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -163,6 +171,9 @@ class _SlowRepo implements MedicationRepository {
   }
 
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+
+  @override
   Future<List<Medication>> fetchMedications() async => [];
 
   @override
@@ -170,4 +181,9 @@ class _SlowRepo implements MedicationRepository {
 
   @override
   Future<List<MedicationReminder>> fetchAllReminders() async => [];
+
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }

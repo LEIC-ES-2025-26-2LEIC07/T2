@@ -53,18 +53,61 @@ class SavedMedicationResult {
   final List<MedicationReminder> reminders;
 }
 
+/// Payload for the multi-step medication edit operation.
+class EditMedicationPayload {
+  const EditMedicationPayload({
+    required this.medicationId,
+    required this.name,
+    required this.dosage,
+    required this.frequency,
+    required this.color,
+    required this.daysOfWeek,
+    required this.remindersToUpsert,
+    required this.remindersToDelete,
+    this.startDate,
+    this.endDate,
+    this.notes,
+  });
+
+  final String medicationId;
+  final String name;
+  final String dosage;
+  final String frequency;
+  final Color color;
+  final List<String> daysOfWeek;
+
+  /// Each map must contain 'medication_id', 'reminder_time', 'days_of_week',
+  /// 'is_active', and optionally 'id' (present for existing reminders).
+  final List<Map<String, dynamic>> remindersToUpsert;
+
+  /// UUIDs of reminders to hard-delete.
+  final List<String> remindersToDelete;
+
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? notes;
+}
+
 /// Abstract repository — keeps ViewModels and tests independent of Supabase.
 abstract class MedicationRepository {
   /// Inserts a medication + its reminders (with rollback on failure).
   /// Returns the new medication UUID and saved reminders (with real IDs).
   Future<SavedMedicationResult> addMedication(AddMedicationPayload payload);
 
+  /// Multi-step edit: UPDATE medication, UPSERT reminders, DELETE removed ones.
+  Future<void> editMedication(EditMedicationPayload payload);
+
   /// Fetches all medications for the authenticated user (newest first).
   Future<List<Medication>> fetchMedications();
 
-  /// Hard-deletes a medication by UUID (used internally for rollback).
+  /// Hard-deletes a medication by UUID (cascades to reminders and logs via DB).
   Future<void> deleteMedication(String id);
 
   /// Fetches all reminders for the authenticated user.
   Future<List<MedicationReminder>> fetchAllReminders();
+
+  /// Fetches reminders for a single medication.
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  );
 }

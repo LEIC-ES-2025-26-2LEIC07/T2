@@ -33,94 +33,111 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
       widget.dose.scheduledTime,
     ).format(context);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dose Logging')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.isOverdue)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF1E5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'This dose is overdue. Please log whether it was taken or skipped.',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            if (widget.isOverdue) const SizedBox(height: 16),
-            Text(
-              widget.dose.medicationName,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text('${widget.dose.dosage} scheduled for $scheduledLabel'),
-            const SizedBox(height: 24),
-            if (_completedStatus == null) ...[
-              FilledButton(
-                onPressed: _isSubmitting
-                    ? null
-                    : () => _logDose(
-                        context,
-                        status: DoseLogStatus.taken,
-                        successMessage: 'Dose marked as taken.',
-                      ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Mark as Taken'),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _isSubmitting
-                    ? null
-                    : () => _logDose(
-                        context,
-                        status: DoseLogStatus.skipped,
-                        successMessage: 'Dose marked as skipped.',
-                      ),
-                child: const Text('Skip Dose'),
-              ),
-            ] else ...[
-              Row(
-                children: [
-                  Icon(
-                    _completedStatus == DoseLogStatus.taken
-                        ? Icons.check_circle_outline
-                        : Icons.block,
-                    color: _completedStatus == DoseLogStatus.taken
-                        ? Colors.green
-                        : Colors.orange,
-                    size: 28,
+    return PopScope(
+      canPop: _completedStatus == null && !_isSubmitting,
+      onPopInvokedWithResult: (bool didPop, _) {
+        if (!didPop && _completedStatus != null && !_isSubmitting) {
+          Navigator.of(context).pop(true);
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Dose Logging')),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.isOverdue)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF1E5),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
+                  child: const Text(
+                    'This dose is overdue. Please log whether it was taken or skipped.',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              if (widget.isOverdue) const SizedBox(height: 16),
+              Text(
+                widget.dose.medicationName,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Text('${widget.dose.dosage} scheduled for $scheduledLabel'),
+              const SizedBox(height: 24),
+              if (_completedStatus == null) ...[
+                FilledButton(
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => _logDose(
+                          context,
+                          status: DoseLogStatus.taken,
+                          successMessage: 'Dose marked as taken.',
+                        ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Mark as Taken'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => _logDose(
+                          context,
+                          status: DoseLogStatus.skipped,
+                          successMessage: 'Dose marked as skipped.',
+                        ),
+                  child: const Text('Skip Dose'),
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Icon(
                       _completedStatus == DoseLogStatus.taken
-                          ? 'Marked as taken at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}'
-                          : 'Marked as skipped at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                          ? Icons.check_circle_outline
+                          : Icons.block,
+                      color: _completedStatus == DoseLogStatus.taken
+                          ? Colors.green
+                          : Colors.orange,
+                      size: 28,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-                child: const Text('Done'),
-              ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _completedStatus == DoseLogStatus.taken
+                            ? 'Marked as taken at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}'
+                            : 'Marked as skipped at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => Navigator.of(context).pop(true),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Done'),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -147,10 +164,10 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
       );
       if (!context.mounted) return;
 
+      setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(successMessage)));
-      Navigator.of(context).pop(true);
     } catch (e, st) {
       // rollback optimistic update
       if (!context.mounted) return;

@@ -59,7 +59,13 @@ class _FakeMedRepo implements MedicationRepository {
   Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
       const SavedMedicationResult(medicationId: '', reminders: []);
   @override
+  Future<void> editMedication(EditMedicationPayload payload) async {}
+  @override
   Future<void> deleteMedication(String id) async {}
+  @override
+  Future<List<MedicationReminder>> fetchRemindersForMedication(
+    String medicationId,
+  ) async => [];
 }
 
 // ── Builders ──────────────────────────────────────────────────────────────────

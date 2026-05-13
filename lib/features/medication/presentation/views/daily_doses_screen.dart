@@ -5,6 +5,7 @@ import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
+import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/daily_doses_view_model.dart';
 
 class DailyDosesScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
           repository: getIt<MedicationRepository>(),
           schedulingService: getIt<DoseSchedulingService>(),
           logRepository: getIt<DoseLogRepository>(),
+          notificationController: getIt<MissedDoseNotificationController>(),
         );
 
     if (widget.viewModel == null) {

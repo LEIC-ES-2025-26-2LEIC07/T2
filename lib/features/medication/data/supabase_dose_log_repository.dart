@@ -20,6 +20,7 @@ class SupabaseDoseLogRepository implements DoseLogRepository {
     required DateTime loggedAt,
   }) async {
     final lastUnderscore = dose.id.lastIndexOf('_');
+    if (lastUnderscore < 0) return;
     final reminderId = dose.id.substring(0, lastUnderscore);
 
     if (!_isValidUuid(reminderId)) return;
@@ -36,6 +37,7 @@ class SupabaseDoseLogRepository implements DoseLogRepository {
     if (_client.auth.currentUser == null) return false;
 
     final lastUnderscore = doseId.lastIndexOf('_');
+    if (lastUnderscore < 0) return false;
     final reminderId = doseId.substring(0, lastUnderscore);
 
     if (!_isValidUuid(reminderId)) return false;
