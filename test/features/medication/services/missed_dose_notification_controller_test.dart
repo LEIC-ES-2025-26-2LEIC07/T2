@@ -139,6 +139,80 @@ void main() {
         );
       },
     );
+
+    test(
+      'sync skips notifications whose dose has not been logged yet',
+      () async {
+        await controller.scheduleDoseReminder(demoDose);
+
+        await controller.syncPendingMissedNotifications();
+
+        expect(notificationGateway.cancelledNotificationIds, isEmpty);
+      },
+    );
+
+    test(
+      'cancelMissedDoseNotification cancels the correct notification ID',
+      () async {
+        await controller.scheduleDoseReminder(demoDose);
+
+        await controller.cancelMissedDoseNotification(demoDose.id);
+
+        expect(
+          notificationGateway.cancelledNotificationIds,
+          contains(
+            MissedDoseNotificationController.missedNotificationIdForDose(
+              demoDose.id,
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'buildDoseLoggingRoute contains scheduled status when not overdue',
+      () {
+        final route = MissedDoseNotificationController.buildDoseLoggingRoute(
+          demoDose,
+        );
+        expect(route, contains('status=scheduled'));
+        expect(route, contains('dose-123'));
+      },
+    );
+
+    test('buildDoseLoggingRoute contains overdue status when overdue', () {
+      final route = MissedDoseNotificationController.buildDoseLoggingRoute(
+        demoDose,
+        isOverdue: true,
+      );
+      expect(route, contains('status=overdue'));
+    });
+
+    test(
+      'primaryNotificationIdForDose differs from missedNotificationIdForDose',
+      () {
+        final primary =
+            MissedDoseNotificationController.primaryNotificationIdForDose(
+              demoDose.id,
+            );
+        final missed =
+            MissedDoseNotificationController.missedNotificationIdForDose(
+              demoDose.id,
+            );
+        expect(primary, isNot(equals(missed)));
+      },
+    );
+
+    test('logDose with explicit loggedAt uses that timestamp', () async {
+      final loggedAt = DateTime(2026, 4, 16, 9);
+      await controller.scheduleDoseReminder(demoDose);
+      await controller.logDose(
+        dose: demoDose,
+        status: DoseLogStatus.skipped,
+        loggedAt: loggedAt,
+      );
+      expect(await doseLogRepository.hasDoseLog(demoDose.id), isTrue);
+    });
   });
 }
 

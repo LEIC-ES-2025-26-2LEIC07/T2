@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/medication/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
@@ -19,7 +20,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../helpers/medication_mocks.dart';
+import '../test/helpers/medication_mocks.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -83,6 +84,7 @@ void main() {
           pendingNotificationStore: getIt<PendingNotificationStore>(),
         ),
       );
+      getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
     });
 
     tearDown(() async {
