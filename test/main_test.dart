@@ -1,6 +1,7 @@
 import 'package:clinic_go/features/medication/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/models/notification_payload.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
@@ -96,6 +97,28 @@ void main() {
           findsOneWidget,
         );
         expect(find.text('Mark as Taken'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'navigates to initial notification route from payload on startup',
+      (tester) async {
+        final navigatorKey = GlobalKey<NavigatorState>();
+        const payload = NotificationPayload(
+          route: '/home',
+          status: 'overdue',
+          doseId: 'test-dose',
+        );
+
+        await tester.pumpWidget(
+          ClinicGO(
+            navigatorKey: navigatorKey,
+            initialNotificationPayload: payload,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(navigatorKey.currentState?.canPop(), isTrue);
       },
     );
 
