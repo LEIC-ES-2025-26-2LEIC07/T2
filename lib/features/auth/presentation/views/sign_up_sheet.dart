@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/sign_up_view_model.dart';
@@ -48,12 +49,9 @@ class _SignUpSheetState extends State<SignUpSheet> {
 
   void _onViewModelChanged() {
     if (_viewModel.success && mounted) {
-      Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Conta criada com sucesso!'),
-          backgroundColor: Color(0xFF2E7D32),
-        ),
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRouter.home,
+        (_) => false,
       );
     }
   }

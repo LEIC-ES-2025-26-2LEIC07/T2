@@ -21,7 +21,7 @@ class SupabaseAuthService implements AuthService {
       _client.auth.currentUser?.userMetadata ?? const {};
 
   @override
-  bool get isLoggedIn => _client.auth.currentUser != null;
+  bool get isLoggedIn => _client.auth.currentSession != null;
 
   @override
   Stream<bool> get authStateChanges => _client.auth.onAuthStateChange.map(

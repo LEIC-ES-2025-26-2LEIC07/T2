@@ -11,10 +11,13 @@ class MockGoTrueClient extends Mock implements GoTrueClient {}
 
 class MockUser extends Mock implements User {}
 
+class MockSession extends Mock implements Session {}
+
 void main() {
   late MockSupabaseClient mockClient;
   late MockGoTrueClient mockAuth;
   late MockUser mockUser;
+  late MockSession mockSession;
   late SupabaseAuthService service;
 
   setUpAll(() {
@@ -25,6 +28,7 @@ void main() {
     mockClient = MockSupabaseClient();
     mockAuth = MockGoTrueClient();
     mockUser = MockUser();
+    mockSession = MockSession();
 
     when(() => mockClient.auth).thenReturn(mockAuth);
     when(() => mockUser.email).thenReturn('user@example.com');
@@ -47,13 +51,13 @@ void main() {
     });
 
     group('isLoggedIn', () {
-      test('isLoggedIn: user exists → returns true', () {
-        when(() => mockAuth.currentUser).thenReturn(mockUser);
+      test('isLoggedIn: active session → returns true', () {
+        when(() => mockAuth.currentSession).thenReturn(mockSession);
         expect(service.isLoggedIn, isTrue);
       });
 
-      test('isLoggedIn: no user → returns false', () {
-        when(() => mockAuth.currentUser).thenReturn(null);
+      test('isLoggedIn: no session → returns false', () {
+        when(() => mockAuth.currentSession).thenReturn(null);
         expect(service.isLoggedIn, isFalse);
       });
     });
