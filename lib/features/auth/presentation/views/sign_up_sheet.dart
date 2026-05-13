@@ -49,10 +49,9 @@ class _SignUpSheetState extends State<SignUpSheet> {
 
   void _onViewModelChanged() {
     if (_viewModel.success && mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRouter.home,
-        (_) => false,
-      );
+      Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(AppRouter.home, (_) => false);
     }
   }
 
