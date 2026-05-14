@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -84,6 +87,7 @@ jobs:
     name: Web Smoke Build
     runs-on: ubuntu-latest
     needs: quality
+    if: github.event_name == 'push'
     timeout-minutes: 20
 
     steps:
