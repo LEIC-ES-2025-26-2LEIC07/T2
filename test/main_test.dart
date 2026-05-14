@@ -72,34 +72,25 @@ void main() {
       expect(find.byType(MainScreen), findsOneWidget);
     });
 
-    testWidgets('renders the home screen search bar', skip: true, (
+    testWidgets('renders home screen with quick action boxes', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
       await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
-      expect(find.text('What do you need?'), findsOneWidget);
-      expect(find.text('Open overdue dose'), findsOneWidget);
+      expect(find.text('Registar sintoma'), findsOneWidget);
+      expect(find.text('Histórico'), findsOneWidget);
     });
 
-    testWidgets(
-      'deep-links to the dose logging screen with overdue messaging',
-      skip: true,
-      (WidgetTester tester) async {
-        await tester.pumpWidget(const ClinicGO());
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Open overdue dose'));
-        await tester.pumpAndSettle();
-        expect(find.text('Dose Logging'), findsOneWidget);
-        expect(
-          find.text(
-            'This dose is overdue. Please log whether it was taken or skipped.',
-          ),
-          findsOneWidget,
-        );
-        expect(find.text('Mark as Taken'), findsOneWidget);
-      },
-    );
+    testWidgets('tapping MEDS nav item shows medications screen', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(const ClinicGO());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('MEDS'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nenhum medicamento'), findsOneWidget);
+    });
 
     testWidgets(
       'navigates to initial notification route from payload on startup',
@@ -123,28 +114,13 @@ void main() {
       },
     );
 
-    testWidgets('shows an error snackbar if dose logging fails', skip: true, (
+    testWidgets('shows Plano de hoje section after loading', (
       WidgetTester tester,
     ) async {
-      controller = MissedDoseNotificationController(
-        notificationGateway: notificationGateway,
-        doseLogRepository: FailingDoseLogRepository(),
-        pendingNotificationStore: const PendingNotificationStore(),
-      );
-      GetIt.I.unregister<MissedDoseNotificationController>();
-      GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
-
       await tester.pumpWidget(const ClinicGO());
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Open overdue dose'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Mark as Taken'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(
-        find.text('We could not save this dose right now. Please try again.'),
-        findsOneWidget,
-      );
+      expect(find.text('Plano de hoje'), findsOneWidget);
+      expect(find.text('Sem doses agendadas para hoje.'), findsOneWidget);
     });
   });
 
