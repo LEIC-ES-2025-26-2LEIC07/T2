@@ -398,6 +398,13 @@ You can find below information and references related to the project management 
 
 ### Sprint 3
 
+<div align="center" justify="center">
+<img width="544" height="964" alt="image" src="https://github.com/user-attachments/assets/1ae3f8a4-ec18-4e7e-9f71-881ea8aff23d" />
+  <p>Start of Sprint 3</p>
+  <!--<p>End of Sprint 3</p> -->
+  </div>
+
+
 ### Sprint 4
 
 ### Final Release
