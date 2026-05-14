@@ -317,6 +317,13 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                   ),
                                   const SizedBox(height: 10),
 
+                                  // With food toggle
+                                  _FoodSwitch(
+                                    value: _viewModel.withFood,
+                                    onChanged: _viewModel.setWithFood,
+                                  ),
+                                  const SizedBox(height: 10),
+
                                   // Notes (optional)
                                   _BlueField(
                                     label: 'notes (optional)',
@@ -606,6 +613,44 @@ class _FrequencyDropdown extends StatelessWidget {
               .toList(),
           onChanged: onChanged,
         ),
+      ),
+    );
+  }
+}
+
+class _FoodSwitch extends StatelessWidget {
+  const _FoodSwitch({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF4E84E5),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'com comida',
+            style: TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: Colors.white,
+            activeTrackColor: Colors.white38,
+            inactiveThumbColor: Colors.white54,
+            inactiveTrackColor: Colors.white24,
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
+import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/medications_list_view_model.dart';
@@ -7,7 +9,6 @@ import 'package:clinic_go/features/medication/presentation/views/add_medication_
 import 'package:clinic_go/features/medication/presentation/views/edit_medication_screen.dart';
 
 /// Medication list embedded in the main shell at nav-bar index 1.
-/// Displays coloured cards (colour = chosen colour from add form).
 class MedicationsListScreen extends StatefulWidget {
   const MedicationsListScreen({super.key, this.onChanged});
 
@@ -54,35 +55,25 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ─────────────────────────────────────────
+            // ── Logo row ────────────────────────────────────────
+            const ClinicGoLogo(),
+            const SizedBox(height: 12),
+
+            // ── Title + add button ──────────────────────────────
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Text(
-                  'Medication',
+                  'Medicação',
                   style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.ink,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const Spacer(),
-                FilledButton(
-                  onPressed: _openAddMedication,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF4E84E5),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text(
-                    'Add +',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ),
+                _AddButton(onTap: _openAddMedication),
               ],
             ),
             const SizedBox(height: 20),
@@ -106,7 +97,7 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
                   }
                   return ListView.separated(
                     itemCount: _viewModel.medications.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 16),
                     itemBuilder: (_, i) => _MedicationCard(
                       medication: _viewModel.medications[i],
                       onEdited: () {
@@ -116,6 +107,39 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Header add button ───────────────────────────────────────────────
+
+class _AddButton extends StatelessWidget {
+  const _AddButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        decoration: BrutalDecor.box(color: AppColors.lemon, radius: 30),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add, color: Colors.white, size: 18),
+            SizedBox(width: 4),
+            Text(
+              'Adicionar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
             ),
           ],
@@ -144,7 +168,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'No medications yet',
+            'Nenhum medicamento',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -153,19 +177,23 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Tap Add + to add your first medication.',
+            'Toque em Adicionar para começar.',
             style: TextStyle(color: Colors.black38),
           ),
           const SizedBox(height: 24),
-          FilledButton(
-            onPressed: onAdd,
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF4E84E5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+          GestureDetector(
+            onTap: onAdd,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BrutalDecor.box(color: AppColors.lemon, radius: 30),
+              child: const Text(
+                'Adicionar medicamento',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            child: const Text('Add medication'),
           ),
         ],
       ),
@@ -211,11 +239,6 @@ class _MedicationCard extends StatefulWidget {
 class _MedicationCardState extends State<_MedicationCard> {
   bool _expanded = false;
 
-  Color get _textColor {
-    final lum = widget.medication.color.computeLuminance();
-    return lum > 0.4 ? Colors.black87 : Colors.white;
-  }
-
   Future<void> _openEdit() async {
     final edited = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
@@ -230,163 +253,111 @@ class _MedicationCardState extends State<_MedicationCard> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: widget.medication.color,
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: _expanded
-          ? _ExpandedBody(
-              med: widget.medication,
-              textColor: _textColor,
-              onCollapse: () => setState(() => _expanded = false),
-              onEdit: _openEdit,
-            )
-          : _CollapsedBody(
-              med: widget.medication,
-              textColor: _textColor,
-              onExpand: () => setState(() => _expanded = true),
-            ),
-    );
-  }
-}
+    final med = widget.medication;
 
-class _CollapsedBody extends StatelessWidget {
-  const _CollapsedBody({
-    required this.med,
-    required this.textColor,
-    required this.onExpand,
-  });
-  final Medication med;
-  final Color textColor;
-  final VoidCallback onExpand;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      child: Row(
-        children: [
-          Text(
-            med.name,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: onExpand,
-            child: Text(
-              'info +',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textColor.withValues(alpha: 0.8),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ExpandedBody extends StatelessWidget {
-  const _ExpandedBody({
-    required this.med,
-    required this.textColor,
-    required this.onCollapse,
-    required this.onEdit,
-  });
-  final Medication med;
-  final Color textColor;
-  final VoidCallback onCollapse;
-  final VoidCallback onEdit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
+    return Container(
+      decoration: BrutalDecor.box(radius: 16),
+      clipBehavior: Clip.hardEdge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // name row
-          Text(
-            med.name,
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: textColor,
+          // ── Always-visible header ──────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 16, 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Colour square
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: med.color,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.ink, width: 1.5),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // Name + dosage · frequency
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              med.name,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.ink,
+                              ),
+                            ),
+                          ),
+                          if (med.isActive) const _AtivoBadge(),
+                        ],
+                      ),
+                      if (med.dosage != null || med.frequency != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          [
+                            if (med.dosage != null) med.dosage!,
+                            if (med.frequency != null) med.frequency!,
+                          ].join(' · '),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.muted,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // colour swatch
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: med.color,
-                  border: Border.all(color: Colors.white, width: 2),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 6,
+
+          // VER INFO / ESCONDER INFO toggle
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 0, 16, 10),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () => setState(() => _expanded = !_expanded),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _expanded ? 'ESCONDER INFO' : 'VER INFO',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.ink,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _expanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      size: 18,
+                      color: AppColors.ink,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
-              // detail bullets
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (med.dosage != null)
-                      _Bullet(text: med.dosage!, color: textColor),
-                    if (med.frequency != null)
-                      _Bullet(text: med.frequency!, color: textColor),
-                    if (med.notes != null && med.notes!.isNotEmpty)
-                      _Bullet(text: med.notes!, color: textColor, italic: true),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: onCollapse,
-                child: Text(
-                  'info -',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: textColor.withValues(alpha: 0.8),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: onEdit,
-                child: Text(
-                  'edit',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: textColor.withValues(alpha: 0.8),
-                  ),
-                ),
-              ),
-            ],
+
+          // ── Expanded section ───────────────────────────────
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            child: _expanded
+                ? _ExpandedSection(med: med, onEdit: _openEdit)
+                : const SizedBox.shrink(),
           ),
         ],
       ),
@@ -394,33 +365,146 @@ class _ExpandedBody extends StatelessWidget {
   }
 }
 
-class _Bullet extends StatelessWidget {
-  const _Bullet({required this.text, required this.color, this.italic = false});
-  final String text;
-  final Color color;
-  final bool italic;
+// ── ATIVO badge ─────────────────────────────────────────────────────
+
+class _AtivoBadge extends StatelessWidget {
+  const _AtivoBadge();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.ink, width: 1.5),
+      ),
+      child: const Text(
+        'ATIVO',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: AppColors.ink,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Expanded section ────────────────────────────────────────────────
+
+class _ExpandedSection extends StatelessWidget {
+  const _ExpandedSection({required this.med, required this.onEdit});
+  final Medication med;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final reminders = med.reminders ?? [];
+
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.ink, width: 1.5)),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 12, 16, 14),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '• ',
-            style: TextStyle(color: color, fontWeight: FontWeight.bold),
-          ),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: color,
-                fontStyle: italic ? FontStyle.italic : FontStyle.normal,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ...reminders.asMap().entries.map((entry) {
+                final parts = entry.value.reminderTime.split(':');
+                final time = TimeOfDay(
+                  hour: int.parse(parts[0]),
+                  minute: int.parse(parts[1]),
+                );
+                final label = reminders.length > 1
+                    ? 'HORÁRIO ${entry.key + 1}'
+                    : 'HORÁRIO';
+                return _InfoChip(label: label, value: time.format(context));
+              }),
+              _InfoChip(
+                label: 'COM COMIDA',
+                value: med.withFood ? 'Sim' : 'Não',
               ),
-            ),
+              if (med.notes != null && med.notes!.isNotEmpty)
+                _InfoChip(label: 'NOTAS', value: med.notes!),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [_CardButton(label: 'EDITAR', onTap: onEdit)],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Info chip ───────────────────────────────────────────────────────
+
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.sky,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.ink, width: 1.5),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(fontSize: 12, color: AppColors.ink),
+          children: [
+            TextSpan(
+              text: '$label  ',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            TextSpan(text: value),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Card action button ──────────────────────────────────────────────
+
+class _CardButton extends StatelessWidget {
+  const _CardButton({required this.label, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.lemon,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.ink, width: 1.5),
+          boxShadow: BrutalDecor.shadowSm,
+        ),
+        child: const Text(
+          'EDITAR',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
     );
   }

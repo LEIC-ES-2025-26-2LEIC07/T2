@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 
 /// Domain model matching the [medications] Supabase table.
 class Medication {
@@ -13,6 +14,8 @@ class Medication {
     this.endDate,
     this.notes,
     required this.createdAt,
+    this.withFood = false,
+    this.reminders,
   });
 
   final String id;
@@ -25,23 +28,45 @@ class Medication {
   final DateTime? endDate;
   final String? notes;
   final DateTime createdAt;
+  final bool withFood;
 
-  factory Medication.fromJson(Map<String, dynamic> json) => Medication(
-    id: json['id'] as String,
-    userId: json['user_id'] as String,
-    name: json['name'] as String,
-    dosage: json['dosage']?.toString(),
-    frequency: json['frequency']?.toString(),
-    color: colorFromHex(json['color']?.toString() ?? '#4E84E5'),
-    startDate: json['start_date'] != null
-        ? DateTime.parse(json['start_date'] as String)
-        : null,
-    endDate: json['end_date'] != null
-        ? DateTime.parse(json['end_date'] as String)
-        : null,
-    notes: json['notes']?.toString(),
-    createdAt: DateTime.parse(json['created_at'] as String),
-  );
+  /// Reminder rows joined from medication_reminders — present only when
+  /// fetched with select('*, medication_reminders(*)').
+  final List<MedicationReminder>? reminders;
+
+  /// True when endDate is null (ongoing) or still in the future.
+  bool get isActive =>
+      endDate == null || endDate!.isAfter(DateTime.now());
+
+  factory Medication.fromJson(Map<String, dynamic> json) {
+    List<MedicationReminder>? reminders;
+    final raw = json['medication_reminders'];
+    if (raw is List) {
+      reminders = raw
+          .cast<Map<String, dynamic>>()
+          .map(MedicationReminder.fromJson)
+          .toList();
+    }
+
+    return Medication(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      name: json['name'] as String,
+      dosage: json['dosage']?.toString(),
+      frequency: json['frequency']?.toString(),
+      color: colorFromHex(json['color']?.toString() ?? '#4E84E5'),
+      startDate: json['start_date'] != null
+          ? DateTime.parse(json['start_date'] as String)
+          : null,
+      endDate: json['end_date'] != null
+          ? DateTime.parse(json['end_date'] as String)
+          : null,
+      notes: json['notes']?.toString(),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      withFood: json['with_food'] as bool? ?? false,
+      reminders: reminders,
+    );
+  }
 
   /// Converts '#RRGGBB' to a Flutter [Color].
   static Color colorFromHex(String hex) {

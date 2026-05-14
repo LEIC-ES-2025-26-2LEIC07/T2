@@ -30,6 +30,7 @@ class SupabaseMedicationRepository implements MedicationRepository {
           'dosage': payload.dosage,
           'frequency': payload.frequency,
           'color': Medication.colorToHex(payload.color),
+          'with_food': payload.withFood,
           if (payload.startDate != null)
             'start_date': payload.startDate!.toIso8601String().substring(0, 10),
           if (payload.endDate != null)
@@ -91,7 +92,7 @@ class SupabaseMedicationRepository implements MedicationRepository {
 
     final response = await _client
         .from('medications')
-        .select()
+        .select('*, medication_reminders(*)')
         .eq('user_id', user.id)
         .order('created_at', ascending: false);
 
@@ -111,6 +112,7 @@ class SupabaseMedicationRepository implements MedicationRepository {
           'dosage': payload.dosage,
           'frequency': payload.frequency,
           'color': Medication.colorToHex(payload.color),
+          'with_food': payload.withFood,
           'start_date': payload.startDate?.toIso8601String().substring(0, 10),
           'end_date': payload.endDate?.toIso8601String().substring(0, 10),
           'notes': payload.notes,

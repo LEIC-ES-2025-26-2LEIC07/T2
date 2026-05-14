@@ -14,6 +14,7 @@ class AddMedicationPayload {
     this.startDate,
     this.endDate,
     this.notes,
+    this.withFood = false,
   });
 
   final String name;
@@ -30,6 +31,7 @@ class AddMedicationPayload {
   final DateTime? startDate;
   final DateTime? endDate;
   final String? notes;
+  final bool withFood;
 }
 
 /// Thrown when the two-step insert fails and a client-side rollback is performed.
@@ -67,6 +69,7 @@ class EditMedicationPayload {
     this.startDate,
     this.endDate,
     this.notes,
+    this.withFood = false,
   });
 
   final String medicationId;
@@ -86,6 +89,7 @@ class EditMedicationPayload {
   final DateTime? startDate;
   final DateTime? endDate;
   final String? notes;
+  final bool withFood;
 }
 
 /// Abstract repository — keeps ViewModels and tests independent of Supabase.

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -25,12 +26,13 @@ class AddMedicationViewModel extends ChangeNotifier {
   String name = '';
   String dosage = '';
   String frequency = frequencyOptions.first;
-  Color selectedColor = const Color(0xFF4E84E5);
+  Color selectedColor = AppColors.lemon;
   List<TimeOfDay> reminderTimes = [const TimeOfDay(hour: 8, minute: 0)];
   List<String> daysOfWeek = _allDays;
   DateTime? startDate;
   DateTime? endDate;
   String notes = '';
+  bool withFood = false;
 
   // ── Validation ───────────────────────────────────────────────────
   String? nameError;
@@ -64,20 +66,16 @@ class AddMedicationViewModel extends ChangeNotifier {
     'sunday',
   ];
 
-  /// Color palette shown in the bottom-sheet picker.
+  /// Color palette shown in the bottom-sheet picker — uses the app's design tokens.
   static const List<Color> colorPalette = [
-    Color(0xFF4E84E5), // blue (default)
-    Color(0xFFE53935), // red
-    Color(0xFF43A047), // green
-    Color(0xFFFF8F00), // amber
-    Color(0xFF8E24AA), // purple
-    Color(0xFF00897B), // teal
-    Color(0xFFD81B60), // pink
-    Color(0xFF3949AB), // indigo
-    Color(0xFF00ACC1), // cyan
-    Color(0xFF7CB342), // lime
-    Color(0xFF6D4C41), // brown
-    Color(0xFF757575), // grey
+    AppColors.lemon,  // primary blue
+    AppColors.ink,    // deep navy
+    AppColors.coral,  // muted salmon
+    AppColors.mint,   // soft sage
+    AppColors.sky,    // pale clinical blue
+    AppColors.rose,   // pale steel
+    AppColors.statusTeal,  // teal
+    AppColors.statusNight, // dark slate
   ];
 
   // ── Setters ──────────────────────────────────────────────────────
@@ -135,6 +133,12 @@ class AddMedicationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setWithFood(bool v) {
+    withFood = v;
+    isDirty = true;
+    notifyListeners();
+  }
+
   void clearError() {
     errorMessage = null;
     notifyListeners();
@@ -165,6 +169,7 @@ class AddMedicationViewModel extends ChangeNotifier {
           startDate: startDate,
           endDate: endDate,
           notes: notes.trim().isEmpty ? null : notes.trim(),
+          withFood: withFood,
         ),
       );
 
