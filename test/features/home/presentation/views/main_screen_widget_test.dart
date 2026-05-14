@@ -27,6 +27,8 @@ void main() {
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.nextDose).thenReturn(null);
     when(() => mockViewModel.isOverdue).thenReturn(false);
+    when(() => mockViewModel.todayDoses).thenReturn([]);
+    when(() => mockViewModel.hadDosesToday).thenReturn(false);
     when(() => mockViewModel.loadNextDose()).thenAnswer((_) async {});
   });
 

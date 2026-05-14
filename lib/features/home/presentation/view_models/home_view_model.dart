@@ -5,6 +5,17 @@ import 'package:clinic_go/features/medication/services/missed_dose_notification_
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 
+class TodayDoseEntry {
+  const TodayDoseEntry({
+    required this.dose,
+    required this.isPending,
+    required this.isOverdue,
+  });
+  final ScheduledDose dose;
+  final bool isPending;
+  final bool isOverdue;
+}
+
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required MedicationRepository repository,
@@ -28,12 +39,14 @@ class HomeViewModel extends ChangeNotifier {
   bool _hadDosesToday = false;
   bool _disposed = false;
   final Set<String> _locallyLoggedDoseIds = {};
+  List<TodayDoseEntry> _todayDoses = [];
 
   ScheduledDose? get nextDose => _nextDose;
   bool get isOverdue => _isOverdue;
   bool get isLoading => _isLoading;
   bool get isLoggingDose => _isLoggingDose;
   bool get hadDosesToday => _hadDosesToday;
+  List<TodayDoseEntry> get todayDoses => List.unmodifiable(_todayDoses);
 
   @override
   void dispose() {
@@ -118,6 +131,29 @@ class HomeViewModel extends ChangeNotifier {
             d.scheduledTime.isBefore(todayEnd),
       );
 
+      // Build today's plan list (all doses for today, logged or pending)
+      final todayDosesList = <TodayDoseEntry>[];
+      for (final dose in allUpcoming) {
+        if (dose.scheduledTime.isBefore(todayStart) ||
+            !dose.scheduledTime.isBefore(todayEnd)) {
+          continue;
+        }
+        final alreadyLogged =
+            _locallyLoggedDoseIds.contains(dose.id) ||
+            await _logRepository.hasDoseLog(dose.id);
+        todayDosesList.add(
+          TodayDoseEntry(
+            dose: dose,
+            isPending: !alreadyLogged,
+            isOverdue: dose.scheduledTime.isBefore(now),
+          ),
+        );
+      }
+      todayDosesList.sort(
+        (a, b) => a.dose.scheduledTime.compareTo(b.dose.scheduledTime),
+      );
+      _todayDoses = todayDosesList;
+
       // Filter out doses already logged (remote check + local optimistic set)
       final pendingDoses = <ScheduledDose>[];
       for (final dose in allUpcoming) {
@@ -139,6 +175,7 @@ class HomeViewModel extends ChangeNotifier {
       debugPrint('Error loading next dose in HomeViewModel: $e');
       _nextDose = null;
       _isOverdue = false;
+      _todayDoses = [];
     } finally {
       _isLoading = false;
       if (!_disposed) notifyListeners();

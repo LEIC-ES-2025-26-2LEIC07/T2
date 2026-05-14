@@ -177,7 +177,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ? null
                           : const DecorationImage(
                               image: AssetImage(
-                                'assets/images/background_topography.png',
+                                'assets/images/wallpaper-paper.png',
                               ),
                               fit: BoxFit.cover,
                               opacity: 0.08,
