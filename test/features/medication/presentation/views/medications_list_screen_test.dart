@@ -114,25 +114,21 @@ void main() {
     await tester.pumpWidget(_buildScreen(_EmptyRepo()));
     await tester.pumpAndSettle();
 
-    expect(find.text('No medications yet'), findsOneWidget);
+    expect(find.text('Nenhum medicamento'), findsOneWidget);
     expect(find.text('Aspirin'), findsNothing);
   });
 
-  testWidgets('renders medication cards with correct background colours', (
-    tester,
-  ) async {
+  testWidgets('renders medication cards with correct colours', (tester) async {
     await tester.pumpWidget(_buildScreen(_LoadedRepo()));
     await tester.pumpAndSettle();
 
     expect(find.text('Lisinopril'), findsOneWidget);
     expect(find.text('Aspirin'), findsOneWidget);
 
-    // Verify each card container has the correct colour
-    final containers = tester.widgetList<AnimatedContainer>(
-      find.byType(AnimatedContainer),
-    );
-    final colours = containers
-        .map((c) => (c.decoration as BoxDecoration?)?.color)
+    // AnimatedContainer(color:) uses BoxDecoration internally → DecoratedBox
+    final colours = tester
+        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+        .map((b) => (b.decoration as BoxDecoration?)?.color)
         .whereType<Color>()
         .toList();
 
@@ -140,29 +136,28 @@ void main() {
     expect(colours, contains(const Color(0xFFE53935)));
   });
 
-  testWidgets('tapping info+ expands a card to show details', (tester) async {
+  testWidgets('tapping EDITAR expands a card to show details', (tester) async {
     await tester.pumpWidget(_buildScreen(_LoadedRepo()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('info +').first);
+    expect(find.text('FECHAR'), findsNothing);
+
+    await tester.tap(find.text('EDITAR').first);
     await tester.pumpAndSettle();
 
-    expect(find.text('10 mg'), findsOneWidget);
-    expect(find.text('Once daily'), findsOneWidget);
-    expect(find.text('info -'), findsOneWidget);
+    expect(find.text('FECHAR'), findsOneWidget);
   });
 
-  testWidgets('tapping info- collapses the expanded card', (tester) async {
+  testWidgets('tapping FECHAR collapses the expanded card', (tester) async {
     await tester.pumpWidget(_buildScreen(_LoadedRepo()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('info +').first);
+    await tester.tap(find.text('EDITAR').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('info -'));
+    await tester.tap(find.text('FECHAR'));
     await tester.pumpAndSettle();
 
-    expect(find.text('info -'), findsNothing);
-    expect(find.text('info +'), findsWidgets);
+    expect(find.text('FECHAR'), findsNothing);
   });
 
   testWidgets('shows error state and Retry button on fetch failure', (

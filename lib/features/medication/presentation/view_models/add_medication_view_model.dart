@@ -68,13 +68,13 @@ class AddMedicationViewModel extends ChangeNotifier {
 
   /// Color palette shown in the bottom-sheet picker — uses the app's design tokens.
   static const List<Color> colorPalette = [
-    AppColors.lemon,  // primary blue
-    AppColors.ink,    // deep navy
-    AppColors.coral,  // muted salmon
-    AppColors.mint,   // soft sage
-    AppColors.sky,    // pale clinical blue
-    AppColors.rose,   // pale steel
-    AppColors.statusTeal,  // teal
+    AppColors.lemon, // primary blue
+    AppColors.ink, // deep navy
+    AppColors.coral, // muted salmon
+    AppColors.mint, // soft sage
+    AppColors.sky, // pale clinical blue
+    AppColors.rose, // pale steel
+    AppColors.statusTeal, // teal
     AppColors.statusNight, // dark slate
   ];
 

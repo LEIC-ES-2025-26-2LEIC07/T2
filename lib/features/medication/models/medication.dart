@@ -35,8 +35,7 @@ class Medication {
   final List<MedicationReminder>? reminders;
 
   /// True when endDate is null (ongoing) or still in the future.
-  bool get isActive =>
-      endDate == null || endDate!.isAfter(DateTime.now());
+  bool get isActive => endDate == null || endDate!.isAfter(DateTime.now());
 
   factory Medication.fromJson(Map<String, dynamic> json) {
     List<MedicationReminder>? reminders;
