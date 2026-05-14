@@ -70,7 +70,11 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/background_topography.png
+    - assets/images/wallpaper-blue.png
+    - assets/images/wallpaper-blue-deep.png
+    - assets/images/wallpaper-sky.png
+    - assets/images/wallpaper-paper.png
+    - assets/images/wallpaper-navy.png
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

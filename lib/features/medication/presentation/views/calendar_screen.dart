@@ -195,7 +195,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
         }
 
         return SafeArea(
-          child: Column(mainAxisSize: MainAxisSize.min, children: all),
+          child: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: all),
+          ),
         );
       },
     );

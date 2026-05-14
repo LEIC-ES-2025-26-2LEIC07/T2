@@ -9,9 +9,9 @@ class AppBackground extends StatelessWidget {
     return SizedBox.expand(
       child: DecoratedBox(
         decoration: const BoxDecoration(
-          color: Color(0xFFF7F6F3),
+          color: Color(0xFFF0F4F8),
           image: DecorationImage(
-            image: AssetImage('assets/images/background_topography.png'),
+            image: AssetImage('assets/images/wallpaper-paper.png'),
             fit: BoxFit.cover,
             alignment: Alignment.center,
           ),

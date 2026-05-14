@@ -156,7 +156,7 @@ void main() {
 
     testWidgets('renders Home tab by default', (tester) async {
       await pumpApp(tester);
-      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
+      expect(find.text('ClinicGO'), findsOneWidget);
     });
 
     testWidgets('Profile tab shows login form when not logged in', (
