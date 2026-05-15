@@ -13,7 +13,6 @@ It is organised by the following activities:
   * [Environment Variables](#Environment-Variables)
   * [Running the App](#Running-the-App)
   * [Running Tests](#Running-Tests)
-  * [CI/CD](#CICD)
 * [Business modeling](#Business-Modelling) 
   * [Product Vision](#Product-Vision)
   * [Features and Assumptions](#Features-and-Assumptions)
@@ -393,7 +392,7 @@ You can find below information and references related to the project management 
 * **Backlog Management:** Both the Product Backlog and Sprint Backlog are actively managed within our GitHub Projects Board.
 * * **Release Management:** Version tracking begins with [v0](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0), followed by v1, v2, v3...
 * **Sprint Planning & Retrospectives:** Planning and retrospective documentation is maintained for Sprint 0, Sprint 1, Sprint 2, Sprint 3, and the Final Release.
-* **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1lBXRWSGOGwlCaAO6XVjdQlxRd8Vy1xQ2nmZJSPKH9LQ/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
+* **Happiness Meters:** We track team morale using a [Happiness Meter](https://docs.google.com/spreadsheets/d/1Dd4dCzsbW1eqSfxNmsqDLT0UyNPI31Aicefy5qclR7k/edit?usp=sharing). Each member fills out the column associated with their designated number (e.g., member M3 fills the third column).
 * **Changelog:** We maintain a detailed changelog to track important changes in each released version. This follows the standard format specified at [Chanellog](CHANGELOG.md)).
 * **Git Workflow:** We follow a feature-branch workflow branching off `main`. Each feature or bug fix is developed on its own dedicated branch and integrated via a Pull Request (PR). Code reviews are mandatory and enforced using branch protection rules to ensure code quality and consistency.
 * **CI/CD (GitHub Actions):** Every Pull Request automatically triggers a GitHub Actions workflow that verifies code formatting and enforces linting rules. This helps maintain a consistent codebase and prevents errors from reaching the main branch.
