@@ -84,4 +84,5 @@ Full Changelog: [v0...v0.1](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/compar
 
 Full Changelog: [v0](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0)
 
+
 -----
