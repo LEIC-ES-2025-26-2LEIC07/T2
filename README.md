@@ -8,6 +8,12 @@ This Software Development Report, tailored for LEIC-ES-2025-26, provides compreh
 
 It is organised by the following activities: 
 
+* [Development Environment](#Development-Environment)
+  * [Prerequisites](#Prerequisites)
+  * [Environment Variables](#Environment-Variables)
+  * [Running the App](#Running-the-App)
+  * [Running Tests](#Running-Tests)
+  * [CI/CD](#CICD)
 * [Business modeling](#Business-Modelling) 
   * [Product Vision](#Product-Vision)
   * [Features and Assumptions](#Features-and-Assumptions)
@@ -43,6 +49,107 @@ Thank you!
 
 [Pedro Meireles](https://github.com/JoaooM26)
 
+
+---
+## Development Environment
+
+### Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Flutter](https://docs.flutter.dev/get-started/install) | stable channel | Framework and SDK |
+| [Dart](https://dart.dev/get-dart) | ≥ 3.11.3 | Bundled with Flutter |
+| [Git](https://git-scm.com/) | any recent | Version control |
+| Android Studio / Xcode | latest | Android / iOS targets |
+| A connected device or emulator | — | Run and debug |
+
+> **Verify your installation** with `flutter doctor`. All required items must show a green checkmark before proceeding.
+
+### Environment Variables
+
+The app reads credentials at runtime from a `.env` file in the project root.
+
+1. Create `.env` by copying the template:
+
+```bash
+cp .env.example .env   # if .env.example exists, otherwise create it manually
+```
+
+2. Fill in the two required keys:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=<your-supabase-project-url>
+SB_PV_KEY=<your-supabase-anon-or-service-role-key>
+```
+
+Both values can be found in the Supabase dashboard under **Project Settings → API**.
+
+> The `.env` file is declared as a Flutter asset in `pubspec.yaml` and loaded at startup via `flutter_dotenv`. Do **not** commit it — it is (or should be) listed in `.gitignore`.
+
+### Running the App
+
+```bash
+# 1. Clone the repository
+git clone <repo-url>
+cd Application
+
+# 2. Install Dart/Flutter dependencies
+flutter pub get
+
+# 3. Launch on a connected device or emulator (debug mode)
+flutter run
+
+# 4. Target a specific platform explicitly
+flutter run -d android
+flutter run -d ios
+flutter run -d linux
+flutter run -d web
+```
+
+For a **release build**:
+
+```bash
+# Android APK
+flutter build apk --release
+
+# Web (credentials must be passed as Dart defines because .env is not bundled)
+flutter build web --release \
+  --dart-define="NEXT_PUBLIC_SUPABASE_URL=<url>" \
+  --dart-define="SB_PV_KEY=<key>"
+```
+
+### Running Tests
+
+```bash
+# All widget/unit tests (no backend required)
+flutter test
+
+# With coverage report
+flutter test --coverage
+
+# Integration tests (requires a real device/emulator and a populated .env)
+flutter test --dart-define-from-file=.env integration_test/app_test.dart
+```
+
+The CI pipeline enforces a **minimum 60% line coverage** gate. Run `flutter test --coverage` locally and inspect `coverage/lcov.info` to check before opening a pull request.
+
+Code style is enforced with the standard Flutter linter:
+
+```bash
+dart format lib test          # auto-format
+flutter analyze               # static analysis
+```
+
+### CI/CD
+
+All pull requests to `main` trigger the GitHub Actions pipeline defined in `.github/workflows/ci.yml`:
+
+| Job | What it does |
+|-----|-------------|
+| **Quality Checks** | Formatting, static analysis, widget tests, 60% coverage gate |
+| **Web Smoke Build** | `flutter build web --release` with secrets injected as Dart defines |
+
+Supabase credentials for CI are stored as **GitHub repository secrets** (`NEXT_PUBLIC_SUPABASE_URL`, `SB_PV_KEY`). If you fork the repository you must set these secrets in your fork's settings for the web build job to pass.
 
 ---
 ## Business Modelling

@@ -1,5 +1,6 @@
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,6 +18,16 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(FakeRoute());
+    registerFallbackValue(
+      ScheduledDose(
+        id: '',
+        medicationId: '',
+        medicationName: '',
+        dosage: '',
+        scheduledTime: DateTime(2000),
+      ),
+    );
+    registerFallbackValue(DoseLogStatus.taken);
   });
 
   setUp(() {
@@ -27,6 +38,7 @@ void main() {
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.nextDose).thenReturn(null);
     when(() => mockViewModel.isOverdue).thenReturn(false);
+    when(() => mockViewModel.isLoggingDose).thenReturn(false);
     when(() => mockViewModel.todayDoses).thenReturn([]);
     when(() => mockViewModel.hadDosesToday).thenReturn(false);
     when(() => mockViewModel.loadNextDose()).thenAnswer((_) async {});
@@ -56,21 +68,20 @@ void main() {
     });
 
     testWidgets(
-      'Empty state: [Scenario] → "No upcoming doses" message is visible',
-      skip: true,
+      'Empty state: [Scenario] → "Sem doses agendadas" message is visible',
       (tester) async {
         when(() => mockViewModel.isLoading).thenReturn(false);
         when(() => mockViewModel.nextDose).thenReturn(null);
+        when(() => mockViewModel.hadDosesToday).thenReturn(false);
 
         await tester.pumpWidget(createWidgetUnderTest());
 
-        expect(find.text('No upcoming doses. Good job!'), findsOneWidget);
+        expect(find.text('Sem doses agendadas.'), findsOneWidget);
       },
     );
 
     testWidgets(
       'Success state (Upcoming): [Scenario] → dose card is rendered correctly',
-      skip: true,
       (tester) async {
         final dose = ScheduledDose(
           id: 'd1',
@@ -86,15 +97,14 @@ void main() {
 
         await tester.pumpWidget(createWidgetUnderTest());
 
-        expect(find.text('Upcoming dose'), findsOneWidget);
-        expect(find.text('Aspirin • 100mg'), findsOneWidget);
-        expect(find.text('Log Dose'), findsOneWidget);
+        expect(find.text('PRÓXIMA DOSE'), findsOneWidget);
+        expect(find.text('Aspirin 100mg'), findsOneWidget);
+        expect(find.text('Tomar agora'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'Success state (Overdue): [Scenario] → warning icon and red text are visible',
-      skip: true,
+      'Success state (Overdue): [Scenario] → overdue badge and Tomar agora are visible',
       (tester) async {
         final dose = ScheduledDose(
           id: 'd1',
@@ -110,15 +120,14 @@ void main() {
 
         await tester.pumpWidget(createWidgetUnderTest());
 
-        expect(find.text('Overdue dose'), findsOneWidget);
-        expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
-        expect(find.text('Log Overdue Dose'), findsOneWidget);
+        expect(find.text('PRÓXIMA DOSE'), findsOneWidget);
+        expect(find.textContaining('EM ATRASO'), findsOneWidget);
+        expect(find.text('Tomar agora'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'User interactions: [Scenario] → tapping Log Dose triggers navigation',
-      skip: true,
+      'User interactions: [Scenario] → tapping Tomar agora invokes logDose',
       (tester) async {
         final dose = ScheduledDose(
           id: 'd1',
@@ -130,14 +139,24 @@ void main() {
 
         when(() => mockViewModel.isLoading).thenReturn(false);
         when(() => mockViewModel.nextDose).thenReturn(dose);
+        when(
+          () => mockViewModel.logDose(
+            dose: any(named: 'dose'),
+            status: any(named: 'status'),
+          ),
+        ).thenAnswer((_) async {});
 
         await tester.pumpWidget(createWidgetUnderTest());
 
-        await tester.tap(find.text('Log Dose'));
-        await tester.pumpAndSettle();
+        await tester.tap(find.text('Tomar agora'));
+        await tester.pump();
 
-        // Verify that a route was pushed
-        verify(() => mockObserver.didPush(any(), any())).called(greaterThan(0));
+        verify(
+          () => mockViewModel.logDose(
+            dose: any(named: 'dose'),
+            status: any(named: 'status'),
+          ),
+        ).called(1);
       },
     );
   });

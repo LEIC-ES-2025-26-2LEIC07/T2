@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
@@ -32,6 +33,7 @@ class EditMedicationViewModel extends ChangeNotifier {
     startDate = medication.startDate;
     endDate = medication.endDate;
     notes = medication.notes ?? '';
+    withFood = medication.withFood;
   }
 
   final MedicationRepository _repository;
@@ -41,7 +43,8 @@ class EditMedicationViewModel extends ChangeNotifier {
   String name = '';
   String dosage = '';
   String frequency = AddMedicationViewModel.frequencyOptions.first;
-  Color selectedColor = const Color(0xFF4E84E5);
+  Color selectedColor = AppColors.lemon;
+  bool withFood = false;
   List<String> daysOfWeek = const [
     'monday',
     'tuesday',
@@ -163,6 +166,12 @@ class EditMedicationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setWithFood(bool v) {
+    withFood = v;
+    isDirty = true;
+    notifyListeners();
+  }
+
   void clearError() {
     errorMessage = null;
     notifyListeners();
@@ -203,6 +212,7 @@ class EditMedicationViewModel extends ChangeNotifier {
           startDate: startDate,
           endDate: endDate,
           notes: notes.trim().isEmpty ? null : notes.trim(),
+          withFood: withFood,
         ),
       );
 

@@ -273,7 +273,9 @@ void main() {
         when(
           () => mockClient.from('medications'),
         ).thenAnswer((_) => queryBuilder);
-        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+        when(
+          () => queryBuilder.select('*, medication_reminders(*)'),
+        ).thenAnswer((_) => filterBuilder);
         when(
           () => filterBuilder.eq('user_id', 'user-123'),
         ).thenAnswer((_) => filterBuilder);
@@ -298,7 +300,9 @@ void main() {
         when(
           () => mockClient.from('medications'),
         ).thenAnswer((_) => queryBuilder);
-        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+        when(
+          () => queryBuilder.select('*, medication_reminders(*)'),
+        ).thenAnswer((_) => filterBuilder);
         when(
           () => filterBuilder.eq('user_id', 'user-123'),
         ).thenAnswer((_) => filterBuilder);
@@ -322,7 +326,9 @@ void main() {
         when(
           () => mockClient.from('medications'),
         ).thenAnswer((_) => queryBuilder);
-        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+        when(
+          () => queryBuilder.select('*, medication_reminders(*)'),
+        ).thenAnswer((_) => filterBuilder);
         when(
           () => filterBuilder.eq('user_id', 'user-123'),
         ).thenAnswer((_) => filterBuilder);
@@ -349,7 +355,9 @@ void main() {
         when(
           () => mockClient.from('medications'),
         ).thenAnswer((_) => queryBuilder);
-        when(() => queryBuilder.select()).thenAnswer((_) => filterBuilder);
+        when(
+          () => queryBuilder.select('*, medication_reminders(*)'),
+        ).thenAnswer((_) => filterBuilder);
         when(
           () => filterBuilder.eq('user_id', 'user-123'),
         ).thenAnswer((_) => filterBuilder);

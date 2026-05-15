@@ -4,9 +4,13 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   quality:
@@ -17,6 +21,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -36,10 +42,97 @@ jobs:
       - name: Run static analysis
         run: flutter analyze
 
-      - name: Run widget tests with coverage
-        run: flutter test --coverage
+      # ── Pull Request: run only tests for changed source files ──────────────
 
-      - name: Publish quality summary
+      - name: Resolve targeted test files
+        if: github.event_name == 'pull_request'
+        id: targets
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- 'lib/**/*.dart')
+          FILES=""
+          while IFS= read -r src; do
+            [ -z "$src" ] && continue
+            candidate="test/$(echo "${src#lib/}" | sed 's/\.dart$/_test.dart/')"
+            [ -f "$candidate" ] && FILES="$FILES $candidate"
+          done <<< "$CHANGED"
+          FILES=$(echo "$FILES" | xargs)
+          COUNT=$(echo "$FILES" | wc -w | tr -d ' ')
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Run targeted tests (PR)
+        if: github.event_name == 'pull_request' && steps.targets.outputs.count != '0'
+        run: flutter test ${{ steps.targets.outputs.files }}
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          TEST_FILES: ${{ steps.targets.outputs.files }}
+          TEST_COUNT: ${{ steps.targets.outputs.count }}
+        with:
+          script: |
+            const count = parseInt(process.env.TEST_COUNT || '0');
+            const files = (process.env.TEST_FILES || '').trim();
+
+            let testsSection;
+            if (count > 0) {
+              const list = files.split(/\s+/).map(f => `- \`${f}\``).join('\n');
+              testsSection = `**${count} test file(s) matched** and ran:\n${list}`;
+            } else {
+              testsSection = `No test files matched the changed source files — skipped.`;
+            }
+
+            const body = [
+              `## CI Report`,
+              ``,
+              `| Check | Status |`,
+              `|-------|--------|`,
+              `| Formatting | ✅ |`,
+              `| Static analysis | ✅ |`,
+              `| Tests | ✅ |`,
+              ``,
+              `### Targeted Tests`,
+              testsSection,
+              ``,
+              `> Full coverage gate (≥ 60%) runs on merge to \`main\`.`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existing = comments.find(
+              c => c.user.login === 'github-actions[bot]' && c.body.startsWith('## CI Report')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      # ── Push to main: full suite + coverage gate ───────────────────────────
+
+      - name: Run all tests with coverage (main)
+        if: github.event_name == 'push'
+        run: flutter test --coverage --concurrency=4
+
+      - name: Evaluate coverage gate
+        if: github.event_name == 'push'
         run: |
           if [ -f coverage/lcov.info ]; then
             coverage=$(awk '
@@ -73,7 +166,7 @@ jobs:
           fi
 
       - name: Upload coverage artifact
-        if: always()
+        if: always() && github.event_name == 'push'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -84,6 +177,7 @@ jobs:
     name: Web Smoke Build
     runs-on: ubuntu-latest
     needs: quality
+    if: github.event_name == 'push'
     timeout-minutes: 20
 
     steps:

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
+import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
@@ -397,80 +398,8 @@ class _HeaderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Logo tile (blue cross)
-        GestureDetector(
-          onTap: onGoToMeds,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.lemon,
-              border: BrutalDecor.border,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: BrutalDecor.shadowSm,
-            ),
-            child: Center(
-              child: SizedBox(
-                width: 18,
-                height: 18,
-                child: CustomPaint(painter: _CrossPainter()),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        const Text(
-          'ClinicGO',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.2,
-            color: AppColors.ink,
-          ),
-        ),
-      ],
-    );
+    return GestureDetector(onTap: onGoToMeds, child: const ClinicGoLogo());
   }
-}
-
-class _CrossPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    // vertical bar
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 7 / 18,
-          size.height * 2 / 18,
-          size.width * 4 / 18,
-          size.height * 14 / 18,
-        ),
-        const Radius.circular(1),
-      ),
-      paint,
-    );
-    // horizontal bar
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 2 / 18,
-          size.height * 7 / 18,
-          size.width * 14 / 18,
-          size.height * 4 / 18,
-        ),
-        const Radius.circular(1),
-      ),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ── _NextDoseCard ─────────────────────────────────────────────────────────────
