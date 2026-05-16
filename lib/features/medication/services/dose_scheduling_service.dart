@@ -51,7 +51,7 @@ class DoseSchedulingService {
               id: _generateStableId(reminder.id!, scheduledTime),
               medicationId: medication.id,
               medicationName: medication.name,
-              dosage: medication.dosage ?? '',
+              dosage: medication.dosageDisplay ?? '',
               scheduledTime: scheduledTime,
             ),
           );

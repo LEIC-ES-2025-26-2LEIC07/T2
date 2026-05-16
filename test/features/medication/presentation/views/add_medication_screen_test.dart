@@ -114,7 +114,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Name is required'), findsOneWidget);
-    expect(find.text('Dosage is required'), findsOneWidget);
+    expect(find.text('Enter a valid dosage'), findsOneWidget);
   });
 
   testWidgets('Save button shows spinner while loading', (tester) async {
@@ -125,7 +125,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextField, 'name'), 'Aspirin');
-    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '100mg');
+    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '100');
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pump(); // start async
 
@@ -154,7 +154,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextField, 'name'), 'Med');
-    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '5mg');
+    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '5');
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pumpAndSettle();
 

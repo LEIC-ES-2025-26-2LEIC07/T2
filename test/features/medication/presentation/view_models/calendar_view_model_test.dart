@@ -227,7 +227,8 @@ void main() {
         id: 'med-1',
         userId: 'user-1',
         name: 'Lisinopril',
-        dosage: '5mg',
+        dosageAmount: 5,
+        dosageUnit: 'mg',
         color: Colors.blue,
         createdAt: DateTime(2026, 1, 1),
       );

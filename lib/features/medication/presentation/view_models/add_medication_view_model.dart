@@ -24,7 +24,8 @@ class AddMedicationViewModel extends ChangeNotifier {
 
   // ── Form fields ──────────────────────────────────────────────────
   String name = '';
-  String dosage = '';
+  int? dosageAmount;
+  String dosageUnit = 'mg';
   String frequency = frequencyOptions.first;
   Color selectedColor = AppColors.lemon;
   List<TimeOfDay> reminderTimes = [const TimeOfDay(hour: 8, minute: 0)];
@@ -66,6 +67,8 @@ class AddMedicationViewModel extends ChangeNotifier {
     'sunday',
   ];
 
+  static const List<String> dosageUnits = ['mg', 'g', 'ml', 'mcg', 'IU'];
+
   /// Color palette shown in the bottom-sheet picker — uses the app's design tokens.
   static const List<Color> colorPalette = [
     AppColors.lemon, // primary blue
@@ -86,9 +89,15 @@ class AddMedicationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDosage(String v) {
-    dosage = v;
+  void setDosageAmount(int? v) {
+    dosageAmount = v;
     dosageError = null;
+    isDirty = true;
+    notifyListeners();
+  }
+
+  void setDosageUnit(String v) {
+    dosageUnit = v;
     isDirty = true;
     notifyListeners();
   }
@@ -156,7 +165,8 @@ class AddMedicationViewModel extends ChangeNotifier {
       final result = await _repository.addMedication(
         AddMedicationPayload(
           name: name.trim(),
-          dosage: dosage.trim(),
+          dosageAmount: dosageAmount!,
+          dosageUnit: dosageUnit,
           frequency: frequency,
           color: selectedColor,
           reminderTimes: reminderTimes
@@ -200,8 +210,8 @@ class AddMedicationViewModel extends ChangeNotifier {
       nameError = 'Name is required';
       valid = false;
     }
-    if (dosage.trim().isEmpty) {
-      dosageError = 'Dosage is required';
+    if (dosageAmount == null || dosageAmount! <= 0) {
+      dosageError = 'Enter a valid dosage';
       valid = false;
     }
     if (!valid) notifyListeners();
@@ -241,7 +251,8 @@ class AddMedicationViewModel extends ChangeNotifier {
       id: result.medicationId,
       userId: '',
       name: name.trim(),
-      dosage: dosage.trim(),
+      dosageAmount: dosageAmount,
+      dosageUnit: dosageUnit,
       color: selectedColor,
       frequency: frequency,
       startDate: startDate,

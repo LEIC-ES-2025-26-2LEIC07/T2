@@ -59,3 +59,4 @@ app.*.map.json
 .env
 .claude
 .codex
+claude-obsidian/

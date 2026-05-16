@@ -24,7 +24,8 @@ class EditMedicationViewModel extends ChangeNotifier {
   }) : _repository = repository,
        _medicationId = medication.id {
     name = medication.name;
-    dosage = medication.dosage ?? '';
+    dosageAmount = medication.dosageAmount;
+    dosageUnit = medication.dosageUnit ?? 'mg';
     frequency =
         AddMedicationViewModel.frequencyOptions.contains(medication.frequency)
         ? medication.frequency!
@@ -41,7 +42,8 @@ class EditMedicationViewModel extends ChangeNotifier {
 
   // ── Form fields ──────────────────────────────────────────────────
   String name = '';
-  String dosage = '';
+  int? dosageAmount;
+  String dosageUnit = 'mg';
   String frequency = AddMedicationViewModel.frequencyOptions.first;
   Color selectedColor = AppColors.lemon;
   bool withFood = false;
@@ -119,9 +121,15 @@ class EditMedicationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDosage(String v) {
-    dosage = v;
+  void setDosageAmount(int? v) {
+    dosageAmount = v;
     dosageError = null;
+    isDirty = true;
+    notifyListeners();
+  }
+
+  void setDosageUnit(String v) {
+    dosageUnit = v;
     isDirty = true;
     notifyListeners();
   }
@@ -203,7 +211,8 @@ class EditMedicationViewModel extends ChangeNotifier {
         EditMedicationPayload(
           medicationId: _medicationId,
           name: name.trim(),
-          dosage: dosage.trim(),
+          dosageAmount: dosageAmount!,
+          dosageUnit: dosageUnit,
           frequency: frequency,
           color: selectedColor,
           daysOfWeek: daysOfWeek,
@@ -254,8 +263,8 @@ class EditMedicationViewModel extends ChangeNotifier {
       nameError = 'Name is required';
       valid = false;
     }
-    if (dosage.trim().isEmpty) {
-      dosageError = 'Dosage is required';
+    if (dosageAmount == null || dosageAmount! <= 0) {
+      dosageError = 'Enter a valid dosage';
       valid = false;
     }
     if (!valid) notifyListeners();
