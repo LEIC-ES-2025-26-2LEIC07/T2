@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
+import 'package:clinic_go/core/widgets/app_loading_button.dart';
+import 'package:clinic_go/core/widgets/auth_error_box.dart';
 import 'package:clinic_go/core/widgets/auth_text_field.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/login_view_model.dart';
@@ -113,58 +114,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       if (_viewModel.errorMessage != null) ...[
                         const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFECEC),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Text(
-                            _viewModel.errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Color(0xFFC62828),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+                        AuthErrorBox(message: _viewModel.errorMessage!),
                         const SizedBox(height: 12),
                       ] else
                         const SizedBox(height: 12),
-                      SizedBox(
-                        height: 58,
-                        child: ElevatedButton(
-                          onPressed: _viewModel.isLoading ? null : _handleLogin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: AppColors.primaryColor,
-                            disabledForegroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                          ),
-                          child: _viewModel.isLoading
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text(
-                                  'Sign in',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
+                      AppLoadingButton(
+                        label: 'Sign in',
+                        onPressed: _handleLogin,
+                        isLoading: _viewModel.isLoading,
                       ),
                       const SizedBox(height: 16),
                       Row(

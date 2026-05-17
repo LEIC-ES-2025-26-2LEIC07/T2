@@ -52,27 +52,14 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     }
   }
 
-  Future<bool> _confirmDiscard() async {
-    if (!_viewModel.isDirty) return true;
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Discard changes?'),
-        content: const Text('Your unsaved medication data will be lost.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Keep editing'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Discard', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-    return result ?? false;
-  }
+  Future<bool> _confirmDiscard() => showDiscardChangesDialog(
+    context,
+    isDirty: _viewModel.isDirty,
+    title: 'Discard changes?',
+    content: 'Your unsaved medication data will be lost.',
+    cancelLabel: 'Keep editing',
+    discardLabel: 'Discard',
+  );
 
   Future<void> _cancelAndPop() async {
     final navigator = Navigator.of(context);
@@ -220,22 +207,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 ),
                 if (_viewModel.errorMessage != null) ...[
                   const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFECEC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: medInk, width: 2),
-                    ),
-                    child: Text(
-                      _viewModel.errorMessage!,
-                      style: const TextStyle(
-                        color: Color(0xFFC62828),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                  MedErrorBox(message: _viewModel.errorMessage!),
                 ],
                 const SizedBox(height: 12),
               ],

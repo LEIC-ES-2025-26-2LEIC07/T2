@@ -2,7 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 
-// ── Shared design tokens ───────────────────────────────────────
+// ── Discard-changes dialog ─────────────────────────────────────
+
+Future<bool> showDiscardChangesDialog(
+  BuildContext context, {
+  required String title,
+  required String content,
+  required String cancelLabel,
+  required String discardLabel,
+  required bool isDirty,
+}) async {
+  if (!isDirty) return true;
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(cancelLabel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(discardLabel, style: const TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+  return result ?? false;
+}
+
+// ── Shared design tokens ──────────────────────────────────────
 const medInk = Color(0xFF0E2748);
 const medPaper = Color(0xFFEEF3FA);
 const medCard = Color(0xFFFFFFFF);
@@ -595,6 +626,34 @@ class MedColorPickerSheet extends StatelessWidget {
                 .toList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Medication error box ───────────────────────────────────────
+
+class MedErrorBox extends StatelessWidget {
+  const MedErrorBox({super.key, required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFECEC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: medInk, width: 2),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: Color(0xFFC62828),
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
