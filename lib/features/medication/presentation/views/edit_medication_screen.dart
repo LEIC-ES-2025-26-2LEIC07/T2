@@ -1,26 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/edit_medication_view_model.dart';
-
-// ── Design tokens ──────────────────────────────────────────────
-const _ink = Color(0xFF0E2748);
-const _paper = Color(0xFFEEF3FA);
-const _card = Color(0xFFFFFFFF);
-const _blue = Color(0xFF3D6BE0);
-const _muted = Color(0xFF7A8AA5);
-const _shadowSm = BoxShadow(color: _ink, offset: Offset(3, 3), blurRadius: 0);
-
-const _quickPalette = [
-  Color(0xFFE0796A),
-  Color(0xFF3D6BE0),
-  Color(0xFFB7D8C7),
-  Color(0xFFC9DCF7),
-  Color(0xFFF4D6D2),
-];
+import 'package:clinic_go/features/medication/presentation/widgets/medication_form_widgets.dart';
 
 class EditMedicationScreen extends StatefulWidget {
   const EditMedicationScreen({super.key, required this.medication});
@@ -106,7 +90,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => _ColorPickerSheet(
+      builder: (_) => MedColorPickerSheet(
         selected: _viewModel.selectedColor,
         onSelected: (c) {
           _viewModel.setColor(c);
@@ -133,14 +117,14 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: _paper,
+        backgroundColor: medPaper,
         body: SafeArea(
           child: AnimatedBuilder(
             animation: _viewModel,
             builder: (context, _) => Stack(
               fit: StackFit.expand,
               children: [
-                const CustomPaint(painter: _TopoPainter()),
+                const CustomPaint(painter: MedTopoPainter()),
                 _buildContent(context),
               ],
             ),
@@ -162,10 +146,10 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
               children: [
                 _buildColorSection(),
                 const SizedBox(height: 20),
-                _LabeledField(
+                MedLabeledField(
                   label: 'Nome',
                   errorText: _viewModel.nameError,
-                  child: _PlainTextField(
+                  child: MedPlainTextField(
                     key: const Key('edit_med_name_field'),
                     controller: _nameController,
                     placeholder: 'ex: Metformina',
@@ -174,10 +158,10 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _LabeledField(
+                MedLabeledField(
                   label: 'Dosagem',
                   errorText: _viewModel.dosageError,
-                  child: _DosageContent(
+                  child: MedDosageContent(
                     key: const Key('edit_med_dosage_field'),
                     controller: _dosageAmountController,
                     selectedUnit: _viewModel.dosageUnit,
@@ -198,11 +182,11 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                     _viewModel.reminderSlots.length,
                     (i) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: _LabeledField(
+                      child: MedLabeledField(
                         label: _viewModel.reminderSlots.length > 1
                             ? 'Horário (${i + 1})'
                             : 'Horário',
-                        child: _TimeContent(
+                        child: MedTimeContent(
                           key: Key('edit_med_time_$i'),
                           time: _viewModel.reminderSlots[i].time,
                           onTap: () => _pickReminderTime(i),
@@ -217,14 +201,14 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontStyle: FontStyle.italic,
-                        color: _ink.withValues(alpha: 0.65),
+                        color: medInk.withValues(alpha: 0.65),
                       ),
                     ),
                   ),
                 ],
-                _LabeledField(
+                MedLabeledField(
                   label: 'Frequência',
-                  child: _FreqContent(
+                  child: MedFreqContent(
                     key: const Key('edit_med_freq_field'),
                     value: _viewModel.frequency,
                     options: AddMedicationViewModel.frequencyOptions,
@@ -232,17 +216,17 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _LabeledField(
+                MedLabeledField(
                   label: 'Com comida',
-                  child: _FoodSwitchContent(
+                  child: MedFoodSwitchContent(
                     value: _viewModel.withFood,
                     onChanged: _viewModel.setWithFood,
                   ),
                 ),
                 const SizedBox(height: 12),
-                _LabeledField(
+                MedLabeledField(
                   label: 'Notas (opcional)',
-                  child: _PlainTextField(
+                  child: MedPlainTextField(
                     controller: _notesController,
                     placeholder: 'ex: com o pequeno-almoço',
                     onChanged: _viewModel.setNotes,
@@ -257,7 +241,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFECEC),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _ink, width: 2),
+                      border: Border.all(color: medInk, width: 2),
                     ),
                     child: Text(
                       _viewModel.errorMessage!,
@@ -294,12 +278,12 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: _card,
+                color: medCard,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _ink, width: 2),
-                boxShadow: const [_shadowSm],
+                border: Border.all(color: medInk, width: 2),
+                boxShadow: const [medShadowSm],
               ),
-              child: const Icon(Icons.arrow_back, size: 18, color: _ink),
+              child: const Icon(Icons.arrow_back, size: 18, color: medInk),
             ),
           ),
           const SizedBox(width: 12),
@@ -309,7 +293,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: _ink,
+                color: medInk,
                 letterSpacing: -0.5,
               ),
             ),
@@ -332,8 +316,8 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
             decoration: BoxDecoration(
               color: _viewModel.selectedColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: _ink, width: 2.5),
-              boxShadow: const [_shadowSm],
+              border: Border.all(color: medInk, width: 2.5),
+              boxShadow: const [medShadowSm],
             ),
             child: Align(
               alignment: Alignment.bottomRight,
@@ -343,11 +327,11 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: _card,
+                    color: medCard,
                     shape: BoxShape.circle,
-                    border: Border.all(color: _ink, width: 2),
+                    border: Border.all(color: medInk, width: 2),
                   ),
-                  child: const Icon(Icons.edit, size: 11, color: _ink),
+                  child: const Icon(Icons.edit, size: 11, color: medInk),
                 ),
               ),
             ),
@@ -363,7 +347,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
-                color: _ink.withValues(alpha: 0.6),
+                color: medInk.withValues(alpha: 0.6),
                 height: 1,
               ),
             ),
@@ -373,12 +357,12 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: _ink,
+                color: medInk,
               ),
             ),
             const SizedBox(height: 8),
             Row(
-              children: _quickPalette.map((c) {
+              children: medQuickPalette.map((c) {
                 final isSelected = _viewModel.selectedColor == c;
                 return GestureDetector(
                   onTap: () => _viewModel.setColor(c),
@@ -390,7 +374,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                       color: c,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: _ink,
+                        color: medInk,
                         width: isSelected ? 2.5 : 1.5,
                       ),
                     ),
@@ -407,8 +391,8 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
   Widget _buildBottomBar(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: _card,
-        border: Border(top: BorderSide(color: _ink, width: 2)),
+        color: medCard,
+        border: Border(top: BorderSide(color: medInk, width: 2)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
       child: Row(
@@ -426,9 +410,9 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                         }
                       },
                 style: OutlinedButton.styleFrom(
-                  backgroundColor: _paper,
-                  foregroundColor: _ink,
-                  side: const BorderSide(color: _ink, width: 2),
+                  backgroundColor: medPaper,
+                  foregroundColor: medInk,
+                  side: const BorderSide(color: medInk, width: 2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -452,8 +436,8 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                     ? null
                     : _viewModel.submit,
                 style: FilledButton.styleFrom(
-                  backgroundColor: _blue,
-                  disabledBackgroundColor: _blue,
+                  backgroundColor: medBlue,
+                  disabledBackgroundColor: medBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -477,375 +461,6 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                       ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Topo background ────────────────────────────────────────────
-
-class _TopoPainter extends CustomPainter {
-  const _TopoPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0x260E2748)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.7;
-
-    final sx = size.width / 390;
-    final sy = size.height / 800;
-
-    _drawGroup(canvas, paint, 180, 200, 9, 32, 30, 0.9, sx, sy);
-    _drawGroup(canvas, paint, 310, 660, 10, 30, 22, 1.1, sx, sy);
-    _drawGroup(canvas, paint, 50, 380, 8, 30, 26, 1.0, sx, sy);
-  }
-
-  void _drawGroup(
-    Canvas canvas,
-    Paint paint,
-    double cx,
-    double cy,
-    int count,
-    double base,
-    double step,
-    double ar,
-    double sx,
-    double sy,
-  ) {
-    for (int i = 0; i < count; i++) {
-      final ry = base + i * step;
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(cx * sx, cy * sy),
-          width: ry * ar * 2 * sx,
-          height: ry * 2 * sy,
-        ),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_TopoPainter old) => false;
-}
-
-// ── Field widgets ──────────────────────────────────────────────
-
-class _LabeledField extends StatelessWidget {
-  const _LabeledField({
-    required this.label,
-    required this.child,
-    this.errorText,
-  });
-
-  final String label;
-  final Widget child;
-  final String? errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.4,
-            color: _ink.withValues(alpha: 0.6),
-            height: 1,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          decoration: BoxDecoration(
-            color: _card,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _ink, width: 2),
-            boxShadow: const [_shadowSm],
-          ),
-          child: child,
-        ),
-        if (errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 4, top: 4),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _PlainTextField extends StatelessWidget {
-  const _PlainTextField({
-    super.key,
-    required this.controller,
-    required this.placeholder,
-    this.onChanged,
-    this.textInputAction,
-    this.maxLines = 1,
-  });
-
-  final TextEditingController controller;
-  final String placeholder;
-  final ValueChanged<String>? onChanged;
-  final TextInputAction? textInputAction;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      textInputAction: textInputAction,
-      maxLines: maxLines,
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w700,
-        color: _ink,
-      ),
-      decoration: InputDecoration(
-        hintText: placeholder,
-        hintStyle: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: _muted,
-        ),
-        filled: false,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-      ),
-    );
-  }
-}
-
-class _DosageContent extends StatelessWidget {
-  const _DosageContent({
-    super.key,
-    required this.controller,
-    required this.selectedUnit,
-    required this.units,
-    required this.onAmountChanged,
-    required this.onUnitChanged,
-  });
-
-  final TextEditingController controller;
-  final String selectedUnit;
-  final List<String> units;
-  final ValueChanged<String> onAmountChanged;
-  final ValueChanged<String?> onUnitChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            onChanged: onAmountChanged,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            textInputAction: TextInputAction.next,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: _ink,
-            ),
-            decoration: InputDecoration(
-              hintText: 'ex: 500',
-              hintStyle: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: _muted,
-              ),
-              filled: false,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-            ),
-          ),
-        ),
-        Container(width: 1, height: 28, color: _ink.withValues(alpha: 0.2)),
-        DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedUnit,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: _ink,
-            ),
-            items: units
-                .map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                .toList(),
-            onChanged: onUnitChanged,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TimeContent extends StatelessWidget {
-  const _TimeContent({super.key, required this.time, required this.onTap});
-
-  final TimeOfDay time;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              time.format(context),
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: _ink,
-              ),
-            ),
-            const Icon(Icons.access_time_rounded, size: 18, color: _ink),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FreqContent extends StatelessWidget {
-  const _FreqContent({
-    super.key,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<String>(
-        value: value,
-        isExpanded: true,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-          color: _ink,
-        ),
-        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _ink),
-        items: options
-            .map((o) => DropdownMenuItem(value: o, child: Text(o)))
-            .toList(),
-        onChanged: onChanged,
-      ),
-    );
-  }
-}
-
-class _FoodSwitchContent extends StatelessWidget {
-  const _FoodSwitchContent({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            value ? 'Sim' : 'Não',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: _ink,
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: _blue,
-            activeThumbColor: _card,
-            inactiveThumbColor: _muted,
-            inactiveTrackColor: const Color(0xFFE0E7F0),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Color picker sheet ─────────────────────────────────────────
-
-class _ColorPickerSheet extends StatelessWidget {
-  const _ColorPickerSheet({required this.selected, required this.onSelected});
-
-  final Color selected;
-  final ValueChanged<Color> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Escolhe uma cor',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: AddMedicationViewModel.colorPalette
-                .map(
-                  (c) => GestureDetector(
-                    onTap: () => onSelected(c),
-                    child: Container(
-                      key: Key('color_${c.toARGB32().toRadixString(16)}'),
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: c == selected
-                            ? Border.all(color: _ink, width: 3)
-                            : Border.all(color: _ink, width: 1.5),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
           ),
         ],
       ),
