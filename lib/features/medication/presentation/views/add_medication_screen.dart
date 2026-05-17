@@ -74,6 +74,13 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     return result ?? false;
   }
 
+  Future<void> _cancelAndPop() async {
+    final navigator = Navigator.of(context);
+    if (await _confirmDiscard() && mounted) {
+      navigator.pop(false);
+    }
+  }
+
   Future<void> _pickColor() async {
     await showModalBottomSheet<void>(
       context: context,
@@ -135,7 +142,12 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildColorSection(),
+                MedColorSection(
+                  swatchKey: const Key('med_color_swatch'),
+                  selectedColor: _viewModel.selectedColor,
+                  onColorChanged: _viewModel.setColor,
+                  onPickerTap: _pickColor,
+                ),
                 const SizedBox(height: 20),
                 MedLabeledField(
                   label: 'Nome',
@@ -230,7 +242,13 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
             ),
           ),
         ),
-        _buildBottomBar(context),
+        MedFormBottomBar(
+          isLoading: _viewModel.isLoading,
+          saveButtonKey: const Key('med_save_button'),
+          saveLabel: 'Guardar',
+          onCancel: _cancelAndPop,
+          onSave: _viewModel.submit,
+        ),
       ],
     );
   }
@@ -253,12 +271,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
           ),
           GestureDetector(
             key: const Key('med_close_button'),
-            onTap: () async {
-              final navigator = Navigator.of(context);
-              if (await _confirmDiscard() && mounted) {
-                navigator.pop(false);
-              }
-            },
+            onTap: _cancelAndPop,
             child: Container(
               width: 38,
               height: 38,
@@ -269,167 +282,6 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 boxShadow: const [medShadowSm],
               ),
               child: const Icon(Icons.close, size: 18, color: medInk),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildColorSection() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        GestureDetector(
-          key: const Key('med_color_swatch'),
-          onTap: _pickColor,
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: _viewModel.selectedColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: medInk, width: 2.5),
-              boxShadow: const [medShadowSm],
-            ),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Transform.translate(
-                offset: const Offset(6, 6),
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: medCard,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: medInk, width: 2),
-                  ),
-                  child: const Icon(Icons.edit, size: 11, color: medInk),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'COR',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.4,
-                color: medInk.withValues(alpha: 0.6),
-                height: 1,
-              ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              'Toca para mudar',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: medInk,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: medQuickPalette.map((c) {
-                final isSelected = _viewModel.selectedColor == c;
-                return GestureDetector(
-                  onTap: () => _viewModel.setColor(c),
-                  child: Container(
-                    width: 22,
-                    height: 22,
-                    margin: const EdgeInsets.only(right: 6),
-                    decoration: BoxDecoration(
-                      color: c,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: medInk,
-                        width: isSelected ? 2.5 : 1.5,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomBar(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: medCard,
-        border: Border(top: BorderSide(color: medInk, width: 2)),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: 52,
-              child: OutlinedButton(
-                onPressed: _viewModel.isLoading
-                    ? null
-                    : () async {
-                        final navigator = Navigator.of(context);
-                        if (await _confirmDiscard() && mounted) {
-                          navigator.pop(false);
-                        }
-                      },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: medPaper,
-                  foregroundColor: medInk,
-                  side: const BorderSide(color: medInk, width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Text(
-                  'Cancelar',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            flex: 2,
-            child: SizedBox(
-              height: 52,
-              child: FilledButton(
-                key: const Key('med_save_button'),
-                onPressed: _viewModel.isLoading ? null : _viewModel.submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: medBlue,
-                  disabledBackgroundColor: medBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 0,
-                ),
-                child: _viewModel.isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                    : const Text(
-                        'Guardar',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-              ),
             ),
           ),
         ],

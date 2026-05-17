@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
+import 'package:clinic_go/core/widgets/auth_text_field.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/sign_up_view_model.dart';
 
@@ -112,19 +113,19 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   ),
                   const SizedBox(height: 24),
 
-                  _SignUpTextField(
+                  AuthTextField(
                     controller: _emailController,
                     hintText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 12),
-                  _SignUpTextField(
+                  AuthTextField(
                     controller: _passwordController,
                     hintText: 'Password',
                     obscureText: true,
                   ),
                   const SizedBox(height: 12),
-                  _SignUpTextField(
+                  AuthTextField(
                     controller: _confirmController,
                     hintText: 'Confirm password',
                     obscureText: true,
@@ -201,54 +202,6 @@ class _SignUpSheetState extends State<SignUpSheet> {
               ), // Column
             ); // SingleChildScrollView
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _SignUpTextField extends StatelessWidget {
-  const _SignUpTextField({
-    required this.controller,
-    required this.hintText,
-    this.keyboardType,
-    this.obscureText = false,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-  final TextInputType? keyboardType;
-  final bool obscureText;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Color(0xFFB0B0B0),
-          fontWeight: FontWeight.w500,
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE4E4E4)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE4E4E4)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
         ),
       ),
     );

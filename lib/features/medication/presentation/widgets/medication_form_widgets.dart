@@ -346,6 +346,204 @@ class MedFoodSwitchContent extends StatelessWidget {
   }
 }
 
+// ── Color section ─────────────────────────────────────────────
+
+class MedColorSection extends StatelessWidget {
+  const MedColorSection({
+    super.key,
+    required this.selectedColor,
+    required this.onColorChanged,
+    required this.onPickerTap,
+    this.swatchKey,
+  });
+
+  final Color selectedColor;
+  final ValueChanged<Color> onColorChanged;
+  final VoidCallback onPickerTap;
+  final Key? swatchKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          key: swatchKey,
+          onTap: onPickerTap,
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: selectedColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: medInk, width: 2.5),
+              boxShadow: const [medShadowSm],
+            ),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Transform.translate(
+                offset: const Offset(6, 6),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: medCard,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: medInk, width: 2),
+                  ),
+                  child: const Icon(Icons.edit, size: 11, color: medInk),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'COR',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+                color: medInk.withValues(alpha: 0.6),
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'Toca para mudar',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: medInk,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: medQuickPalette.map((c) {
+                final isSelected = selectedColor == c;
+                return GestureDetector(
+                  onTap: () => onColorChanged(c),
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(
+                      color: c,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: medInk,
+                        width: isSelected ? 2.5 : 1.5,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ── Form bottom bar ────────────────────────────────────────────
+
+class MedFormBottomBar extends StatelessWidget {
+  const MedFormBottomBar({
+    super.key,
+    required this.isLoading,
+    required this.onCancel,
+    required this.onSave,
+    required this.saveLabel,
+    this.isSaveDisabled = false,
+    this.saveButtonKey,
+  });
+
+  final bool isLoading;
+  final Future<void> Function() onCancel;
+  final VoidCallback onSave;
+  final String saveLabel;
+  final bool isSaveDisabled;
+  final Key? saveButtonKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: medCard,
+        border: Border(top: BorderSide(color: medInk, width: 2)),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: OutlinedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        onCancel();
+                      },
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: medPaper,
+                  foregroundColor: medInk,
+                  side: const BorderSide(color: medInk, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 2,
+            child: SizedBox(
+              height: 52,
+              child: FilledButton(
+                key: saveButtonKey,
+                onPressed: (isLoading || isSaveDisabled) ? null : onSave,
+                style: FilledButton.styleFrom(
+                  backgroundColor: medBlue,
+                  disabledBackgroundColor: medBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(
+                        saveLabel,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Color picker sheet ─────────────────────────────────────────
 
 class MedColorPickerSheet extends StatelessWidget {
