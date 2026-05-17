@@ -9,8 +9,8 @@ import 'package:clinic_go/features/medication/data/supabase_dose_log_repository.
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/supabase_medication_repository.dart';
-import 'package:clinic_go/features/medication/data/calendar_repository.dart';
-import 'package:clinic_go/features/medication/data/supabase_calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/supabase_calendar_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/flutter_local_notification_gateway.dart';

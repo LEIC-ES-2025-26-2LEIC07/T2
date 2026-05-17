@@ -1,4 +1,4 @@
-import 'dose_log_repository.dart';
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 
 class DoseLogEntry {
   DoseLogEntry({

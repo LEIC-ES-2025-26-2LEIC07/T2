@@ -7,13 +7,13 @@ import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 import 'package:clinic_go/features/medication/presentation/views/medications_list_screen.dart';
-import 'package:clinic_go/features/medication/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/presentation/view_models/calendar_view_model.dart';
+import 'package:clinic_go/features/calendar/presentation/views/calendar_screen.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
-import 'package:clinic_go/features/medication/presentation/view_models/calendar_view_model.dart';
-import 'package:clinic_go/features/medication/presentation/views/calendar_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
 import 'package:clinic_go/features/home/presentation/views/home_content.dart';
 

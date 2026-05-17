@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:clinic_go/features/medication/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
