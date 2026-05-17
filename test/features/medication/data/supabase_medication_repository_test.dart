@@ -63,7 +63,8 @@ void main() {
     group('addMedication', () {
       final payload = AddMedicationPayload(
         name: 'Aspirin',
-        dosage: '100mg',
+        dosageAmount: 100,
+        dosageUnit: 'mg',
         frequency: 'Daily',
         color: const Color(0xFFE57373),
         startDate: DateTime(2023, 1, 1),
@@ -262,7 +263,8 @@ void main() {
               'id': 'med-123',
               'user_id': 'user-123',
               'name': 'Aspirin',
-              'dosage': '100mg',
+              'dosage': 100,
+              'dosage_unit': 'mg',
               'frequency': 'Daily',
               'color': '#E57373',
               'created_at': '2023-01-01T00:00:00Z',

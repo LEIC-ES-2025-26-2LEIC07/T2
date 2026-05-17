@@ -14,7 +14,8 @@ void main() {
       id: 'med-1',
       userId: 'user-1',
       name: 'Lisinopril',
-      dosage: '10mg',
+      dosageAmount: 10,
+      dosageUnit: 'mg',
       color: Colors.blue,
       createdAt: DateTime(2026, 4, 1),
     );

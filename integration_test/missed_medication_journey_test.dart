@@ -75,7 +75,8 @@ void main() {
         id: 'med-123',
         userId: 'user-123',
         name: 'Lisinopril',
-        dosage: '10mg',
+        dosageAmount: 10,
+        dosageUnit: 'mg',
         color: Colors.blue,
         createdAt: now.subtract(const Duration(days: 1)),
       );

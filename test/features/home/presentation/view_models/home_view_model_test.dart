@@ -59,7 +59,8 @@ void main() {
           id: 'med-1',
           userId: 'u1',
           name: 'Aspirin',
-          dosage: '100mg',
+          dosageAmount: 100,
+          dosageUnit: 'mg',
           color: Colors.red,
           createdAt: DateTime(2026, 1, 1),
         );
@@ -108,7 +109,8 @@ void main() {
           id: 'med-1',
           userId: 'u1',
           name: 'Aspirin',
-          dosage: '100mg',
+          dosageAmount: 100,
+          dosageUnit: 'mg',
           color: Colors.red,
           createdAt: DateTime(2026, 1, 1),
         );
@@ -170,7 +172,8 @@ void main() {
         id: 'stable-med-id',
         userId: 'u1',
         name: 'Aspirin',
-        dosage: '100mg',
+        dosageAmount: 100,
+        dosageUnit: 'mg',
         color: Colors.red,
         createdAt: baseDate.subtract(const Duration(days: 10)),
       );

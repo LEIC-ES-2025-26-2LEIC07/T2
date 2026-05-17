@@ -141,7 +141,7 @@ void main() {
   group('AddMedicationViewModel – validation', () {
     test('submit with empty name sets nameError', () async {
       final vm = vmFactory();
-      vm.setDosage('10mg');
+      vm.setDosageAmount(10);
       await vm.submit();
 
       expect(vm.nameError, isNotNull);
@@ -180,7 +180,7 @@ void main() {
       final repo = _SuccessRepo();
       final vm = vmFactory(repo: repo);
       vm.setName('Lisinopril');
-      vm.setDosage('10 mg');
+      vm.setDosageAmount(10);
       await vm.submit();
 
       expect(vm.isSuccess, isTrue);
@@ -191,7 +191,7 @@ void main() {
     test('isDirty becomes false after successful submit', () async {
       final vm = vmFactory();
       vm.setName('Med');
-      vm.setDosage('5mg');
+      vm.setDosageAmount(5);
       expect(vm.isDirty, isTrue);
       await vm.submit();
       expect(vm.isDirty, isFalse);
@@ -202,7 +202,7 @@ void main() {
       final repo = _CapturingRepo((p) => captured = p);
       final vm = vmFactory(repo: repo);
       vm.setName('Med');
-      vm.setDosage('5mg');
+      vm.setDosageAmount(5);
       vm.setColor(const Color(0xFFE53935));
       await vm.submit();
 
@@ -214,7 +214,7 @@ void main() {
     test('sets errorMessage when MedicationSaveException is thrown', () async {
       final vm = vmFactory(repo: _RollbackRepo());
       vm.setName('Med');
-      vm.setDosage('5mg');
+      vm.setDosageAmount(5);
       await vm.submit();
 
       expect(vm.isSuccess, isFalse);
@@ -224,7 +224,7 @@ void main() {
     test('sets generic errorMessage on unknown exception', () async {
       final vm = vmFactory(repo: _NetworkErrorRepo());
       vm.setName('Med');
-      vm.setDosage('5mg');
+      vm.setDosageAmount(5);
       await vm.submit();
 
       expect(vm.errorMessage, isNotNull);

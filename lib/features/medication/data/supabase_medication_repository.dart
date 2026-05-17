@@ -27,7 +27,8 @@ class SupabaseMedicationRepository implements MedicationRepository {
         .insert({
           'user_id': user.id,
           'name': payload.name,
-          'dosage': payload.dosage,
+          'dosage': payload.dosageAmount,
+          'dosage_unit': payload.dosageUnit,
           'frequency': payload.frequency,
           'color': Medication.colorToHex(payload.color),
           'with_food': payload.withFood,
@@ -109,7 +110,8 @@ class SupabaseMedicationRepository implements MedicationRepository {
         .from('medications')
         .update({
           'name': payload.name,
-          'dosage': payload.dosage,
+          'dosage': payload.dosageAmount,
+          'dosage_unit': payload.dosageUnit,
           'frequency': payload.frequency,
           'color': Medication.colorToHex(payload.color),
           'with_food': payload.withFood,

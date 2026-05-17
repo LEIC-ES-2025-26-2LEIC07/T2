@@ -6,7 +6,8 @@ import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 class AddMedicationPayload {
   const AddMedicationPayload({
     required this.name,
-    required this.dosage,
+    required this.dosageAmount,
+    required this.dosageUnit,
     required this.frequency,
     required this.color,
     required this.reminderTimes,
@@ -18,7 +19,8 @@ class AddMedicationPayload {
   });
 
   final String name;
-  final String dosage;
+  final int dosageAmount;
+  final String dosageUnit;
   final String frequency;
   final Color color;
 
@@ -60,7 +62,8 @@ class EditMedicationPayload {
   const EditMedicationPayload({
     required this.medicationId,
     required this.name,
-    required this.dosage,
+    required this.dosageAmount,
+    required this.dosageUnit,
     required this.frequency,
     required this.color,
     required this.daysOfWeek,
@@ -74,7 +77,8 @@ class EditMedicationPayload {
 
   final String medicationId;
   final String name;
-  final String dosage;
+  final int dosageAmount;
+  final String dosageUnit;
   final String frequency;
   final Color color;
   final List<String> daysOfWeek;

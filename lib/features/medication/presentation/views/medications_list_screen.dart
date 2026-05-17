@@ -354,11 +354,11 @@ class _MedicationCardState extends State<_MedicationCard> {
                       color: AppColors.ink,
                     ),
                   ),
-                  if (med.dosage != null || med.frequency != null) ...[
+                  if (med.dosageDisplay != null || med.frequency != null) ...[
                     const SizedBox(height: 3),
                     Text(
                       [
-                        if (med.dosage != null) med.dosage!,
+                        if (med.dosageDisplay != null) med.dosageDisplay!,
                         if (med.frequency != null) med.frequency!,
                       ].join(' · '),
                       style: const TextStyle(
@@ -439,11 +439,11 @@ class _MedicationCardState extends State<_MedicationCard> {
                         if (med.isActive) const _AtivoBadge(),
                       ],
                     ),
-                    if (med.dosage != null || med.frequency != null) ...[
+                    if (med.dosageDisplay != null || med.frequency != null) ...[
                       const SizedBox(height: 3),
                       Text(
                         [
-                          if (med.dosage != null) med.dosage!,
+                          if (med.dosageDisplay != null) med.dosageDisplay!,
                           if (med.frequency != null) med.frequency!,
                         ].join(' · '),
                         style: const TextStyle(

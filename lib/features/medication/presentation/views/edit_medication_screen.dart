@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
@@ -33,7 +34,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
     );
     _nameController = TextEditingController(text: widget.medication.name);
     _dosageController = TextEditingController(
-      text: widget.medication.dosage ?? '',
+      text: widget.medication.dosageAmount?.toString() ?? '',
     );
     _notesController = TextEditingController(
       text: widget.medication.notes ?? '',
@@ -262,13 +263,16 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                   const SizedBox(height: 10),
 
                                   // Dosage
-                                  _BlueField(
+                                  _DosageField(
                                     key: const Key('edit_med_dosage_field'),
-                                    label: 'dosage',
                                     controller: _dosageController,
+                                    selectedUnit: _viewModel.dosageUnit,
+                                    units: AddMedicationViewModel.dosageUnits,
                                     errorText: _viewModel.dosageError,
-                                    onChanged: _viewModel.setDosage,
-                                    textInputAction: TextInputAction.next,
+                                    onAmountChanged: (v) => _viewModel
+                                        .setDosageAmount(int.tryParse(v)),
+                                    onUnitChanged: (u) =>
+                                        _viewModel.setDosageUnit(u ?? 'mg'),
                                   ),
                                   const SizedBox(height: 10),
 
@@ -459,6 +463,98 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+// ── Dosage field: numeric input + unit dropdown ─────────────────────
+
+class _DosageField extends StatelessWidget {
+  const _DosageField({
+    super.key,
+    required this.controller,
+    required this.selectedUnit,
+    required this.units,
+    required this.onAmountChanged,
+    required this.onUnitChanged,
+    this.errorText,
+  });
+
+  final TextEditingController controller;
+  final String selectedUnit;
+  final List<String> units;
+  final ValueChanged<String> onAmountChanged;
+  final ValueChanged<String?> onUnitChanged;
+  final String? errorText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF4E84E5),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  onChanged: onAmountChanged,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  textInputAction: TextInputAction.next,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: 'dosage',
+                    hintStyle: TextStyle(
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    filled: false,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              Container(width: 1, height: 28, color: Colors.white24),
+              DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selectedUnit,
+                  dropdownColor: const Color(0xFF4E84E5),
+                  iconEnabledColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                  items: units
+                      .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                      .toList(),
+                  onChanged: onUnitChanged,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, top: 4),
+            child: Text(
+              errorText!,
+              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
+            ),
+          ),
       ],
     );
   }
