@@ -143,10 +143,7 @@ void main() {
       );
       await vm.loadMedications();
 
-      expect(
-        () => (vm.medications as List<Medication>).add(_med('2')),
-        throwsUnsupportedError,
-      );
+      expect(() => vm.medications.add(_med('2')), throwsUnsupportedError);
     });
   });
 }

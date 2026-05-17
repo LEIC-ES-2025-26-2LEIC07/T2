@@ -269,8 +269,9 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
           GestureDetector(
             key: const Key('med_close_button'),
             onTap: () async {
+              final navigator = Navigator.of(context);
               if (await _confirmDiscard() && mounted) {
-                Navigator.of(context).pop(false);
+                navigator.pop(false);
               }
             },
             child: Container(
@@ -391,8 +392,9 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                 onPressed: _viewModel.isLoading
                     ? null
                     : () async {
+                        final navigator = Navigator.of(context);
                         if (await _confirmDiscard() && mounted) {
-                          Navigator.of(context).pop(false);
+                          navigator.pop(false);
                         }
                       },
                 style: OutlinedButton.styleFrom(

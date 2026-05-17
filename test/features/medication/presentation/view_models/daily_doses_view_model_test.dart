@@ -244,7 +244,7 @@ void main() {
       await vm.loadTodayDoses();
 
       expect(
-        () => (vm.doses as List<DoseItem>).add(DoseItem(dose: _dose())),
+        () => vm.doses.add(DoseItem(dose: _dose())),
         throwsUnsupportedError,
       );
     });

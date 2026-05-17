@@ -8,6 +8,7 @@
 //   --dart-define=TEST_EMAIL=a@a.pt \
 //   --dart-define=TEST_PASSWORD=123456
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart' show Color;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,19 +22,19 @@ const _anonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 const _email = String.fromEnvironment('TEST_EMAIL');
 const _password = String.fromEnvironment('TEST_PASSWORD');
 
-void _log(String step, String msg) => print('[$step] $msg');
+void _log(String step, String msg) => debugPrint('[$step] $msg');
 
 void _logPostgrestError(String step, PostgrestException e) {
-  print('[$step] PostgrestException:');
-  print('  code   : ${e.code}');
-  print('  message: ${e.message}');
-  print('  details: ${e.details}');
-  print('  hint   : ${e.hint}');
+  debugPrint('[$step] PostgrestException:');
+  debugPrint('  code   : ${e.code}');
+  debugPrint('  message: ${e.message}');
+  debugPrint('  details: ${e.details}');
+  debugPrint('  hint   : ${e.hint}');
 }
 
 void main() {
   late SupabaseClient client;
-  String? _cleanupId;
+  String? cleanupId;
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -54,14 +55,14 @@ void main() {
   });
 
   tearDown(() async {
-    if (_cleanupId != null) {
+    if (cleanupId != null) {
       try {
-        await client.from('medications').delete().eq('id', _cleanupId!);
-        _log('tearDown', 'deleted test medication $_cleanupId');
+        await client.from('medications').delete().eq('id', cleanupId!);
+        _log('tearDown', 'deleted test medication $cleanupId');
       } catch (e) {
         _log('tearDown', 'cleanup failed: $e');
       }
-      _cleanupId = null;
+      cleanupId = null;
     }
     await client.auth.signOut();
   });
@@ -96,9 +97,9 @@ void main() {
             .select('id')
             .single();
 
-        _cleanupId = row['id'] as String;
-        _log('STEP 2', 'inserted medication id=$_cleanupId');
-        expect(_cleanupId, isNotEmpty);
+        cleanupId = row['id'] as String;
+        _log('STEP 2', 'inserted medication id=$cleanupId');
+        expect(cleanupId, isNotEmpty);
       } on PostgrestException catch (e) {
         _logPostgrestError('STEP 2', e);
         rethrow;
@@ -126,11 +127,11 @@ void main() {
           .select('id')
           .single();
 
-      _cleanupId = medRow['id'] as String;
+      cleanupId = medRow['id'] as String;
 
       try {
         final remRows = await client.from('medication_reminders').insert({
-          'medication_id': _cleanupId,
+          'medication_id': cleanupId,
           'reminder_time': '08:00:00',
           'days_of_week': [
             'monday',
@@ -172,7 +173,7 @@ void main() {
 
         try {
           final result = await repo.addMedication(payload);
-          _cleanupId = result.medicationId;
+          cleanupId = result.medicationId;
           _log('STEP 4', 'medicationId=${result.medicationId}');
           _log('STEP 4', 'reminders saved: ${result.reminders.length}');
           expect(result.medicationId, isNotEmpty);
