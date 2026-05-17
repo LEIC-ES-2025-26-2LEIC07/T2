@@ -28,14 +28,14 @@ class FakeScheduledDose extends Fake implements ScheduledDose {}
 // ── Stub repositories ─────────────────────────────────────────────────────────
 
 Medication _med({String id = 'med-1'}) => Medication(
-      id: id,
-      userId: 'u1',
-      name: 'Aspirin',
-      dosageAmount: 100,
-      dosageUnit: 'mg',
-      color: Colors.blue,
-      createdAt: DateTime(2025),
-    );
+  id: id,
+  userId: 'u1',
+  name: 'Aspirin',
+  dosageAmount: 100,
+  dosageUnit: 'mg',
+  color: Colors.blue,
+  createdAt: DateTime(2025),
+);
 
 MedicationReminder _reminder({String medicationId = 'med-1'}) =>
     MedicationReminder(
@@ -46,12 +46,12 @@ MedicationReminder _reminder({String medicationId = 'med-1'}) =>
     );
 
 ScheduledDose _dose({String id = 'dose-1'}) => ScheduledDose(
-      id: id,
-      medicationId: 'med-1',
-      medicationName: 'Aspirin',
-      dosage: '100mg',
-      scheduledTime: DateTime.now().add(const Duration(hours: 1)),
-    );
+  id: id,
+  medicationId: 'med-1',
+  medicationName: 'Aspirin',
+  dosage: '100mg',
+  scheduledTime: DateTime.now().add(const Duration(hours: 1)),
+);
 
 class _StubMedRepo implements MedicationRepository {
   final List<Medication> meds;
@@ -86,8 +86,7 @@ class _StubMedRepo implements MedicationRepository {
   @override
   Future<List<MedicationReminder>> fetchRemindersForMedication(
     String medicationId,
-  ) async =>
-      [];
+  ) async => [];
 }
 
 // ── Helper: build VM with mocked scheduling that returns a fixed dose ─────────

@@ -7,10 +7,10 @@ import 'package:clinic_go/features/medication/services/missed_dose_notification_
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 
 // ── Design tokens ──────────────────────────────────────────────
-const _ink   = Color(0xFF0E2748);
+const _ink = Color(0xFF0E2748);
 const _paper = Color(0xFFEEF3FA);
-const _card  = Color(0xFFFFFFFF);
-const _blue  = Color(0xFF3D6BE0);
+const _card = Color(0xFFFFFFFF);
+const _blue = Color(0xFF3D6BE0);
 const _muted = Color(0xFF7A8AA5);
 const _shadowSm = BoxShadow(color: _ink, offset: Offset(3, 3), blurRadius: 0);
 
@@ -174,8 +174,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
                     units: AddMedicationViewModel.dosageUnits,
                     onAmountChanged: (v) =>
                         _viewModel.setDosageAmount(int.tryParse(v)),
-                    onUnitChanged: (u) =>
-                        _viewModel.setDosageUnit(u ?? 'mg'),
+                    onUnitChanged: (u) => _viewModel.setDosageUnit(u ?? 'mg'),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -472,8 +471,18 @@ class _TopoPainter extends CustomPainter {
     _drawGroup(canvas, paint, 50, 380, 8, 30, 26, 1.0, sx, sy);
   }
 
-  void _drawGroup(Canvas canvas, Paint paint, double cx, double cy,
-      int count, double base, double step, double ar, double sx, double sy) {
+  void _drawGroup(
+    Canvas canvas,
+    Paint paint,
+    double cx,
+    double cy,
+    int count,
+    double base,
+    double step,
+    double ar,
+    double sx,
+    double sy,
+  ) {
     for (int i = 0; i < count; i++) {
       final ry = base + i * step;
       canvas.drawOval(
@@ -534,10 +543,7 @@ class _LabeledField extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, top: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(
-                color: Color(0xFFC62828),
-                fontSize: 12,
-              ),
+              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
             ),
           ),
       ],
@@ -581,7 +587,10 @@ class _PlainTextField extends StatelessWidget {
           color: _muted,
         ),
         filled: false,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
@@ -640,11 +649,7 @@ class _DosageContent extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          width: 1,
-          height: 28,
-          color: _ink.withValues(alpha: 0.2),
-        ),
+        Container(width: 1, height: 28, color: _ink.withValues(alpha: 0.2)),
         DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: selectedUnit,

@@ -16,9 +16,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/supabase_medication_repository.dart';
 
-const _url      = String.fromEnvironment('SUPABASE_URL');
-const _anonKey  = String.fromEnvironment('SUPABASE_ANON_KEY');
-const _email    = String.fromEnvironment('TEST_EMAIL');
+const _url = String.fromEnvironment('SUPABASE_URL');
+const _anonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+const _email = String.fromEnvironment('TEST_EMAIL');
 const _password = String.fromEnvironment('TEST_PASSWORD');
 
 void _log(String step, String msg) => print('[$step] $msg');
@@ -129,18 +129,20 @@ void main() {
       _cleanupId = medRow['id'] as String;
 
       try {
-        final remRows = await client
-            .from('medication_reminders')
-            .insert({
-              'medication_id': _cleanupId,
-              'reminder_time': '08:00:00',
-              'days_of_week': [
-                'monday', 'tuesday', 'wednesday',
-                'thursday', 'friday', 'saturday', 'sunday',
-              ],
-              'is_active': true,
-            })
-            .select();
+        final remRows = await client.from('medication_reminders').insert({
+          'medication_id': _cleanupId,
+          'reminder_time': '08:00:00',
+          'days_of_week': [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+          ],
+          'is_active': true,
+        }).select();
 
         _log('STEP 3', 'inserted reminders: $remRows');
         expect(remRows, isNotEmpty);
@@ -153,33 +155,36 @@ void main() {
     // ── Step 4 ────────────────────────────────────────────────────────────────
     // Full addMedication via the repository — the exact production path.
     // If Steps 2 and 3 pass but this fails: logic issue inside the repository.
-    test('Step 4 — full addMedication via SupabaseMedicationRepository', () async {
-      final repo = SupabaseMedicationRepository(client);
+    test(
+      'Step 4 — full addMedication via SupabaseMedicationRepository',
+      () async {
+        final repo = SupabaseMedicationRepository(client);
 
-      const payload = AddMedicationPayload(
-        name: 'Integration Test Med (full)',
-        dosageAmount: 50,
-        dosageUnit: 'mg',
-        frequency: 'Twice daily',
-        color: Color(0xFF3D6BE0),
-        reminderTimes: ['08:00:00', '20:00:00'],
-        daysOfWeek: ['monday', 'wednesday', 'friday'],
-      );
+        const payload = AddMedicationPayload(
+          name: 'Integration Test Med (full)',
+          dosageAmount: 50,
+          dosageUnit: 'mg',
+          frequency: 'Twice daily',
+          color: Color(0xFF3D6BE0),
+          reminderTimes: ['08:00:00', '20:00:00'],
+          daysOfWeek: ['monday', 'wednesday', 'friday'],
+        );
 
-      try {
-        final result = await repo.addMedication(payload);
-        _cleanupId = result.medicationId;
-        _log('STEP 4', 'medicationId=${result.medicationId}');
-        _log('STEP 4', 'reminders saved: ${result.reminders.length}');
-        expect(result.medicationId, isNotEmpty);
-        expect(result.reminders, hasLength(2));
-      } on MedicationSaveException catch (e) {
-        _log('STEP 4', 'MedicationSaveException: ${e.message}');
-        rethrow;
-      } on PostgrestException catch (e) {
-        _logPostgrestError('STEP 4', e);
-        rethrow;
-      }
-    });
+        try {
+          final result = await repo.addMedication(payload);
+          _cleanupId = result.medicationId;
+          _log('STEP 4', 'medicationId=${result.medicationId}');
+          _log('STEP 4', 'reminders saved: ${result.reminders.length}');
+          expect(result.medicationId, isNotEmpty);
+          expect(result.reminders, hasLength(2));
+        } on MedicationSaveException catch (e) {
+          _log('STEP 4', 'MedicationSaveException: ${e.message}');
+          rethrow;
+        } on PostgrestException catch (e) {
+          _logPostgrestError('STEP 4', e);
+          rethrow;
+        }
+      },
+    );
   });
 }

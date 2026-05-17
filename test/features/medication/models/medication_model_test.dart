@@ -12,21 +12,20 @@ Map<String, dynamic> _baseJson({
   String dosageUnit = 'mg',
   String color = '#E53935',
   String createdAt = '2025-01-01T00:00:00.000Z',
-}) =>
-    {
-      'id': id,
-      'user_id': userId,
-      'name': name,
-      'dosage': dosage,
-      'dosage_unit': dosageUnit,
-      'frequency': 'Once daily',
-      'color': color,
-      'start_date': null,
-      'end_date': null,
-      'notes': null,
-      'created_at': createdAt,
-      'with_food': false,
-    };
+}) => {
+  'id': id,
+  'user_id': userId,
+  'name': name,
+  'dosage': dosage,
+  'dosage_unit': dosageUnit,
+  'frequency': 'Once daily',
+  'color': color,
+  'start_date': null,
+  'end_date': null,
+  'notes': null,
+  'created_at': createdAt,
+  'with_food': false,
+};
 
 void main() {
   group('Medication.fromJson', () {
@@ -147,10 +146,7 @@ void main() {
     });
 
     test('colorToHex formats Color to #RRGGBB', () {
-      expect(
-        Medication.colorToHex(const Color(0xFFE53935)),
-        '#e53935',
-      );
+      expect(Medication.colorToHex(const Color(0xFFE53935)), '#e53935');
     });
 
     test('colorFromHex and colorToHex round-trip', () {

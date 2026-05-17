@@ -269,10 +269,8 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                     selectedUnit: _viewModel.dosageUnit,
                                     units: AddMedicationViewModel.dosageUnits,
                                     errorText: _viewModel.dosageError,
-                                    onAmountChanged: (v) =>
-                                        _viewModel.setDosageAmount(
-                                          int.tryParse(v),
-                                        ),
+                                    onAmountChanged: (v) => _viewModel
+                                        .setDosageAmount(int.tryParse(v)),
                                     onUnitChanged: (u) =>
                                         _viewModel.setDosageUnit(u ?? 'mg'),
                                   ),

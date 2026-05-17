@@ -8,12 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 // ── Stub repositories ─────────────────────────────────────────────────────────
 
 Medication _med(String id) => Medication(
-      id: id,
-      userId: 'u1',
-      name: 'Med $id',
-      color: Colors.blue,
-      createdAt: DateTime(2025),
-    );
+  id: id,
+  userId: 'u1',
+  name: 'Med $id',
+  color: Colors.blue,
+  createdAt: DateTime(2025),
+);
 
 class _SuccessRepo implements MedicationRepository {
   final List<Medication> medications;
@@ -110,14 +110,17 @@ void main() {
       expect(vm.errorMessage, isNull);
     });
 
-    test('sets errorMessage and leaves list empty on repository error', () async {
-      final vm = MedicationsListViewModel(repository: _FailingRepo());
-      await vm.loadMedications();
+    test(
+      'sets errorMessage and leaves list empty on repository error',
+      () async {
+        final vm = MedicationsListViewModel(repository: _FailingRepo());
+        await vm.loadMedications();
 
-      expect(vm.errorMessage, isNotNull);
-      expect(vm.medications, isEmpty);
-      expect(vm.isLoading, isFalse);
-    });
+        expect(vm.errorMessage, isNotNull);
+        expect(vm.medications, isEmpty);
+        expect(vm.isLoading, isFalse);
+      },
+    );
 
     test('clears previous errorMessage on successful retry', () async {
       final failRepo = _FailingRepo();

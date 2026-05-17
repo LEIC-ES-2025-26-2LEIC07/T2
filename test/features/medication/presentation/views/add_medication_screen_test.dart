@@ -123,10 +123,7 @@ void main() {
       find.widgetWithText(TextField, 'ex: Metformina'),
       'Aspirin',
     );
-    await tester.enterText(
-      find.widgetWithText(TextField, 'ex: 500'),
-      '100',
-    );
+    await tester.enterText(find.widgetWithText(TextField, 'ex: 500'), '100');
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pump();
 
@@ -156,10 +153,7 @@ void main() {
       find.widgetWithText(TextField, 'ex: Metformina'),
       'Med',
     );
-    await tester.enterText(
-      find.widgetWithText(TextField, 'ex: 500'),
-      '5',
-    );
+    await tester.enterText(find.widgetWithText(TextField, 'ex: 500'), '5');
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pumpAndSettle();
 
