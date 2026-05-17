@@ -1,7 +1,7 @@
 # AI Usage Report — Sprint 3
 **Project:** ClinicGO · **Repo:** LEIC-ES-2025-26-2LEIC07/T2
 **Period:** 2026-04-22 → 2026-05-15
-**Author:** David (df668203@gmail.com)
+**Author:** David 
 
 ---
 
