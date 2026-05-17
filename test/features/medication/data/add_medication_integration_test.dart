@@ -22,6 +22,9 @@ const _anonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 const _email = String.fromEnvironment('TEST_EMAIL');
 const _password = String.fromEnvironment('TEST_PASSWORD');
 
+const _hasCredentials =
+    _url != '' && _anonKey != '' && _email != '' && _password != '';
+
 void _log(String step, String msg) => debugPrint('[$step] $msg');
 
 void _logPostgrestError(String step, PostgrestException e) {
@@ -33,6 +36,15 @@ void _logPostgrestError(String step, PostgrestException e) {
 }
 
 void main() {
+  if (!_hasCredentials) {
+    test(
+      'integration tests skipped — pass --dart-define=SUPABASE_URL=... to run',
+      () {},
+      skip: 'no credentials provided via --dart-define',
+    );
+    return;
+  }
+
   late SupabaseClient client;
   String? cleanupId;
 
