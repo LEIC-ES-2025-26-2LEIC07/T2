@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/edit_medication_view_model.dart';
+import 'package:clinic_go/features/medication/presentation/widgets/edit_medication_form.dart';
 
 /// Screen for editing or deleting an existing medication.
 ///
@@ -127,7 +127,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => _ColorPickerSheet(
+      builder: (_) => EditMedColorPickerSheet(
         selected: _viewModel.selectedColor,
         onSelected: (c) {
           _viewModel.setColor(c);
@@ -251,8 +251,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Name
-                                  _BlueField(
+                                  EditMedBlueField(
                                     key: const Key('edit_med_name_field'),
                                     label: 'name',
                                     controller: _nameController,
@@ -261,9 +260,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                     textInputAction: TextInputAction.next,
                                   ),
                                   const SizedBox(height: 10),
-
-                                  // Dosage
-                                  _DosageField(
+                                  EditMedDosageField(
                                     key: const Key('edit_med_dosage_field'),
                                     controller: _dosageController,
                                     selectedUnit: _viewModel.dosageUnit,
@@ -275,15 +272,13 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                         _viewModel.setDosageUnit(u ?? 'mg'),
                                   ),
                                   const SizedBox(height: 10),
-
-                                  // Reminder time pickers
                                   ...List.generate(
                                     _viewModel.reminderSlots.length,
                                     (i) => Padding(
                                       padding: const EdgeInsets.only(
                                         bottom: 10,
                                       ),
-                                      child: _TimeTile(
+                                      child: EditMedTimeTile(
                                         key: Key('edit_med_time_$i'),
                                         label:
                                             _viewModel.reminderSlots.length > 1
@@ -294,8 +289,6 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                       ),
                                     ),
                                   ),
-
-                                  // Reminder times note
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
                                     child: Text(
@@ -310,9 +303,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                       ),
                                     ),
                                   ),
-
-                                  // Frequency dropdown
-                                  _FrequencyDropdown(
+                                  EditMedFrequencyDropdown(
                                     key: const Key('edit_med_freq_field'),
                                     value: _viewModel.frequency,
                                     options:
@@ -320,23 +311,17 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                                     onChanged: _viewModel.setFrequency,
                                   ),
                                   const SizedBox(height: 10),
-
-                                  // With food toggle
-                                  _FoodSwitch(
+                                  EditMedFoodSwitch(
                                     value: _viewModel.withFood,
                                     onChanged: _viewModel.setWithFood,
                                   ),
                                   const SizedBox(height: 10),
-
-                                  // Notes (optional)
-                                  _BlueField(
+                                  EditMedBlueField(
                                     label: 'notes (optional)',
                                     controller: _notesController,
                                     onChanged: _viewModel.setNotes,
                                     maxLines: 2,
                                   ),
-
-                                  // Error message
                                   if (_viewModel.errorMessage != null) ...[
                                     const SizedBox(height: 12),
                                     Container(
@@ -402,7 +387,6 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
           child: Row(
             children: [
-              // Cancel
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -425,7 +409,6 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              // Save Changes
               Expanded(
                 flex: 2,
                 child: FilledButton(
@@ -464,338 +447,6 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-// ── Dosage field: numeric input + unit dropdown ─────────────────────
-
-class _DosageField extends StatelessWidget {
-  const _DosageField({
-    super.key,
-    required this.controller,
-    required this.selectedUnit,
-    required this.units,
-    required this.onAmountChanged,
-    required this.onUnitChanged,
-    this.errorText,
-  });
-
-  final TextEditingController controller;
-  final String selectedUnit;
-  final List<String> units;
-  final ValueChanged<String> onAmountChanged;
-  final ValueChanged<String?> onUnitChanged;
-  final String? errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF4E84E5),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  onChanged: onAmountChanged,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  textInputAction: TextInputAction.next,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: 'dosage',
-                    hintStyle: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    filled: false,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              Container(width: 1, height: 28, color: Colors.white24),
-              DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedUnit,
-                  dropdownColor: const Color(0xFF4E84E5),
-                  iconEnabledColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                  items: units
-                      .map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                      .toList(),
-                  onChanged: onUnitChanged,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-// ── Reusable form widgets (mirrors add_medication_screen.dart) ──────
-
-class _BlueField extends StatelessWidget {
-  const _BlueField({
-    super.key,
-    required this.label,
-    required this.controller,
-    this.errorText,
-    this.onChanged,
-    this.textInputAction,
-    this.maxLines = 1,
-  });
-
-  final String label;
-  final TextEditingController controller;
-  final String? errorText;
-  final ValueChanged<String>? onChanged;
-  final TextInputAction? textInputAction;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: controller,
-          onChanged: onChanged,
-          textInputAction: textInputAction,
-          maxLines: maxLines,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          decoration: InputDecoration(
-            hintText: label,
-            hintStyle: const TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
-            ),
-            filled: true,
-            fillColor: const Color(0xFF4E84E5),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none,
-            ),
-            errorText: null,
-          ),
-        ),
-        if (errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _TimeTile extends StatelessWidget {
-  const _TimeTile({
-    super.key,
-    required this.label,
-    required this.time,
-    required this.onTap,
-  });
-
-  final String label;
-  final TimeOfDay time;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final formatted = time.format(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF4E84E5),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              formatted,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FrequencyDropdown extends StatelessWidget {
-  const _FrequencyDropdown({
-    super.key,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  final String value;
-  final List<String> options;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4E84E5),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: const Color(0xFF4E84E5),
-          iconEnabledColor: Colors.white,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          hint: const Text('freq', style: TextStyle(color: Colors.white70)),
-          items: options
-              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-}
-
-class _FoodSwitch extends StatelessWidget {
-  const _FoodSwitch({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4E84E5),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'com comida',
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: Colors.white38,
-            inactiveThumbColor: Colors.white54,
-            inactiveTrackColor: Colors.white24,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ColorPickerSheet extends StatelessWidget {
-  const _ColorPickerSheet({required this.selected, required this.onSelected});
-
-  final Color selected;
-  final ValueChanged<Color> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Choose a colour',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: AddMedicationViewModel.colorPalette
-                .map(
-                  (c) => GestureDetector(
-                    onTap: () => onSelected(c),
-                    child: Container(
-                      key: Key('edit_color_${c.toARGB32().toRadixString(16)}'),
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: c == selected
-                            ? Border.all(color: Colors.black, width: 3)
-                            : null,
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
     );
   }
 }
