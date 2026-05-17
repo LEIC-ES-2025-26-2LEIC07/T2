@@ -6,10 +6,22 @@ import 'package:clinic_go/features/medication/presentation/view_models/add_medic
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 
-/// Full add-medication form pushed onto the stack from [MedicationsListScreen].
-///
-/// Matches the mockup: grey card container, blue pill input fields, inline
-/// colour swatch tapper, dynamic reminder time pickers, and discard guard.
+// ── Design tokens ──────────────────────────────────────────────
+const _ink   = Color(0xFF0E2748);
+const _paper = Color(0xFFEEF3FA);
+const _card  = Color(0xFFFFFFFF);
+const _blue  = Color(0xFF3D6BE0);
+const _muted = Color(0xFF7A8AA5);
+const _shadowSm = BoxShadow(color: _ink, offset: Offset(3, 3), blurRadius: 0);
+
+const _quickPalette = [
+  Color(0xFFE0796A),
+  Color(0xFF3D6BE0),
+  Color(0xFFB7D8C7),
+  Color(0xFFC9DCF7),
+  Color(0xFFF4D6D2),
+];
+
 class AddMedicationScreen extends StatefulWidget {
   const AddMedicationScreen({super.key});
 
@@ -111,308 +123,421 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFEEEEEE),
+        backgroundColor: _paper,
         body: SafeArea(
           child: AnimatedBuilder(
             animation: _viewModel,
-            builder: (context, _) => _buildBody(context),
+            builder: (context, _) => Stack(
+              fit: StackFit.expand,
+              children: [
+                const CustomPaint(painter: _TopoPainter()),
+                _buildContent(context),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildContent(BuildContext context) {
     return Column(
       children: [
-        // ── Header ────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFD9D9D9),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'add med',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ),
-
-        // ── Form ──────────────────────────────────────────────
+        _buildHeader(context),
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Colour picker column ─────────────────────
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: _pickColor,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: _viewModel.selectedColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      const SizedBox(
-                        width: 60,
-                        child: Text(
-                          'tap to\nchange\nthe color',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 10, color: Colors.black54),
-                        ),
-                      ),
-                    ],
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildColorSection(),
+                const SizedBox(height: 20),
+                _LabeledField(
+                  label: 'Nome',
+                  errorText: _viewModel.nameError,
+                  child: _PlainTextField(
+                    key: const Key('med_name_field'),
+                    controller: _nameController,
+                    placeholder: 'ex: Metformina',
+                    onChanged: _viewModel.setName,
+                    textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(width: 16),
-
-                  // ── Fields column ────────────────────────────
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Name
-                        _BlueField(
-                          key: const Key('med_name_field'),
-                          label: 'name',
-                          controller: _nameController,
-                          errorText: _viewModel.nameError,
-                          onChanged: _viewModel.setName,
-                          textInputAction: TextInputAction.next,
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Dosage
-                        _DosageField(
-                          key: const Key('med_dosage_field'),
-                          controller: _dosageAmountController,
-                          selectedUnit: _viewModel.dosageUnit,
-                          units: AddMedicationViewModel.dosageUnits,
-                          errorText: _viewModel.dosageError,
-                          onAmountChanged: (v) =>
-                              _viewModel.setDosageAmount(int.tryParse(v)),
-                          onUnitChanged: (u) =>
-                              _viewModel.setDosageUnit(u ?? 'mg'),
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Reminder time pickers
-                        ...List.generate(
-                          _viewModel.reminderTimes.length,
-                          (i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _TimeTile(
-                              key: Key('med_time_$i'),
-                              label: _viewModel.reminderTimes.length > 1
-                                  ? 'when (${i + 1})'
-                                  : 'when',
-                              time: _viewModel.reminderTimes[i],
-                              onTap: () => _pickReminderTime(i),
-                            ),
-                          ),
-                        ),
-
-                        // Frequency dropdown
-                        _FrequencyDropdown(
-                          key: const Key('med_freq_field'),
-                          value: _viewModel.frequency,
-                          options: AddMedicationViewModel.frequencyOptions,
-                          onChanged: _viewModel.setFrequency,
-                        ),
-                        const SizedBox(height: 10),
-
-                        // With food toggle
-                        _FoodSwitch(
-                          value: _viewModel.withFood,
-                          onChanged: _viewModel.setWithFood,
-                        ),
-                        const SizedBox(height: 10),
-
-                        // Notes (optional)
-                        _BlueField(
-                          label: 'notes (optional)',
-                          controller: _notesController,
-                          onChanged: _viewModel.setNotes,
-                          maxLines: 2,
-                        ),
-
-                        // Error message
-                        if (_viewModel.errorMessage != null) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFECEC),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              _viewModel.errorMessage!,
-                              style: const TextStyle(
-                                color: Color(0xFFC62828),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                ),
+                const SizedBox(height: 12),
+                _LabeledField(
+                  label: 'Dosagem',
+                  errorText: _viewModel.dosageError,
+                  child: _DosageContent(
+                    key: const Key('med_dosage_field'),
+                    controller: _dosageAmountController,
+                    selectedUnit: _viewModel.dosageUnit,
+                    units: AddMedicationViewModel.dosageUnits,
+                    onAmountChanged: (v) =>
+                        _viewModel.setDosageAmount(int.tryParse(v)),
+                    onUnitChanged: (u) =>
+                        _viewModel.setDosageUnit(u ?? 'mg'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ...List.generate(
+                  _viewModel.reminderTimes.length,
+                  (i) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _LabeledField(
+                      label: _viewModel.reminderTimes.length > 1
+                          ? 'Horário (${i + 1})'
+                          : 'Horário',
+                      child: _TimeContent(
+                        key: Key('med_time_$i'),
+                        time: _viewModel.reminderTimes[i],
+                        onTap: () => _pickReminderTime(i),
+                      ),
+                    ),
+                  ),
+                ),
+                _LabeledField(
+                  label: 'Frequência',
+                  child: _FreqContent(
+                    key: const Key('med_freq_field'),
+                    value: _viewModel.frequency,
+                    options: AddMedicationViewModel.frequencyOptions,
+                    onChanged: _viewModel.setFrequency,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _LabeledField(
+                  label: 'Com comida',
+                  child: _FoodSwitchContent(
+                    value: _viewModel.withFood,
+                    onChanged: _viewModel.setWithFood,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _LabeledField(
+                  label: 'Notas (opcional)',
+                  child: _PlainTextField(
+                    controller: _notesController,
+                    placeholder: 'ex: com o pequeno-almoço',
+                    onChanged: _viewModel.setNotes,
+                    maxLines: 2,
+                  ),
+                ),
+                if (_viewModel.errorMessage != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFECEC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: _ink, width: 2),
+                    ),
+                    child: Text(
+                      _viewModel.errorMessage!,
+                      style: const TextStyle(
+                        color: Color(0xFFC62828),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        ),
+        _buildBottomBar(context),
+      ],
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: Row(
+        children: [
+          const Expanded(
+            child: Text(
+              'Adicionar medicação',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: _ink,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ),
+          GestureDetector(
+            key: const Key('med_close_button'),
+            onTap: () async {
+              if (await _confirmDiscard() && mounted) {
+                Navigator.of(context).pop(false);
+              }
+            },
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: _card,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _ink, width: 2),
+                boxShadow: const [_shadowSm],
+              ),
+              child: const Icon(Icons.close, size: 18, color: _ink),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColorSection() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          key: const Key('med_color_swatch'),
+          onTap: _pickColor,
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: _viewModel.selectedColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: _ink, width: 2.5),
+              boxShadow: const [_shadowSm],
+            ),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Transform.translate(
+                offset: const Offset(6, 6),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: _card,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: _ink, width: 2),
+                  ),
+                  child: const Icon(Icons.edit, size: 11, color: _ink),
+                ),
               ),
             ),
           ),
         ),
-
-        // ── Footer ────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
-          child: Row(
-            children: [
-              // Cancel
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextButton(
-                    onPressed: _viewModel.isLoading
-                        ? null
-                        : () async {
-                            if (await _confirmDiscard() && context.mounted) {
-                              Navigator.of(context).pop(false);
-                            }
-                          },
-                    child: const Text(
-                      'cancel',
-                      style: TextStyle(color: Colors.black54),
+        const SizedBox(width: 16),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'COR',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+                color: _ink.withValues(alpha: 0.6),
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'Toca para mudar',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: _ink,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: _quickPalette.map((c) {
+                final isSelected = _viewModel.selectedColor == c;
+                return GestureDetector(
+                  onTap: () => _viewModel.setColor(c),
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(
+                      color: c,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: _ink,
+                        width: isSelected ? 2.5 : 1.5,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Save
-              Expanded(
-                flex: 2,
-                child: FilledButton(
-                  key: const Key('med_save_button'),
-                  onPressed: _viewModel.isLoading ? null : _viewModel.submit,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF4E84E5),
-                    disabledBackgroundColor: const Color(0xFF4E84E5),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: _viewModel.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          'Save',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
+                );
+              }).toList(),
+            ),
+          ],
         ),
       ],
     );
   }
+
+  Widget _buildBottomBar(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: _card,
+        border: Border(top: BorderSide(color: _ink, width: 2)),
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: OutlinedButton(
+                onPressed: _viewModel.isLoading
+                    ? null
+                    : () async {
+                        if (await _confirmDiscard() && mounted) {
+                          Navigator.of(context).pop(false);
+                        }
+                      },
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: _paper,
+                  foregroundColor: _ink,
+                  side: const BorderSide(color: _ink, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Cancelar',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 2,
+            child: SizedBox(
+              height: 52,
+              child: FilledButton(
+                key: const Key('med_save_button'),
+                onPressed: _viewModel.isLoading ? null : _viewModel.submit,
+                style: FilledButton.styleFrom(
+                  backgroundColor: _blue,
+                  disabledBackgroundColor: _blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                child: _viewModel.isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Guardar',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-// ── Reusable form widgets ───────────────────────────────────────────
+// ── Topo background ────────────────────────────────────────────
 
-class _BlueField extends StatelessWidget {
-  const _BlueField({
-    super.key,
+class _TopoPainter extends CustomPainter {
+  const _TopoPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0x260E2748)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.7;
+
+    final sx = size.width / 390;
+    final sy = size.height / 800;
+
+    _drawGroup(canvas, paint, 180, 200, 9, 32, 30, 0.9, sx, sy);
+    _drawGroup(canvas, paint, 310, 660, 10, 30, 22, 1.1, sx, sy);
+    _drawGroup(canvas, paint, 50, 380, 8, 30, 26, 1.0, sx, sy);
+  }
+
+  void _drawGroup(Canvas canvas, Paint paint, double cx, double cy,
+      int count, double base, double step, double ar, double sx, double sy) {
+    for (int i = 0; i < count; i++) {
+      final ry = base + i * step;
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(cx * sx, cy * sy),
+          width: ry * ar * 2 * sx,
+          height: ry * 2 * sy,
+        ),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TopoPainter old) => false;
+}
+
+// ── Field widgets ──────────────────────────────────────────────
+
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({
     required this.label,
-    required this.controller,
+    required this.child,
     this.errorText,
-    this.onChanged,
-    this.textInputAction,
-    this.maxLines = 1,
   });
 
   final String label;
-  final TextEditingController controller;
+  final Widget child;
   final String? errorText;
-  final ValueChanged<String>? onChanged;
-  final TextInputAction? textInputAction;
-  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: controller,
-          onChanged: onChanged,
-          textInputAction: textInputAction,
-          maxLines: maxLines,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.4,
+            color: _ink.withValues(alpha: 0.6),
+            height: 1,
           ),
-          decoration: InputDecoration(
-            hintText: label,
-            hintStyle: const TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
-            ),
-            filled: true,
-            fillColor: const Color(0xFF4E84E5),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide.none,
-            ),
-            errorText: null, // shown separately below
+        ),
+        const SizedBox(height: 4),
+        Container(
+          decoration: BoxDecoration(
+            color: _card,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _ink, width: 2),
+            boxShadow: const [_shadowSm],
           ),
+          child: child,
         ),
         if (errorText != null)
           Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
+            padding: const EdgeInsets.only(left: 4, top: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
+              style: const TextStyle(
+                color: Color(0xFFC62828),
+                fontSize: 12,
+              ),
             ),
           ),
       ],
@@ -420,46 +545,150 @@ class _BlueField extends StatelessWidget {
   }
 }
 
-class _TimeTile extends StatelessWidget {
-  const _TimeTile({
+class _PlainTextField extends StatelessWidget {
+  const _PlainTextField({
     super.key,
-    required this.label,
-    required this.time,
-    required this.onTap,
+    required this.controller,
+    required this.placeholder,
+    this.onChanged,
+    this.textInputAction,
+    this.maxLines = 1,
   });
 
-  final String label;
+  final TextEditingController controller;
+  final String placeholder;
+  final ValueChanged<String>? onChanged;
+  final TextInputAction? textInputAction;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      textInputAction: textInputAction,
+      maxLines: maxLines,
+      style: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: _ink,
+      ),
+      decoration: InputDecoration(
+        hintText: placeholder,
+        hintStyle: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: _muted,
+        ),
+        filled: false,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+      ),
+    );
+  }
+}
+
+class _DosageContent extends StatelessWidget {
+  const _DosageContent({
+    super.key,
+    required this.controller,
+    required this.selectedUnit,
+    required this.units,
+    required this.onAmountChanged,
+    required this.onUnitChanged,
+  });
+
+  final TextEditingController controller;
+  final String selectedUnit;
+  final List<String> units;
+  final ValueChanged<String> onAmountChanged;
+  final ValueChanged<String?> onUnitChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            onChanged: onAmountChanged,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            textInputAction: TextInputAction.next,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: _ink,
+            ),
+            decoration: InputDecoration(
+              hintText: 'ex: 500',
+              hintStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: _muted,
+              ),
+              filled: false,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+            ),
+          ),
+        ),
+        Container(
+          width: 1,
+          height: 28,
+          color: _ink.withValues(alpha: 0.2),
+        ),
+        DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: selectedUnit,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: _ink,
+            ),
+            items: units
+                .map((u) => DropdownMenuItem(value: u, child: Text(u)))
+                .toList(),
+            onChanged: onUnitChanged,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TimeContent extends StatelessWidget {
+  const _TimeContent({super.key, required this.time, required this.onTap});
+
   final TimeOfDay time;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final formatted = time.format(context);
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF4E84E5),
-          borderRadius: BorderRadius.circular(30),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              label,
+              time.format(context),
               style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              formatted,
-              style: const TextStyle(
-                color: Colors.white,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
+                color: _ink,
               ),
             ),
+            const Icon(Icons.access_time_rounded, size: 18, color: _ink),
           ],
         ),
       ),
@@ -467,8 +696,8 @@ class _TimeTile extends StatelessWidget {
   }
 }
 
-class _FrequencyDropdown extends StatelessWidget {
-  const _FrequencyDropdown({
+class _FreqContent extends StatelessWidget {
+  const _FreqContent({
     super.key,
     required this.value,
     required this.options,
@@ -481,64 +710,54 @@ class _FrequencyDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4E84E5),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: const Color(0xFF4E84E5),
-          iconEnabledColor: Colors.white,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          hint: const Text('freq', style: TextStyle(color: Colors.white70)),
-          items: options
-              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
-              .toList(),
-          onChanged: onChanged,
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: value,
+        isExpanded: true,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: _ink,
         ),
+        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _ink),
+        items: options
+            .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+            .toList(),
+        onChanged: onChanged,
       ),
     );
   }
 }
 
-class _FoodSwitch extends StatelessWidget {
-  const _FoodSwitch({required this.value, required this.onChanged});
+class _FoodSwitchContent extends StatelessWidget {
+  const _FoodSwitchContent({required this.value, required this.onChanged});
 
   final bool value;
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF4E84E5),
-        borderRadius: BorderRadius.circular(30),
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'com comida',
-            style: TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
+          Text(
+            value ? 'Sim' : 'Não',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: _ink,
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: Colors.white38,
-            inactiveThumbColor: Colors.white54,
-            inactiveTrackColor: Colors.white24,
+            activeTrackColor: _blue,
+            activeThumbColor: _card,
+            inactiveThumbColor: _muted,
+            inactiveTrackColor: const Color(0xFFE0E7F0),
           ),
         ],
       ),
@@ -546,103 +765,7 @@ class _FoodSwitch extends StatelessWidget {
   }
 }
 
-// ── Dosage field: numeric input + unit dropdown ─────────────────────
-
-class _DosageField extends StatelessWidget {
-  const _DosageField({
-    super.key,
-    required this.controller,
-    required this.selectedUnit,
-    required this.units,
-    required this.onAmountChanged,
-    required this.onUnitChanged,
-    this.errorText,
-  });
-
-  final TextEditingController controller;
-  final String selectedUnit;
-  final List<String> units;
-  final ValueChanged<String> onAmountChanged;
-  final ValueChanged<String?> onUnitChanged;
-  final String? errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF4E84E5),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  onChanged: onAmountChanged,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  textInputAction: TextInputAction.next,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: 'dosage',
-                    hintStyle: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    filled: false,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 28,
-                color: Colors.white24,
-              ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedUnit,
-                  dropdownColor: const Color(0xFF4E84E5),
-                  iconEnabledColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                  items: units
-                      .map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                      .toList(),
-                  onChanged: onUnitChanged,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 12, top: 4),
-            child: Text(
-              errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-// ── Colour picker bottom sheet ──────────────────────────────────────
+// ── Color picker sheet ─────────────────────────────────────────
 
 class _ColorPickerSheet extends StatelessWidget {
   const _ColorPickerSheet({required this.selected, required this.onSelected});

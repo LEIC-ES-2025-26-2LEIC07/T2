@@ -18,7 +18,7 @@ class FakeMedication extends Fake implements Medication {}
 
 class FakeMedicationReminder extends Fake implements MedicationReminder {}
 
-// ── Mock repository ─────────────────────────────────────────────────
+// ── Mock repository ─────────────────────────────────────────────────────
 
 class _MockMedicationRepository implements MedicationRepository {
   bool shouldFail;
@@ -52,7 +52,7 @@ class _MockMedicationRepository implements MedicationRepository {
   ) async => [];
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────
 
 Widget _buildScreen(MedicationRepository repo) {
   if (!GetIt.I.isRegistered<MedicationRepository>()) {
@@ -74,7 +74,7 @@ Widget _buildScreen(MedicationRepository repo) {
   return const MaterialApp(home: AddMedicationScreen());
 }
 
-// ── Tests ───────────────────────────────────────────────────────────
+// ── Tests ─────────────────────────────────────────────────────────────────
 
 void main() {
   setUpAll(() {
@@ -82,10 +82,7 @@ void main() {
     registerFallbackValue(FakeMedicationReminder());
   });
 
-  setUp(() async {
-    final getIt = GetIt.instance;
-    await getIt.reset();
-  });
+  setUp(() async => await GetIt.instance.reset());
   tearDown(() async => await GetIt.I.reset());
 
   testWidgets('renders all required form fields and colour swatch', (
@@ -94,14 +91,13 @@ void main() {
     await tester.pumpWidget(_buildScreen(_MockMedicationRepository()));
     await tester.pumpAndSettle();
 
-    expect(find.text('add med'), findsOneWidget);
-    expect(find.widgetWithText(TextField, 'name'), findsOneWidget);
-    expect(find.widgetWithText(TextField, 'dosage'), findsOneWidget);
-    // colour swatch container (GestureDetector child)
-    expect(find.byType(GestureDetector), findsWidgets);
-    expect(find.text('tap to\nchange\nthe color'), findsOneWidget);
-    expect(find.text('cancel'), findsOneWidget);
-    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('Adicionar medicação'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'ex: Metformina'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'ex: 500'), findsOneWidget);
+    expect(find.byKey(const Key('med_color_swatch')), findsOneWidget);
+    expect(find.text('Toca para mudar'), findsOneWidget);
+    expect(find.text('Cancelar'), findsOneWidget);
+    expect(find.text('Guardar'), findsOneWidget);
   });
 
   testWidgets('tapping Save with empty fields shows validation errors', (
@@ -118,16 +114,21 @@ void main() {
   });
 
   testWidgets('Save button shows spinner while loading', (tester) async {
-    // Use a slow-completing repo
     final slowRepo = _SlowRepo();
 
     await tester.pumpWidget(_buildScreen(slowRepo));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.widgetWithText(TextField, 'name'), 'Aspirin');
-    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '100');
+    await tester.enterText(
+      find.widgetWithText(TextField, 'ex: Metformina'),
+      'Aspirin',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'ex: 500'),
+      '100',
+    );
     await tester.tap(find.byKey(const Key('med_save_button')));
-    await tester.pump(); // start async
+    await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     await tester.pumpAndSettle();
@@ -139,9 +140,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(_MockMedicationRepository()));
     await tester.pumpAndSettle();
 
-    // The colour swatch is the first GestureDetector that is a plain Container
-    final swatch = find.byWidgetPredicate((w) => w is GestureDetector);
-    await tester.tap(swatch.first);
+    await tester.tap(find.byKey(const Key('med_color_swatch')));
     await tester.pumpAndSettle();
 
     expect(find.text('Choose a colour'), findsOneWidget);
@@ -153,8 +152,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.widgetWithText(TextField, 'name'), 'Med');
-    await tester.enterText(find.widgetWithText(TextField, 'dosage'), '5');
+    await tester.enterText(
+      find.widgetWithText(TextField, 'ex: Metformina'),
+      'Med',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'ex: 500'),
+      '5',
+    );
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pumpAndSettle();
 
@@ -162,7 +167,8 @@ void main() {
   });
 }
 
-// Slow mock — delays so the test can observe the loading spinner.
+// ── Slow repo ─────────────────────────────────────────────────────────────
+
 class _SlowRepo implements MedicationRepository {
   @override
   Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async {
