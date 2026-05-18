@@ -7,7 +7,6 @@ import 'package:clinic_go/core/widgets/app_loading_button.dart';
 import 'package:clinic_go/core/widgets/auth_text_field.dart';
 import 'package:clinic_go/core/widgets/status_banner.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
-import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -197,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () => SignUpSheet.show(context),
+            onTap: () => Navigator.of(context).pushNamed(AppRouter.register),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
               decoration: BoxDecoration(

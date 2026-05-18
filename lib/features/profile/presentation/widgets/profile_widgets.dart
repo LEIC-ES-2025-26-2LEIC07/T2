@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
-import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
 class ProfileStatusMessage extends StatelessWidget {
@@ -238,7 +238,7 @@ class ProfileLoginForm extends StatelessWidget {
         TextButton(
           onPressed: viewModel.isLoading
               ? null
-              : () => SignUpSheet.show(context),
+              : () => Navigator.of(context).pushNamed(AppRouter.register),
           child: const Text.rich(
             TextSpan(
               text: "Don't have an account? ",

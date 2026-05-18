@@ -8,12 +8,18 @@ class AuthTextField extends StatelessWidget {
     required this.hintText,
     this.keyboardType,
     this.obscureText = false,
+    this.suffixIcon,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final TextEditingController controller;
   final String hintText;
   final TextInputType? keyboardType;
   final bool obscureText;
+  final Widget? suffixIcon;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,16 @@ class AuthTextField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      readOnly: readOnly,
+      onTap: onTap,
       decoration: InputDecoration(
+        suffixIcon: suffixIcon != null
+            ? Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: suffixIcon,
+              )
+            : null,
+        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
         hintText: hintText,
         hintStyle: const TextStyle(
           color: Color(0xFFB0B0B0),
