@@ -40,22 +40,8 @@ class _MedicationCardState extends State<MedicationCard> {
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar medicamento?'),
-        content: Text(
-          'Queres eliminar ${widget.medication.name}? Esta ação não pode ser desfeita.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      builder: (ctx) =>
+          _DeleteMedicationDialog(medicationName: widget.medication.name),
     );
     if (confirmed != true) return;
 
@@ -352,22 +338,31 @@ class _ExpandedSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Wrap(
-            alignment: WrapAlignment.end,
-            spacing: 8,
-            runSpacing: 8,
+          Row(
             children: [
               _CardButton(
                 label: 'FECHAR',
                 onTap: onClose,
                 variant: _CardButtonVariant.secondary,
               ),
-              _CardButton(
-                label: isDeleting ? 'A APAGAR...' : 'ELIMINAR',
-                onTap: onDelete,
-                variant: _CardButtonVariant.danger,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _CardButton(
+                        label: isDeleting ? 'A APAGAR...' : 'ELIMINAR',
+                        onTap: onDelete,
+                        variant: _CardButtonVariant.danger,
+                      ),
+                      _CardButton(label: 'EDITAR', onTap: onEdit),
+                    ],
+                  ),
+                ),
               ),
-              _CardButton(label: 'EDITAR', onTap: onEdit),
             ],
           ),
         ],
@@ -400,6 +395,91 @@ class _InfoChip extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             TextSpan(text: value),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteMedicationDialog extends StatelessWidget {
+  const _DeleteMedicationDialog({required this.medicationName});
+
+  final String medicationName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 420),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+        decoration: BrutalDecor.box(color: AppColors.paper, radius: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE53935),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.ink, width: 1.5),
+                  ),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Eliminar medicamento?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Queres eliminar $medicationName? Esta ação não pode ser desfeita.',
+              style: const TextStyle(
+                fontSize: 14,
+                height: 1.35,
+                color: AppColors.muted,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _CardButton(
+                    label: 'CANCELAR',
+                    onTap: () => Navigator.of(context).pop(false),
+                    variant: _CardButtonVariant.secondary,
+                  ),
+                  _CardButton(
+                    label: 'ELIMINAR',
+                    onTap: () => Navigator.of(context).pop(true),
+                    variant: _CardButtonVariant.danger,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
