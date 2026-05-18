@@ -39,11 +39,12 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
       },
     );
 
-    await plugin
+    final androidPlugin = plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.requestNotificationsPermission();
+        >();
+    await androidPlugin?.requestNotificationsPermission();
+    await androidPlugin?.requestExactAlarmsPermission();
     await plugin
         .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin
@@ -72,9 +73,19 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
   Future<void> cancel(int notificationId) => _plugin.cancel(id: notificationId);
 
   @override
-  Future<void> schedule(NotificationRequest request) {
+  Future<void> schedule(NotificationRequest request) async {
     final scheduledDate = tz.TZDateTime.from(request.scheduledTime, tz.local);
     final isMissedDoseAlert = request.payload.contains('"status":"overdue"');
+
+    final androidImpl = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final canExact =
+        await androidImpl?.canScheduleExactNotifications() ?? false;
+    final scheduleMode = canExact
+        ? AndroidScheduleMode.exact
+        : AndroidScheduleMode.inexactAllowWhileIdle;
 
     return _plugin.zonedSchedule(
       id: request.id,
@@ -108,7 +119,7 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
         ),
       ),
       payload: request.payload,
-      androidScheduleMode: AndroidScheduleMode.exact,
+      androidScheduleMode: scheduleMode,
     );
   }
 

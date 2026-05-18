@@ -106,10 +106,14 @@ class AddMedicationViewModel extends ChangeNotifier with MedicationFormFields {
         ),
       );
 
-      await _scheduleInitialNotifications(result);
-
       isSuccess = true;
       isDirty = false;
+
+      try {
+        await _scheduleInitialNotifications(result);
+      } catch (e, stackTrace) {
+        debugPrint('Notification scheduling failed: $e\n$stackTrace');
+      }
     } on MedicationSaveException catch (e) {
       debugPrint('MedicationSaveException: ${e.message}');
       errorMessage = e.message;
