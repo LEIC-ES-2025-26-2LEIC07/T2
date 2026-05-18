@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/presentation/views/login_screen.dart';
-import 'package:clinic_go/features/auth/presentation/views/register_screen.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
@@ -18,7 +17,6 @@ class AppRouter {
 
   static const String home = '/home';
   static const String login = '/login';
-  static const String register = '/register';
   static const String logSymptom = '/log-symptom';
   static const String symptomHistory = '/symptom-history';
 
@@ -51,13 +49,6 @@ class AppRouter {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (_) => const LoginScreen(),
-      );
-    }
-
-    if (routeName == register) {
-      return MaterialPageRoute<void>(
-        settings: settings,
-        builder: (_) => const RegisterScreen(),
       );
     }
 

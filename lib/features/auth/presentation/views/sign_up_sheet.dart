@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/app_loading_button.dart';
-import 'package:clinic_go/core/widgets/auth_error_box.dart';
 import 'package:clinic_go/core/widgets/auth_text_field.dart';
+import 'package:clinic_go/core/widgets/status_banner.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/sign_up_view_model.dart';
 
-/// Shows a modal bottom sheet with an account creation form.
+/// Modal bottom sheet com o formulário de criação de conta.
 ///
-/// Call [SignUpSheet.show] from any widget; no need to navigate.
+/// Chamar via [SignUpSheet.show] a partir de qualquer widget.
 class SignUpSheet extends StatefulWidget {
   const SignUpSheet({super.key});
 
@@ -72,12 +73,13 @@ class _SignUpSheetState extends State<SignUpSheet> {
 
     return Container(
       margin: const EdgeInsets.only(top: 60),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8F6F0),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        border: BrutalDecor.border,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Padding(
-        padding: EdgeInsets.fromLTRB(24, 28, 24, 24 + bottomInset),
+        padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + bottomInset),
         child: AnimatedBuilder(
           animation: _viewModel,
           builder: (context, _) {
@@ -86,78 +88,91 @@ class _SignUpSheetState extends State<SignUpSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Handle bar
                   Center(
                     child: Container(
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDDDDDD),
+                        color: AppColors.muted.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   const Text(
-                    'Create account',
+                    'Criar conta',
                     style: TextStyle(
                       fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.2,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   const Text(
-                    'Sign up to start using ClinicGO.',
-                    style: TextStyle(color: Color(0xFF8F8F8F)),
+                    'JUNTA-TE À CLINICGO',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.muted,
+                      letterSpacing: 1.4,
+                    ),
                   ),
                   const SizedBox(height: 24),
-
-                  AuthTextField(
-                    controller: _emailController,
-                    hintText: 'Email',
-                    keyboardType: TextInputType.emailAddress,
+                  Container(
+                    decoration: BrutalDecor.box(),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AuthTextField(
+                          controller: _emailController,
+                          hintText: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 12),
+                        AuthTextField(
+                          controller: _passwordController,
+                          hintText: 'Password',
+                          obscureText: true,
+                        ),
+                        const SizedBox(height: 12),
+                        AuthTextField(
+                          controller: _confirmController,
+                          hintText: 'Confirmar password',
+                          obscureText: true,
+                        ),
+                        if (_viewModel.errorMessage != null) ...[
+                          const SizedBox(height: 12),
+                          StatusBanner(
+                            message: _viewModel.errorMessage!,
+                            isSuccess: false,
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        AppLoadingButton(
+                          label: 'Criar conta',
+                          onPressed: _handleSignUp,
+                          isLoading: _viewModel.isLoading,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  AuthTextField(
-                    controller: _passwordController,
-                    hintText: 'Password',
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 12),
-                  AuthTextField(
-                    controller: _confirmController,
-                    hintText: 'Confirm password',
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 16),
-
-                  if (_viewModel.errorMessage != null) ...[
-                    AuthErrorBox(message: _viewModel.errorMessage!),
-                    const SizedBox(height: 16),
-                  ],
-
-                  AppLoadingButton(
-                    label: 'Create account',
-                    onPressed: _handleSignUp,
-                    isLoading: _viewModel.isLoading,
-                  ),
-                  const SizedBox(height: 12),
-
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text(
-                      'Already have an account',
+                      'Já tenho conta',
                       style: TextStyle(
-                        color: Color(0xFF7F7F7F),
+                        color: AppColors.muted,
                         fontWeight: FontWeight.w600,
+                        fontSize: 13,
                       ),
                     ),
                   ),
                 ],
-              ), // Column
-            ); // SingleChildScrollView
+              ),
+            );
           },
         ),
       ),
