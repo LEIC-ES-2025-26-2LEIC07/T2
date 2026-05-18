@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'calendar_repository.dart';
-import 'dose_log_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
+import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 
 class SupabaseCalendarRepository implements CalendarRepository {
   SupabaseCalendarRepository(this._client);

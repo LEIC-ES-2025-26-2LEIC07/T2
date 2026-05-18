@@ -1,4 +1,4 @@
-import 'package:clinic_go/features/medication/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';

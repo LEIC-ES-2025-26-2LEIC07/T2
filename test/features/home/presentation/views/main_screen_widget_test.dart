@@ -1,5 +1,5 @@
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
-import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
+import 'package:clinic_go/features/home/presentation/views/home_content.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:flutter/material.dart';

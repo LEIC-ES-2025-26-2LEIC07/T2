@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
+import 'package:clinic_go/features/medication/presentation/view_models/medication_form_mixin.dart';
 
 /// A reminder slot in the edit form — wraps an existing ID (if any) and time.
 class ReminderSlot {
@@ -13,11 +13,7 @@ class ReminderSlot {
   TimeOfDay time;
 }
 
-/// ViewModel for the Edit Medication form.
-///
-/// Pre-populates from [medication], fetches existing reminders via the
-/// repository, and exposes submit/delete mutations.
-class EditMedicationViewModel extends ChangeNotifier {
+class EditMedicationViewModel extends ChangeNotifier with MedicationFormFields {
   EditMedicationViewModel({
     required MedicationRepository repository,
     required Medication medication,
@@ -40,42 +36,13 @@ class EditMedicationViewModel extends ChangeNotifier {
   final MedicationRepository _repository;
   final String _medicationId;
 
-  // ── Form fields ──────────────────────────────────────────────────
-  String name = '';
-  int? dosageAmount;
-  String dosageUnit = 'mg';
-  String frequency = AddMedicationViewModel.frequencyOptions.first;
-  Color selectedColor = AppColors.lemon;
-  bool withFood = false;
-  List<String> daysOfWeek = const [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
-  DateTime? startDate;
-  DateTime? endDate;
-  String notes = '';
-
   List<ReminderSlot> _reminderSlots = [];
   final List<String> _remindersToDelete = [];
 
   List<ReminderSlot> get reminderSlots => List.unmodifiable(_reminderSlots);
 
-  // ── Validation ───────────────────────────────────────────────────
-  String? nameError;
-  String? dosageError;
-
-  // ── Async state ──────────────────────────────────────────────────
   bool isLoadingReminders = true;
-  bool isLoading = false;
-  String? errorMessage;
-  bool isSuccess = false;
   bool wasDeleted = false;
-  bool isDirty = false;
 
   // ── Init ─────────────────────────────────────────────────────────
   Future<void> loadReminders() async {
@@ -113,37 +80,11 @@ class EditMedicationViewModel extends ChangeNotifier {
     }
   }
 
-  // ── Setters ──────────────────────────────────────────────────────
-  void setName(String v) {
-    name = v;
-    nameError = null;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setDosageAmount(int? v) {
-    dosageAmount = v;
-    dosageError = null;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setDosageUnit(String v) {
-    dosageUnit = v;
-    isDirty = true;
-    notifyListeners();
-  }
-
+  // ── Frequency + reminder sync ────────────────────────────────────
   void setFrequency(String? v) {
     if (v == null || v == frequency) return;
     frequency = v;
     _syncReminderSlots();
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setColor(Color color) {
-    selectedColor = color;
     isDirty = true;
     notifyListeners();
   }
@@ -156,38 +97,28 @@ class EditMedicationViewModel extends ChangeNotifier {
     }
   }
 
-  void setStartDate(DateTime? date) {
-    startDate = date;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setEndDate(DateTime? date) {
-    endDate = date;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setNotes(String v) {
-    notes = v;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void setWithFood(bool v) {
-    withFood = v;
-    isDirty = true;
-    notifyListeners();
-  }
-
-  void clearError() {
-    errorMessage = null;
-    notifyListeners();
+  void _syncReminderSlots() {
+    final target = slotsFor(frequency);
+    if (target > _reminderSlots.length) {
+      _reminderSlots = [
+        ..._reminderSlots,
+        ...List.generate(
+          target - _reminderSlots.length,
+          (_) => ReminderSlot(time: const TimeOfDay(hour: 12, minute: 0)),
+        ),
+      ];
+    } else if (target < _reminderSlots.length) {
+      final removed = _reminderSlots.sublist(target);
+      for (final slot in removed) {
+        if (slot.id != null) _remindersToDelete.add(slot.id!);
+      }
+      _reminderSlots = _reminderSlots.sublist(0, target);
+    }
   }
 
   // ── Submit ───────────────────────────────────────────────────────
   Future<void> submit() async {
-    if (!_validate()) return;
+    if (!validateForm()) return;
 
     isLoading = true;
     errorMessage = null;
@@ -251,53 +182,6 @@ class EditMedicationViewModel extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
-    }
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────
-  bool _validate() {
-    nameError = null;
-    dosageError = null;
-    bool valid = true;
-    if (name.trim().isEmpty) {
-      nameError = 'Name is required';
-      valid = false;
-    }
-    if (dosageAmount == null || dosageAmount! <= 0) {
-      dosageError = 'Enter a valid dosage';
-      valid = false;
-    }
-    if (!valid) notifyListeners();
-    return valid;
-  }
-
-  void _syncReminderSlots() {
-    final target = _slotsFor(frequency);
-    if (target > _reminderSlots.length) {
-      _reminderSlots = [
-        ..._reminderSlots,
-        ...List.generate(
-          target - _reminderSlots.length,
-          (_) => ReminderSlot(time: const TimeOfDay(hour: 12, minute: 0)),
-        ),
-      ];
-    } else if (target < _reminderSlots.length) {
-      final removed = _reminderSlots.sublist(target);
-      for (final slot in removed) {
-        if (slot.id != null) _remindersToDelete.add(slot.id!);
-      }
-      _reminderSlots = _reminderSlots.sublist(0, target);
-    }
-  }
-
-  int _slotsFor(String freq) {
-    switch (freq) {
-      case 'Twice daily':
-        return 2;
-      case 'Three times daily':
-        return 3;
-      default:
-        return 1;
     }
   }
 }

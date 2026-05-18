@@ -31,4 +31,15 @@ class MedicationsListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> deleteMedication(String id) async {
+    try {
+      await _repository.deleteMedication(id);
+      _medications = _medications.where((med) => med.id != id).toList();
+    } catch (_) {
+      rethrow;
+    } finally {
+      notifyListeners();
+    }
+  }
 }

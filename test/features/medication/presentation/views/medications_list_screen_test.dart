@@ -138,23 +138,25 @@ void main() {
     expect(colours, contains(const Color(0xFFE53935)));
   });
 
-  testWidgets('tapping EDITAR expands a card to show details', (tester) async {
+  testWidgets('tapping INFO expands a card to show details', (tester) async {
     await tester.pumpWidget(_buildScreen(_LoadedRepo()));
     await tester.pumpAndSettle();
 
     expect(find.text('FECHAR'), findsNothing);
 
-    await tester.tap(find.text('EDITAR').first);
+    await tester.tap(find.text('INFO').first);
     await tester.pumpAndSettle();
 
     expect(find.text('FECHAR'), findsOneWidget);
+    expect(find.text('ELIMINAR'), findsOneWidget);
+    expect(find.text('EDITAR'), findsOneWidget);
   });
 
   testWidgets('tapping FECHAR collapses the expanded card', (tester) async {
     await tester.pumpWidget(_buildScreen(_LoadedRepo()));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('EDITAR').first);
+    await tester.tap(find.text('INFO').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('FECHAR'));
     await tester.pumpAndSettle();

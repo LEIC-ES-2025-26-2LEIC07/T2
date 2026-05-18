@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:clinic_go/features/medication/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
+import 'package:clinic_go/features/calendar/presentation/view_models/calendar_view_model.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
-import 'package:clinic_go/features/medication/presentation/view_models/calendar_view_model.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
