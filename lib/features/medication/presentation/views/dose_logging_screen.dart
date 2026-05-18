@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
@@ -130,7 +131,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.card,
                           ),
                         )
                       : const Text('Done'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 import 'package:clinic_go/core/di/service_locator.dart';
 
@@ -103,7 +104,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
               final completed = item.status != null;
 
               return Card(
-                color: completed ? Colors.grey.shade200 : Colors.white,
+                color: completed ? Colors.grey.shade200 : AppColors.card,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),

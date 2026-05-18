@@ -119,7 +119,7 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.4,
-                              color: Colors.white,
+                              color: AppColors.card,
                             ),
                           )
                         : const Text('Save symptom'),

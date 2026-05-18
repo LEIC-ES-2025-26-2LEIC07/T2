@@ -210,14 +210,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'CRIAR',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.card,
                       fontWeight: FontWeight.w800,
                       fontSize: 13,
                       letterSpacing: 0.6,
                     ),
                   ),
                   SizedBox(width: 4),
-                  Icon(Icons.arrow_forward, color: Colors.white, size: 14),
+                  Icon(Icons.arrow_forward, color: AppColors.card, size: 14),
                 ],
               ),
             ),
@@ -247,7 +247,7 @@ class _LoginHero extends StatelessWidget {
           ),
           child: const Icon(
             Icons.medication_rounded,
-            color: Colors.white,
+            color: AppColors.card,
             size: 36,
           ),
         ),

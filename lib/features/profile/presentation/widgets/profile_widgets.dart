@@ -67,7 +67,7 @@ class ProfileLoginTextField extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.card,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 18,
@@ -158,9 +158,9 @@ class ProfileContinueButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.card,
           disabledBackgroundColor: AppColors.primaryColor,
-          disabledForegroundColor: Colors.white,
+          disabledForegroundColor: AppColors.card,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32),
@@ -171,7 +171,7 @@ class ProfileContinueButton extends StatelessWidget {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.card,
                   strokeWidth: 2.2,
                 ),
               )
@@ -286,7 +286,7 @@ class ProfileActionButton extends StatelessWidget {
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
-                  color: Colors.white,
+                  color: AppColors.card,
                   strokeWidth: 2,
                 ),
               )
@@ -297,9 +297,9 @@ class ProfileActionButton extends StatelessWidget {
               ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.card,
           disabledBackgroundColor: AppColors.primaryColor,
-          disabledForegroundColor: Colors.white,
+          disabledForegroundColor: AppColors.card,
           elevation: 7,
           shadowColor: Colors.black.withValues(alpha: 0.22),
           shape: RoundedRectangleBorder(
@@ -503,7 +503,7 @@ class ProfileLoggedInCard extends StatelessWidget {
               onPressed: viewModel.isLoading ? null : onCancelPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCFCFCF),
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.card,
                 elevation: 5,
                 shadowColor: Colors.black.withValues(alpha: 0.18),
                 shape: RoundedRectangleBorder(

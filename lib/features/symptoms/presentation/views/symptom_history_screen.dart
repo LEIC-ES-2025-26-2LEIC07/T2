@@ -72,7 +72,7 @@ class _SymptomTimelineCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.card,
         borderRadius: BorderRadius.circular(26),
         boxShadow: const [
           BoxShadow(
