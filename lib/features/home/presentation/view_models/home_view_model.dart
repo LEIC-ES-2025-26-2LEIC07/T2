@@ -163,9 +163,17 @@ class HomeViewModel extends ChangeNotifier {
         }
       }
 
-      if (pendingDoses.isNotEmpty) {
-        pendingDoses.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
-        _nextDose = pendingDoses.first;
+      // Only consider today's pending doses for the "next dose / all done"
+      // state. Tomorrow's doses must not suppress the success card.
+      final pendingTodayDoses = pendingDoses
+          .where((d) => d.scheduledTime.isBefore(todayEnd))
+          .toList();
+
+      if (pendingTodayDoses.isNotEmpty) {
+        pendingTodayDoses.sort(
+          (a, b) => a.scheduledTime.compareTo(b.scheduledTime),
+        );
+        _nextDose = pendingTodayDoses.first;
         _isOverdue = _nextDose!.scheduledTime.isBefore(now);
       } else {
         _nextDose = null;

@@ -16,10 +16,8 @@ class DaySummary {
   final List<ScheduledDose> scheduled = [];
 
   DaySummaryStatus get status {
-    // Today is always neutral — only colour it once the day has ended.
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    if (date == today) return DaySummaryStatus.none;
 
     if (logs.isEmpty && scheduled.isEmpty) return DaySummaryStatus.none;
 
@@ -28,7 +26,12 @@ class DaySummary {
 
     if (totalScheduled == 0) return DaySummaryStatus.none;
 
+    // All logged doses were taken and nothing remains unlogged → green.
     if (taken == totalScheduled) return DaySummaryStatus.allTaken;
+
+    // Keep today neutral until all doses are confirmed taken.
+    if (date == today) return DaySummaryStatus.none;
+
     if (taken > 0) return DaySummaryStatus.partial;
 
     // none taken — past day → missed
@@ -128,9 +131,13 @@ class CalendarViewModel extends ChangeNotifier {
       }
 
       for (final s in scheduled) {
-        // Skip doses whose reminder already has a log entry for this month —
-        // they appear in logs and must not be double-counted in scheduled.
-        if (loggedReminderIds.contains(s.id)) continue;
+        // ScheduledDose.id format is "reminderId_epochSeconds".
+        // loggedReminderIds contains plain reminder UUIDs, so extract the
+        // prefix before the last underscore for a correct comparison.
+        final reminderIdFromDose = s.id.contains('_')
+            ? s.id.substring(0, s.id.lastIndexOf('_'))
+            : s.id;
+        if (loggedReminderIds.contains(reminderIdFromDose)) continue;
         final day = DateTime(
           s.scheduledTime.year,
           s.scheduledTime.month,

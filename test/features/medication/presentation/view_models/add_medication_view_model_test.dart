@@ -1,6 +1,7 @@
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
+import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -16,6 +17,8 @@ class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
 class FakeMedication extends Fake implements Medication {}
 
 class FakeMedicationReminder extends Fake implements MedicationReminder {}
+
+class FakeScheduledDose extends Fake implements ScheduledDose {}
 
 // ── Hand-rolled mock repositories ──────────────────────────────────
 
@@ -106,6 +109,7 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeMedication());
     registerFallbackValue(FakeMedicationReminder());
+    registerFallbackValue(FakeScheduledDose());
     registerFallbackValue(
       Medication(
         id: '',
@@ -265,6 +269,34 @@ void main() {
       vm.setFrequency('Three times daily');
       vm.setFrequency('Once daily');
       expect(vm.reminderTimes.length, 1);
+    });
+  });
+
+  group('AddMedicationViewModel – notification scheduling failure', () {
+    test('notification error does not prevent successful save', () async {
+      final dose = ScheduledDose(
+        id: 'dose-x',
+        medicationId: 'new-id-123',
+        medicationName: 'Med',
+        dosage: '5mg',
+        scheduledTime: DateTime.now().add(const Duration(hours: 1)),
+      );
+
+      when(
+        () => mockScheduling.calculateUpcomingDoses(any(), any()),
+      ).thenReturn([dose]);
+
+      when(
+        () => mockController.scheduleDoseReminder(any()),
+      ).thenThrow(Exception('exact_alarms_not_permitted'));
+
+      final vm = vmFactory();
+      vm.setName('Med');
+      vm.setDosageAmount(5);
+      await vm.submit();
+
+      expect(vm.isSuccess, isTrue);
+      expect(vm.errorMessage, isNull);
     });
   });
 }
