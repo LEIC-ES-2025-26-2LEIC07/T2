@@ -47,6 +47,30 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
     }
   }
 
+  Future<void> _deleteMedication(String id) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      await _viewModel.deleteMedication(id);
+      widget.onChanged?.call();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Medicamento eliminado com sucesso.'),
+          backgroundColor: Color(0xFF43A047),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não foi possível eliminar o medicamento. Tenta novamente.',
+          ),
+          backgroundColor: Color(0xFFE53935),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -99,6 +123,7 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
                         _viewModel.loadMedications();
                         widget.onChanged?.call();
                       },
+                      onDelete: _deleteMedication,
                     ),
                   );
                 },

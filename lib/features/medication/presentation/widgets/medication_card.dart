@@ -3,15 +3,19 @@ import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/presentation/views/edit_medication_screen.dart';
 
+typedef MedicationDeleteCallback = Future<void> Function(String id);
+
 class MedicationCard extends StatefulWidget {
   const MedicationCard({
     super.key,
     required this.medication,
     required this.onEdited,
+    required this.onDelete,
   });
 
   final Medication medication;
   final VoidCallback onEdited;
+  final MedicationDeleteCallback onDelete;
 
   @override
   State<MedicationCard> createState() => _MedicationCardState();
@@ -19,6 +23,7 @@ class MedicationCard extends StatefulWidget {
 
 class _MedicationCardState extends State<MedicationCard> {
   bool _expanded = false;
+  bool _isDeleting = false;
 
   Future<void> _openEdit() async {
     final edited = await Navigator.of(context).push<bool>(
@@ -29,6 +34,37 @@ class _MedicationCardState extends State<MedicationCard> {
     if (edited == true) {
       setState(() => _expanded = false);
       widget.onEdited();
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar medicamento?'),
+        content: Text(
+          'Queres eliminar ${widget.medication.name}? Esta ação não pode ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _isDeleting = true);
+    try {
+      await widget.onDelete(widget.medication.id);
+      if (mounted) setState(() => _expanded = false);
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
     }
   }
 
@@ -161,7 +197,7 @@ class _MedicationCardState extends State<MedicationCard> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Center(
               child: _CardButton(
-                label: 'INFO+',
+                label: 'INFO',
                 onTap: () => setState(() => _expanded = true),
               ),
             ),
@@ -231,7 +267,9 @@ class _MedicationCardState extends State<MedicationCard> {
         _ExpandedSection(
           med: med,
           onEdit: _openEdit,
+          onDelete: _isDeleting ? null : _confirmDelete,
           onClose: () => setState(() => _expanded = false),
+          isDeleting: _isDeleting,
         ),
       ],
     );
@@ -267,12 +305,16 @@ class _ExpandedSection extends StatelessWidget {
   const _ExpandedSection({
     required this.med,
     required this.onEdit,
+    required this.onDelete,
     required this.onClose,
+    required this.isDeleting,
   });
 
   final Medication med;
   final VoidCallback onEdit;
+  final VoidCallback? onDelete;
   final VoidCallback onClose;
+  final bool isDeleting;
 
   @override
   Widget build(BuildContext context) {
@@ -310,11 +352,21 @@ class _ExpandedSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
             children: [
-              _CardButton(label: 'FECHAR', onTap: onClose, filled: false),
-              const SizedBox(width: 8),
+              _CardButton(
+                label: 'FECHAR',
+                onTap: onClose,
+                variant: _CardButtonVariant.secondary,
+              ),
+              _CardButton(
+                label: isDeleting ? 'A APAGAR...' : 'ELIMINAR',
+                onTap: onDelete,
+                variant: _CardButtonVariant.danger,
+              ),
               _CardButton(label: 'EDITAR', onTap: onEdit),
             ],
           ),
@@ -355,25 +407,40 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
+enum _CardButtonVariant { primary, secondary, danger }
+
 class _CardButton extends StatelessWidget {
   const _CardButton({
     required this.label,
     required this.onTap,
-    this.filled = true,
+    this.variant = _CardButtonVariant.primary,
   });
 
   final String label;
-  final VoidCallback onTap;
-  final bool filled;
+  final VoidCallback? onTap;
+  final _CardButtonVariant variant;
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final backgroundColor = switch (variant) {
+      _CardButtonVariant.primary => AppColors.lemon,
+      _CardButtonVariant.secondary => Colors.white,
+      _CardButtonVariant.danger => const Color(0xFFE53935),
+    };
+    final foregroundColor = switch (variant) {
+      _CardButtonVariant.secondary => AppColors.ink,
+      _ => Colors.white,
+    };
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         decoration: BoxDecoration(
-          color: filled ? AppColors.lemon : Colors.white,
+          color: enabled
+              ? backgroundColor
+              : backgroundColor.withValues(alpha: 0.65),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.ink, width: 1.5),
           boxShadow: BrutalDecor.shadowSm,
@@ -383,7 +450,7 @@ class _CardButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: filled ? Colors.white : AppColors.ink,
+            color: foregroundColor,
             letterSpacing: 0.5,
           ),
         ),
