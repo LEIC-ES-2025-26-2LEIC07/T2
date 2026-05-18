@@ -42,8 +42,8 @@ class SignUpViewModel extends ChangeNotifier {
       return;
     }
 
-    if (cleanPassword.length < 8) {
-      _setError('A password tem de ter pelo menos 8 caracteres.');
+    if (cleanPassword.length < 6) {
+      _setError('A password tem de ter pelo menos 6 caracteres.');
       return;
     }
 

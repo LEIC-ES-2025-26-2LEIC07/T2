@@ -41,7 +41,7 @@ void main() {
     // ── AuthException path ──────────────────────────────────────────────────
 
     test(
-      'sets errorMessage to "Invalid credentials" when AuthException is thrown',
+      'sets errorMessage to friendly Portuguese text when AuthException is thrown',
       () async {
         final vm = LoginViewModel(
           authService: AlwaysFailAuth(
@@ -51,7 +51,7 @@ void main() {
 
         await vm.signIn(email: 'user@example.com', password: 'wrong');
 
-        expect(vm.errorMessage, 'Invalid credentials');
+        expect(vm.errorMessage, contains('Credenciais'));
       },
     );
 

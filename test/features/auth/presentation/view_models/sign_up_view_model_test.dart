@@ -3,24 +3,41 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/sign_up_view_model.dart';
 import '../../../../helpers/mocks.dart';
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
 void main() {
   group('SignUpViewModel', () {
     // ── Input validation ────────────────────────────────────────────────────
 
+    test('sets errorMessage when name is blank', () async {
+      final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
+      await vm.signUp(
+        email: 'a@b.com',
+        password: 'abc123',
+        confirmPassword: 'abc123',
+      );
+      expect(vm.errorMessage, isNotNull);
+      expect(vm.success, isFalse);
+    });
+
     test('sets errorMessage when email is blank', () async {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
-      await vm.signUp(email: '', password: 'abc123', confirmPassword: 'abc123');
+      await vm.signUp(
+        email: '',
+        password: 'abc123',
+        confirmPassword: 'abc123',
+        fullName: 'Test User',
+      );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
     });
 
     test('sets errorMessage when password is blank', () async {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
-      await vm.signUp(email: 'a@b.com', password: '', confirmPassword: '');
+      await vm.signUp(
+        email: 'a@b.com',
+        password: '',
+        confirmPassword: '',
+        fullName: 'Test User',
+      );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
     });
@@ -31,6 +48,7 @@ void main() {
         email: 'notanemail',
         password: 'abc123',
         confirmPassword: 'abc123',
+        fullName: 'Test User',
       );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
@@ -44,8 +62,9 @@ void main() {
           email: 'a@b.com',
           password: 'abc',
           confirmPassword: 'abc',
+          fullName: 'Test User',
         );
-        expect(vm.errorMessage, isNotNull);
+        expect(vm.errorMessage, contains('6 caracteres'));
         expect(vm.success, isFalse);
       },
     );
@@ -56,8 +75,9 @@ void main() {
         email: 'a@b.com',
         password: 'abc123',
         confirmPassword: 'xyz999',
+        fullName: 'Test User',
       );
-      expect(vm.errorMessage, contains('match'));
+      expect(vm.errorMessage, contains('coincidem'));
       expect(vm.success, isFalse);
     });
 
@@ -73,8 +93,9 @@ void main() {
         email: 'a@b.com',
         password: 'abc123',
         confirmPassword: 'abc123',
+        fullName: 'Test User',
       );
-      expect(vm.errorMessage, contains('registered'));
+      expect(vm.errorMessage, contains('registado'));
       expect(vm.success, isFalse);
     });
 
@@ -86,6 +107,7 @@ void main() {
         email: 'a@b.com',
         password: 'abc123',
         confirmPassword: 'abc123',
+        fullName: 'Test User',
       );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
@@ -101,6 +123,7 @@ void main() {
           email: 'a@b.com',
           password: 'abc123',
           confirmPassword: 'abc123',
+          fullName: 'Test User',
         );
         expect(vm.success, isTrue);
         expect(vm.errorMessage, isNull);
@@ -113,13 +136,19 @@ void main() {
         email: 'a@b.com',
         password: 'abc123',
         confirmPassword: 'abc123',
+        fullName: 'Test User',
       );
       expect(vm.isLoading, isFalse);
     });
 
     test('clearError removes the displayed error', () async {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
-      await vm.signUp(email: '', password: 'abc123', confirmPassword: 'abc123');
+      await vm.signUp(
+        email: '',
+        password: 'abc123',
+        confirmPassword: 'abc123',
+        fullName: 'Test User',
+      );
       expect(vm.errorMessage, isNotNull);
 
       vm.clearError();

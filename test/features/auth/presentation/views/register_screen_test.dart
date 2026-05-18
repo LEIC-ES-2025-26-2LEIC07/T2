@@ -78,7 +78,7 @@ void main() {
       await tester.tap(find.text('Concluir registo →'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('8 caracteres'), findsOneWidget);
+      expect(find.textContaining('A password tem de ter'), findsOneWidget);
     });
 
     testWidgets('back button pops the screen', (tester) async {

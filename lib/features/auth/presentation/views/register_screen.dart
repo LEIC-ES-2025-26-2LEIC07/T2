@@ -233,7 +233,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Pelo menos 8 caracteres, com letras e números.',
+                          'Pelo menos 6 caracteres, com letras e números.',
                           style: TextStyle(
                             fontSize: 11,
                             color: AppColors.muted,
