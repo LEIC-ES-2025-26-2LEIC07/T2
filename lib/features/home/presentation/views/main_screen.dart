@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
 import 'package:clinic_go/core/widgets/floating_bottom_nav_bar.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
@@ -29,6 +30,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 2;
   bool _isSignedIn = false;
+  String? _signOutMessage;
 
   late final CalendarViewModel _calendarViewModel;
   late final HomeViewModel _homeViewModel;
@@ -39,12 +41,13 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
+    _isSignedIn = getIt<AuthService>().isLoggedIn;
+
     _calendarViewModel = CalendarViewModel(
       calendarRepository: getIt<CalendarRepository>(),
       medRepository: getIt<MedicationRepository>(),
       schedulingService: getIt<DoseSchedulingService>(),
     );
-    _calendarViewModel.loadMonth(DateTime.now());
 
     _homeViewModel =
         widget.homeViewModel ??
@@ -55,21 +58,44 @@ class _MainScreenState extends State<MainScreen> {
           notificationController: getIt<MissedDoseNotificationController>(),
         );
 
-    if (widget.homeViewModel == null) {
-      _homeViewModel.loadNextDose();
+    if (_isSignedIn) {
+      _calendarViewModel.loadMonth(DateTime.now());
+      if (widget.homeViewModel == null) {
+        _homeViewModel.loadNextDose();
+      }
     }
 
-    _isSignedIn = getIt<AuthService>().isLoggedIn;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isSignedIn && mounted) {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRouter.login, (_) => false);
+      }
+    });
 
     _authSubscription = getIt<AuthService>().authStateChanges.listen((_) {
       if (!mounted) return;
       // Re-read isLoggedIn synchronously — the stream maps initialSession as
       // false, which would incorrectly hide the navbar on an existing session.
       final signedIn = getIt<AuthService>().isLoggedIn;
-      setState(() {
-        _isSignedIn = signedIn;
-        _currentIndex = signedIn ? 2 : 0;
-      });
+      if (!signedIn) {
+        final msg = _signOutMessage;
+        _signOutMessage = null;
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRouter.login,
+          (_) => false,
+          arguments: msg,
+        );
+      } else {
+        setState(() {
+          _isSignedIn = true;
+          _currentIndex = 2;
+        });
+        _calendarViewModel.loadMonth(DateTime.now());
+        if (widget.homeViewModel == null) {
+          _homeViewModel.loadNextDose();
+        }
+      }
     });
   }
 
@@ -95,7 +121,11 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      const ProfileView(),
+      ProfileView(
+        onSignOut: () {
+          _signOutMessage = 'Sessão terminada com sucesso.';
+        },
+      ),
       MedicationsListScreen(onChanged: _onMedicationChanged),
       HomeContent(
         viewModel: _homeViewModel,

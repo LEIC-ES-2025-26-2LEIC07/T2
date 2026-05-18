@@ -48,9 +48,10 @@ class AppRouter {
     }
 
     if (routeName == login) {
+      final msg = settings.arguments as String?;
       return MaterialPageRoute<void>(
         settings: settings,
-        builder: (_) => const LoginScreen(),
+        builder: (_) => LoginScreen(successMessage: msg),
       );
     }
 

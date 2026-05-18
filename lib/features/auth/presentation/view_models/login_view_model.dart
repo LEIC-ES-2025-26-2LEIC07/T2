@@ -50,12 +50,12 @@ class LoginViewModel extends ChangeNotifier {
 
     // Local validation first — no network call needed.
     if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
-      _setError('Please fill in email and password.');
+      _setError('Preenche o email e a password.');
       return;
     }
 
     if (!cleanEmail.contains('@')) {
-      _setError('Enter a valid email.');
+      _setError('Introduz um email válido.');
       return;
     }
 
@@ -68,11 +68,11 @@ class LoginViewModel extends ChangeNotifier {
       _clearError();
     } on AuthException {
       // Always surface a generic message to avoid leaking Supabase internals.
-      _errorMessage = 'Invalid credentials';
+      _errorMessage = 'Credenciais inválidas.';
       _clearPassword = true;
       notifyListeners();
     } catch (_) {
-      _errorMessage = 'Could not sign in. Please try again.';
+      _errorMessage = 'Não foi possível iniciar sessão. Tenta novamente.';
       _clearPassword = true;
       notifyListeners();
     } finally {
@@ -85,7 +85,7 @@ class LoginViewModel extends ChangeNotifier {
     final cleanEmail = email.trim();
 
     if (cleanEmail.isEmpty) {
-      _setError('Enter your email to recover your password.');
+      _setError('Introduz o teu email para recuperar a password.');
       return;
     }
 
@@ -97,10 +97,10 @@ class LoginViewModel extends ChangeNotifier {
       // Info message is handled by ProfileViewModel; here we just clear errors.
       _clearError();
     } on AuthException {
-      _errorMessage = 'Could not send recovery email.';
+      _errorMessage = 'Não foi possível enviar o email de recuperação.';
       notifyListeners();
     } catch (_) {
-      _errorMessage = 'Could not send recovery email.';
+      _errorMessage = 'Não foi possível enviar o email de recuperação.';
       notifyListeners();
     } finally {
       _setLoading(false);

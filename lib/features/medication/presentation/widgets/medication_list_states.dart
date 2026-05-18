@@ -40,7 +40,7 @@ class MedListEmptyState extends StatelessWidget {
               child: const Text(
                 'Adicionar medicamento',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.card,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -96,12 +96,12 @@ class MedListAddButton extends StatelessWidget {
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add, color: Colors.white, size: 18),
+            Icon(Icons.add, color: AppColors.card, size: 18),
             SizedBox(width: 4),
             Text(
               'Adicionar',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.card,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 class FavoritesView extends StatelessWidget {
   const FavoritesView({super.key});
@@ -15,7 +16,7 @@ class FavoritesView extends StatelessWidget {
             ), // Push the search bar down mimicking mockup
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.card,
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(

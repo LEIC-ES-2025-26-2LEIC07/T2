@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 
 // ── Discard-changes dialog ─────────────────────────────────────
@@ -34,22 +35,13 @@ Future<bool> showDiscardChangesDialog(
 }
 
 // ── Shared design tokens ──────────────────────────────────────
-const medInk = Color(0xFF0E2748);
-const medPaper = Color(0xFFEEF3FA);
-const medCard = Color(0xFFFFFFFF);
-const medBlue = Color(0xFF3D6BE0);
 const medMuted = Color(0xFF7A8AA5);
-const medShadowSm = BoxShadow(
-  color: medInk,
-  offset: Offset(3, 3),
-  blurRadius: 0,
-);
 
 const medQuickPalette = [
-  Color(0xFFE0796A),
-  Color(0xFF3D6BE0),
-  Color(0xFFB7D8C7),
-  Color(0xFFC9DCF7),
+  AppColors.coral,
+  AppColors.lemon,
+  AppColors.mint,
+  AppColors.sky,
   Color(0xFFF4D6D2),
 ];
 
@@ -127,17 +119,17 @@ class MedLabeledField extends StatelessWidget {
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.4,
-            color: medInk.withValues(alpha: 0.6),
+            color: AppColors.ink.withValues(alpha: 0.6),
             height: 1,
           ),
         ),
         const SizedBox(height: 4),
         Container(
           decoration: BoxDecoration(
-            color: medCard,
+            color: AppColors.card,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: medInk, width: 2),
-            boxShadow: const [medShadowSm],
+            border: Border.all(color: AppColors.ink, width: 2),
+            boxShadow: BrutalDecor.shadowSm,
           ),
           child: child,
         ),
@@ -180,7 +172,7 @@ class MedPlainTextField extends StatelessWidget {
       style: const TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w700,
-        color: medInk,
+        color: AppColors.ink,
       ),
       decoration: InputDecoration(
         hintText: placeholder,
@@ -232,7 +224,7 @@ class MedDosageContent extends StatelessWidget {
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: medInk,
+              color: AppColors.ink,
             ),
             decoration: InputDecoration(
               hintText: 'ex: 500',
@@ -252,7 +244,11 @@ class MedDosageContent extends StatelessWidget {
             ),
           ),
         ),
-        Container(width: 1, height: 28, color: medInk.withValues(alpha: 0.2)),
+        Container(
+          width: 1,
+          height: 28,
+          color: AppColors.ink.withValues(alpha: 0.2),
+        ),
         DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: selectedUnit,
@@ -260,7 +256,7 @@ class MedDosageContent extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: medInk,
+              color: AppColors.ink,
             ),
             items: units
                 .map((u) => DropdownMenuItem(value: u, child: Text(u)))
@@ -293,10 +289,14 @@ class MedTimeContent extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: medInk,
+                color: AppColors.ink,
               ),
             ),
-            const Icon(Icons.access_time_rounded, size: 18, color: medInk),
+            const Icon(
+              Icons.access_time_rounded,
+              size: 18,
+              color: AppColors.ink,
+            ),
           ],
         ),
       ),
@@ -326,9 +326,12 @@ class MedFreqContent extends StatelessWidget {
         style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: medInk,
+          color: AppColors.ink,
         ),
-        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: medInk),
+        icon: const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: AppColors.ink,
+        ),
         items: options
             .map((o) => DropdownMenuItem(value: o, child: Text(o)))
             .toList(),
@@ -360,14 +363,14 @@ class MedFoodSwitchContent extends StatelessWidget {
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: medInk,
+              color: AppColors.ink,
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: medBlue,
-            activeThumbColor: medCard,
+            activeTrackColor: AppColors.lemon,
+            activeThumbColor: AppColors.card,
             inactiveThumbColor: medMuted,
             inactiveTrackColor: const Color(0xFFE0E7F0),
           ),
@@ -407,8 +410,8 @@ class MedColorSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: selectedColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: medInk, width: 2.5),
-              boxShadow: const [medShadowSm],
+              border: Border.all(color: AppColors.ink, width: 2.5),
+              boxShadow: BrutalDecor.shadowSm,
             ),
             child: Align(
               alignment: Alignment.bottomRight,
@@ -418,11 +421,11 @@ class MedColorSection extends StatelessWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: medCard,
+                    color: AppColors.card,
                     shape: BoxShape.circle,
-                    border: Border.all(color: medInk, width: 2),
+                    border: Border.all(color: AppColors.ink, width: 2),
                   ),
-                  child: const Icon(Icons.edit, size: 11, color: medInk),
+                  child: const Icon(Icons.edit, size: 11, color: AppColors.ink),
                 ),
               ),
             ),
@@ -438,7 +441,7 @@ class MedColorSection extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
-                color: medInk.withValues(alpha: 0.6),
+                color: AppColors.ink.withValues(alpha: 0.6),
                 height: 1,
               ),
             ),
@@ -448,7 +451,7 @@ class MedColorSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: medInk,
+                color: AppColors.ink,
               ),
             ),
             const SizedBox(height: 8),
@@ -465,7 +468,7 @@ class MedColorSection extends StatelessWidget {
                       color: c,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: medInk,
+                        color: AppColors.ink,
                         width: isSelected ? 2.5 : 1.5,
                       ),
                     ),
@@ -504,8 +507,8 @@ class MedFormBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: medCard,
-        border: Border(top: BorderSide(color: medInk, width: 2)),
+        color: AppColors.card,
+        border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
       child: Row(
@@ -520,9 +523,9 @@ class MedFormBottomBar extends StatelessWidget {
                         onCancel();
                       },
                 style: OutlinedButton.styleFrom(
-                  backgroundColor: medPaper,
-                  foregroundColor: medInk,
-                  side: const BorderSide(color: medInk, width: 2),
+                  backgroundColor: AppColors.paper,
+                  foregroundColor: AppColors.ink,
+                  side: const BorderSide(color: AppColors.ink, width: 2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -543,8 +546,8 @@ class MedFormBottomBar extends StatelessWidget {
                 key: saveButtonKey,
                 onPressed: (isLoading || isSaveDisabled) ? null : onSave,
                 style: FilledButton.styleFrom(
-                  backgroundColor: medBlue,
-                  disabledBackgroundColor: medBlue,
+                  backgroundColor: AppColors.lemon,
+                  disabledBackgroundColor: AppColors.lemon,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -555,7 +558,7 @@ class MedFormBottomBar extends StatelessWidget {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: AppColors.card,
                           strokeWidth: 2,
                         ),
                       )
@@ -617,8 +620,8 @@ class MedColorPickerSheet extends StatelessWidget {
                         color: c,
                         shape: BoxShape.circle,
                         border: c == selected
-                            ? Border.all(color: medInk, width: 3)
-                            : Border.all(color: medInk, width: 1.5),
+                            ? Border.all(color: AppColors.ink, width: 3)
+                            : Border.all(color: AppColors.ink, width: 1.5),
                       ),
                     ),
                   ),
@@ -646,7 +649,7 @@ class MedErrorBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFFFECEC),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: medInk, width: 2),
+        border: Border.all(color: AppColors.ink, width: 2),
       ),
       child: Text(
         message,

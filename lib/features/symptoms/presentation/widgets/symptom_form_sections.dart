@@ -20,7 +20,7 @@ class SymptomSectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
+        color: AppColors.card.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(28),
         boxShadow: const [
           BoxShadow(
@@ -93,7 +93,7 @@ class SymptomSearchCard extends StatelessWidget {
               prefixIcon: const Icon(Icons.search),
               hintText: 'Search symptoms',
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.card,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide.none,
@@ -246,7 +246,7 @@ class NotesCard extends StatelessWidget {
               hintText:
                   'Add context like triggers, timing, or anything that changed.',
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.card,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
                 borderSide: BorderSide.none,
