@@ -5,7 +5,6 @@ import 'package:clinic_go/features/auth/presentation/views/register_screen.dart'
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
-import 'package:clinic_go/features/medication/presentation/views/monthly_summary_screen.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/symptoms/presentation/views/log_symptom_screen.dart';
 import 'package:clinic_go/features/symptoms/presentation/views/symptom_history_screen.dart';
@@ -20,7 +19,6 @@ class AppRouter {
   static const String home = '/home';
   static const String login = '/login';
   static const String register = '/register';
-  static const String summary = '/summary';
   static const String logSymptom = '/log-symptom';
   static const String symptomHistory = '/symptom-history';
 
@@ -60,13 +58,6 @@ class AppRouter {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (_) => const RegisterScreen(),
-      );
-    }
-
-    if (routeName == summary) {
-      return MaterialPageRoute<void>(
-        settings: settings,
-        builder: (_) => const MonthlySummaryScreen(),
       );
     }
 

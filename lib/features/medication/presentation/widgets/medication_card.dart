@@ -161,7 +161,7 @@ class _MedicationCardState extends State<MedicationCard> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Center(
               child: _CardButton(
-                label: 'EDITAR',
+                label: 'INFO+',
                 onTap: () => setState(() => _expanded = true),
               ),
             ),
