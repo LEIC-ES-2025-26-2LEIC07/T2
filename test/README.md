@@ -1,7 +1,5 @@
 # Test Suite — ClinicGO
 
-> **296 tests passing · 7 skipped** (as of Sprint 3)
-
 Tests are organised by feature and layer (data → domain → view model → view).  
 Skipped tests are marked with `[skip]`.
 
@@ -13,6 +11,7 @@ Skipped tests are marked with `[skip]`.
 - [Core — Routing](#core--routing)
 - [Supabase Config](#supabase-config)
 - [Auth](#auth)
+- [Calendar](#calendar)
 - [Medication](#medication)
 - [Home](#home)
 - [Profile](#profile)
@@ -163,20 +162,11 @@ Skipped tests are marked with `[skip]`.
 | RegisterScreen | shows error when password too short |
 | RegisterScreen | navigates back when Sign in link is tapped |
 
-### `features/auth/presentation/views/sign_up_sheet_test.dart`
-
-| Group | Test case |
-|-------|-----------|
-| SignUpSheet | renders email, password, and confirm fields |
-| SignUpSheet | shows error message when fields are empty |
-| SignUpSheet | shows error when passwords do not match |
-| SignUpSheet | closes sheet when "Already have an account" is tapped |
-
 ---
 
-## Medication
+## Calendar
 
-### `features/medication/data/supabase_calendar_repository_test.dart`
+### `features/calendar/data/supabase_calendar_repository_test.dart`
 
 | Group | Test case |
 |-------|-----------|
@@ -186,6 +176,60 @@ Skipped tests are marked with `[skip]`.
 | SupabaseCalendarRepository.fetchDoseLogs | maps a taken log to a DoseLogEntry with correct fields |
 | SupabaseCalendarRepository.fetchDoseLogs | maps a skipped log to DoseLogEntry with skipped status |
 | SupabaseCalendarRepository.fetchDoseLogs | throws when the medication_logs query fails |
+
+### `features/calendar/presentation/view_models/calendar_view_model_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| DaySummary.status | none when both lists are empty |
+| DaySummary.status | allTaken when all logs are taken and no scheduled remain |
+| DaySummary.status | partial when some logs taken and some skipped |
+| DaySummary.status | partial when a taken log exists alongside pending scheduled doses |
+| DaySummary.status | missed when no doses taken on a past day |
+| DaySummary.status | upcoming when no doses taken on a future day |
+| CalendarViewModel.loadMonth | returns 31 summaries for May 2026 |
+| CalendarViewModel.loadMonth | clears loading flag and error on success |
+| CalendarViewModel.loadMonth | maps a log entry to the correct day summary |
+| CalendarViewModel.loadMonth | sets error message when repository throws |
+| CalendarViewModel.loadMonth | sets currentMonth to the first day of the requested month |
+| CalendarViewModel.loadMonth | transitions isLoading from true to false |
+| CalendarViewModel.loadMonth | uses scheduled doses from reminders in day summaries |
+| CalendarViewModel navigation | goToNextMonth advances currentMonth to June |
+| CalendarViewModel navigation | goToPreviousMonth steps currentMonth back to April |
+| CalendarViewModel navigation | goToNextMonth wraps December into January of the following year |
+| CalendarViewModel.daySummaryFor | returns null before loadMonth is called |
+| CalendarViewModel.daySummaryFor | returns a non-null summary after loadMonth |
+| CalendarViewModel.daySummaryFor | returns null for a day outside the loaded month |
+
+### `features/calendar/presentation/views/calendar_screen_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| Loading state | shows CircularProgressIndicator while loading |
+| Error state | shows error message when repository throws |
+| Header and legend | displays the formatted month header |
+| Header and legend | displays all four legend labels |
+| Day grid | renders the first and last day of May 2026 |
+| Day grid | shows check_circle icon on a day with all doses taken |
+| Day tap bottom sheet | shows "no activity" message for an empty day |
+| Day tap bottom sheet | shows log entry details in the bottom sheet |
+| Navigation buttons | chevron_right advances to June 2026 |
+| Navigation buttons | chevron_left goes back to April 2026 |
+
+---
+
+## Medication
+
+### `features/medication/data/add_medication_integration_test.dart`
+
+> Hits the real Supabase instance. All tests are skipped unless `--dart-define=SUPABASE_URL=...` credentials are passed.
+
+| Group | Test case | Skip |
+|-------|-----------|------|
+| addMedication — real Supabase integration | Step 1 — sign-in gives a valid currentUser | ✓* |
+| addMedication — real Supabase integration | Step 2 — raw insert into medications table | ✓* |
+| addMedication — real Supabase integration | Step 3 — raw insert into medication_reminders table | ✓* |
+| addMedication — real Supabase integration | Step 4 — full addMedication via SupabaseMedicationRepository | ✓* |
 
 ### `features/medication/data/supabase_dose_log_repository_test.dart`
 
@@ -216,6 +260,33 @@ Skipped tests are marked with `[skip]`.
 | fetchAllReminders | Network failure: throws PostgrestException |
 | fetchAllReminders | Malformed data: handles invalid structure gracefully |
 
+### `features/medication/models/medication_model_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| Medication.fromJson | parses all required fields correctly |
+| Medication.fromJson | parses color hex to Flutter Color |
+| Medication.fromJson | falls back to default color when color is null |
+| Medication.fromJson | accepts null dosage and leaves dosageAmount null |
+| Medication.fromJson | defaults dosageUnit to "mg" when dosage_unit is null |
+| Medication.fromJson | parses nested medication_reminders list |
+| Medication.fromJson | reminders is null when key is absent |
+| Medication.fromJson | parses start_date and end_date |
+| Medication.dosageDisplay | returns "500mg" when amount=500 and unit="mg" |
+| Medication.dosageDisplay | appends unit correctly for different units |
+| Medication.dosageDisplay | returns null when dosageAmount is null |
+| Medication.isActive | is true when endDate is null (ongoing) |
+| Medication.isActive | is true when endDate is in the future |
+| Medication.isActive | is false when endDate is in the past |
+| Medication.colorFromHex / colorToHex | colorFromHex parses #RRGGBB correctly |
+| Medication.colorFromHex / colorToHex | colorToHex formats Color to #RRGGBB |
+| Medication.colorFromHex / colorToHex | colorFromHex and colorToHex round-trip |
+| MedicationReminder.fromJson | parses all fields |
+| MedicationReminder.fromJson | defaults isActive to true when absent |
+| MedicationReminder.fromJson | toInsertJson produces expected keys |
+| ScheduledDose serialisation | toJson produces expected map |
+| ScheduledDose serialisation | fromJson round-trips toJson |
+
 ### `features/medication/presentation/view_models/add_medication_view_model_test.dart`
 
 | Group | Test case |
@@ -235,37 +306,54 @@ Skipped tests are marked with `[skip]`.
 | Reminder slots | Three times daily produces three slots |
 | Reminder slots | switching back to Once daily reduces to one slot |
 
-### `features/medication/presentation/view_models/calendar_view_model_test.dart`
+### `features/medication/presentation/view_models/daily_doses_view_model_test.dart`
 
 | Group | Test case |
 |-------|-----------|
-| DaySummary.status | none when both lists are empty |
-| DaySummary.status | allTaken when all logs are taken and no scheduled remain |
-| DaySummary.status | partial when some logs taken and some skipped |
-| DaySummary.status | partial when a taken log exists alongside pending scheduled doses |
-| DaySummary.status | missed when no doses taken on a past day |
-| DaySummary.status | upcoming when no doses taken on a future day |
-| CalendarViewModel.loadMonth | returns 31 summaries for May 2026 |
-| CalendarViewModel.loadMonth | clears loading flag and error on success |
-| CalendarViewModel.loadMonth | maps a log entry to the correct day summary |
-| CalendarViewModel.loadMonth | sets error message when repository throws |
-| CalendarViewModel.loadMonth | sets currentMonth to the first day of the requested month |
-| CalendarViewModel.loadMonth | transitions isLoading from true to false |
-| CalendarViewModel.loadMonth | uses scheduled doses from reminders in day summaries |
-| CalendarViewModel navigation | goToNextMonth advances currentMonth to June |
-| CalendarViewModel navigation | goToPreviousMonth steps currentMonth back to April |
-| CalendarViewModel navigation | goToNextMonth wraps December into January of the following year |
-| CalendarViewModel.daySummaryFor | returns null before loadMonth is called |
-| CalendarViewModel.daySummaryFor | returns a non-null summary after loadMonth |
-| CalendarViewModel.daySummaryFor | returns null for a day outside the loaded month |
+| DailyDosesViewModel – initial state | starts empty, not loading, no error |
+| DailyDosesViewModel – loadTodayDoses | toggles isLoading true then false |
+| DailyDosesViewModel – loadTodayDoses | loads pending doses not yet logged |
+| DailyDosesViewModel – loadTodayDoses | excludes doses already logged |
+| DailyDosesViewModel – loadTodayDoses | sets errorMessage and leaves doses empty on repo failure |
+| DailyDosesViewModel – loadTodayDoses | refresh calls loadTodayDoses |
+| DailyDosesViewModel – loadTodayDoses | doses list is unmodifiable |
+| DailyDosesViewModel – logDose | throws StateError when dose is not in the loaded list |
+| DailyDosesViewModel – logDose | marks dose as taken after successful log |
+| DailyDosesViewModel – logDose | marks dose as skipped after successful log |
+| DailyDosesViewModel – logDose | rollback on log repository failure restores prior state |
+| DailyDosesViewModel – logDose | delegates to notificationController when provided |
+| DailyDosesViewModel – dose disappears after refresh | taken dose is absent after refresh |
+| DailyDosesViewModel – dose disappears after refresh | skipped dose is absent after refresh |
+| DailyDosesViewModel – dose disappears after refresh | only logged dose is removed, other doses remain after refresh |
+| DailyDosesViewModel – dose disappears after refresh | taken dose via notification controller is absent after refresh when controller shares the log repository |
 
-### `features/medication/presentation/view_models/monthly_summary_providers_test.dart`
+### `features/medication/presentation/view_models/edit_medication_view_model_test.dart`
 
 | Group | Test case |
 |-------|-----------|
-| MonthlySummary | calculates adherence percentage from taken vs total logs |
-| MonthlySummary | returns null adherence percentage when there are no logs |
-| MonthlySummary | resolves daily adherence statuses |
+| EditMedicationViewModel – initial state | pre-fills all fields from the medication object |
+| EditMedicationViewModel – loadReminders | populates slots from repository |
+| EditMedicationViewModel – loadReminders | falls back to single 08:00 slot when repository returns empty |
+| EditMedicationViewModel – loadReminders | falls back to single slot when repository throws |
+| EditMedicationViewModel – validation | submit with blank name sets nameError and returns early |
+| EditMedicationViewModel – validation | submit with null dosage sets dosageError and returns early |
+| EditMedicationViewModel – validation | submit with both blank sets both errors |
+| EditMedicationViewModel – happy path submit | sets isSuccess and clears isDirty after successful save |
+| EditMedicationViewModel – submit failure | sets errorMessage when repo throws, isSuccess stays false |
+| EditMedicationViewModel – deleteMedication | sets wasDeleted and isSuccess on success |
+| EditMedicationViewModel – deleteMedication | sets errorMessage and keeps wasDeleted false on failure |
+
+### `features/medication/presentation/view_models/medications_list_view_model_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| MedicationsListViewModel – initial state | starts with empty list, not loading, no error |
+| MedicationsListViewModel – loadMedications | sets isLoading to true during fetch then false after |
+| MedicationsListViewModel – loadMedications | populates medications list on success |
+| MedicationsListViewModel – loadMedications | returns empty list when repository returns no medications |
+| MedicationsListViewModel – loadMedications | sets errorMessage and leaves list empty on repository error |
+| MedicationsListViewModel – loadMedications | clears previous errorMessage on successful retry |
+| MedicationsListViewModel – loadMedications | medications list is unmodifiable |
 
 ### `features/medication/presentation/views/add_medication_screen_test.dart`
 
@@ -277,20 +365,27 @@ Skipped tests are marked with `[skip]`.
 | tapping colour swatch opens colour picker bottom sheet |
 | error message is shown when repository throws |
 
-### `features/medication/presentation/views/calendar_screen_test.dart`
+### `features/medication/presentation/views/dose_logging_screen_test.dart`
 
 | Group | Test case |
 |-------|-----------|
-| Loading state | shows CircularProgressIndicator while loading |
-| Error state | shows error message when repository throws |
-| Header and legend | displays the formatted month header |
-| Header and legend | displays all four legend labels |
-| Day grid | renders the first and last day of May 2026 |
-| Day grid | shows check_circle icon on a day with all doses taken |
-| Day tap bottom sheet | shows "no activity" message for an empty day |
-| Day tap bottom sheet | shows log entry details in the bottom sheet |
-| Navigation buttons | chevron_right advances to June 2026 |
-| Navigation buttons | chevron_left goes back to April 2026 |
+| DoseLoggingScreen – rendering | renders medication name, dosage and action buttons |
+| DoseLoggingScreen – rendering | shows overdue banner when isOverdue is true |
+| DoseLoggingScreen – rendering | does not show overdue banner when isOverdue is false |
+| DoseLoggingScreen – mark as taken | shows success state and snackbar after marking taken |
+| DoseLoggingScreen – skip dose | shows success state and snackbar after skipping |
+| DoseLoggingScreen – error handling | log failure shows error snackbar and rolls back buttons |
+
+### `features/medication/presentation/views/edit_medication_screen_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| EditMedicationScreen – rendering | shows title and pre-filled name and dosage |
+| EditMedicationScreen – rendering | shows Guardar alterações and Cancelar buttons |
+| EditMedicationScreen – rendering | shows colour swatch |
+| EditMedicationScreen – validation | Save with blank name shows name error |
+| EditMedicationScreen – success | successful save shows snackbar and pops screen |
+| EditMedicationScreen – error | repo error shows error message in form |
 
 ### `features/medication/presentation/views/medications_list_screen_test.dart`
 
