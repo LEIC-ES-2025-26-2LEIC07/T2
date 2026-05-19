@@ -85,8 +85,10 @@ class MissedDoseNotificationController {
     final medicationRepository = _medicationRepository;
     final schedulingService = _schedulingService;
 
-    if (authService == null || medicationRepository == null ||
-        schedulingService == null || !authService.isLoggedIn) {
+    if (authService == null ||
+        medicationRepository == null ||
+        schedulingService == null ||
+        !authService.isLoggedIn) {
       return;
     }
 
