@@ -15,9 +15,9 @@ class MissedDoseNotificationController {
     required LocalNotificationGateway notificationGateway,
     required DoseLogRepository doseLogRepository,
     required PendingNotificationStore pendingNotificationStore,
-    required MedicationRepository medicationRepository,
-    required DoseSchedulingService schedulingService,
-    required AuthService authService,
+    MedicationRepository? medicationRepository,
+    DoseSchedulingService? schedulingService,
+    AuthService? authService,
     this.gracePeriod = const Duration(minutes: 30),
   }) : _notificationGateway = notificationGateway,
        _doseLogRepository = doseLogRepository,
@@ -29,9 +29,9 @@ class MissedDoseNotificationController {
   final LocalNotificationGateway _notificationGateway;
   final DoseLogRepository _doseLogRepository;
   final PendingNotificationStore _pendingNotificationStore;
-  final MedicationRepository _medicationRepository;
-  final DoseSchedulingService _schedulingService;
-  final AuthService _authService;
+  final MedicationRepository? _medicationRepository;
+  final DoseSchedulingService? _schedulingService;
+  final AuthService? _authService;
   final Duration gracePeriod;
 
   Future<void> scheduleDoseReminder(ScheduledDose dose) async {
@@ -81,11 +81,16 @@ class MissedDoseNotificationController {
   Future<void> refreshScheduledMedicationReminders({
     Duration horizon = const Duration(days: 14),
   }) async {
-    if (!_authService.isLoggedIn) {
+    final authService = _authService;
+    final medicationRepository = _medicationRepository;
+    final schedulingService = _schedulingService;
+
+    if (authService == null || medicationRepository == null ||
+        schedulingService == null || !authService.isLoggedIn) {
       return;
     }
 
-    final medications = await _medicationRepository.fetchMedications();
+    final medications = await medicationRepository.fetchMedications();
     final upcomingDoses = <ScheduledDose>[];
 
     for (final medication in medications) {
@@ -94,7 +99,7 @@ class MissedDoseNotificationController {
       }
 
       upcomingDoses.addAll(
-        _schedulingService.calculateUpcomingDoses(
+        schedulingService.calculateUpcomingDoses(
           medication,
           medication.reminders!,
           duration: horizon,
