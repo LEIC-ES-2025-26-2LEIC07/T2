@@ -1,6 +1,7 @@
 import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
@@ -58,6 +59,7 @@ void main() {
     GetIt.I.registerSingleton<DoseSchedulingService>(
       const DoseSchedulingService(),
     );
+    GetIt.I.registerSingleton<LocalNotificationGateway>(notificationGateway);
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(_LoggedInAuth());
     GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
