@@ -96,14 +96,15 @@ class MissedDoseNotificationController {
     final upcomingDoses = <ScheduledDose>[];
 
     for (final medication in medications) {
-      if (!medication.isActive || medication.reminders == null) {
+      final reminders = medication.reminders;
+      if (!medication.isActive || reminders == null) {
         continue;
       }
 
       upcomingDoses.addAll(
         schedulingService.calculateUpcomingDoses(
           medication,
-          medication.reminders!,
+          reminders,
           duration: horizon,
         ),
       );

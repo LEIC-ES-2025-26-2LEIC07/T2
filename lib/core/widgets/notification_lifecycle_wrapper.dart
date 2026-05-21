@@ -43,6 +43,7 @@ class _NotificationLifecycleWrapperState
 
   Future<void> _initializeNotifications() async {
     final granted = await _notificationGateway.requestPermissions();
+    if (!mounted) return;
     setState(() {
       _showPermissionWarning = !granted;
     });
@@ -56,8 +57,10 @@ class _NotificationLifecycleWrapperState
           _notificationController.refreshScheduledMedicationReminders();
         }
       });
-    } catch (_) {
-      // ignore if authService isn't available through getIt; not fatal.
+    } catch (error) {
+      debugPrint(
+        'NotificationLifecycleWrapper: auth listener setup failed: $error',
+      );
     }
   }
 
@@ -66,6 +69,11 @@ class _NotificationLifecycleWrapperState
     if (state == AppLifecycleState.resumed) {
       _notificationController.syncPendingMissedNotifications();
       _notificationController.refreshScheduledMedicationReminders();
+      _notificationGateway.hasPermissions().then((granted) {
+        if (mounted) {
+          setState(() => _showPermissionWarning = !granted);
+        }
+      });
     }
   }
 
