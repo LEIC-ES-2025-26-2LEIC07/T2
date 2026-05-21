@@ -6,6 +6,7 @@ import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, this.viewModel});
@@ -24,11 +25,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.initState();
     _viewModel =
         widget.viewModel ??
-        CalendarViewModel(
-          calendarRepository: getIt<CalendarRepository>(),
-          medRepository: getIt<MedicationRepository>(),
-          schedulingService: getIt<DoseSchedulingService>(),
-        );
+            CalendarViewModel(
+              calendarRepository: getIt<CalendarRepository>(),
+              medRepository: getIt<MedicationRepository>(),
+              schedulingService: getIt<DoseSchedulingService>(),
+            );
     if (widget.viewModel == null) {
       _viewModel.loadMonth(DateTime.now());
     }
@@ -43,54 +44,70 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calendar')),
+      appBar: AppBar(title: const Text('Plano')),
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, _) {
-          if (_viewModel.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (_viewModel.error != null) {
-            return Center(child: Text(_viewModel.error!));
-          }
+          if (_viewModel.isLoading) return const Center(child: CircularProgressIndicator());
+          if (_viewModel.error != null) return Center(child: Text(_viewModel.error!));
 
           final month = _viewModel.currentMonth;
-          final header = DateFormat.yMMMM().format(month);
+          final header = DateFormat.MMMM().format(month) + ' ${month.year}';
+          final summaries = _viewModel.summaries;
 
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
                 child: Row(
                   children: [
-                    IconButton(
-                      onPressed: _viewModel.goToPreviousMonth,
-                      icon: const Icon(Icons.chevron_left),
-                    ),
+                    IconButton(onPressed: _viewModel.goToPreviousMonth, icon: const Icon(Icons.chevron_left)),
                     Expanded(
                       child: Center(
-                        child: Text(
-                          header,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.lemon,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.ink, width: 2),
+                          ),
+                          child: Text(
+                            header,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
                           ),
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: _viewModel.goToNextMonth,
-                      icon: const Icon(Icons.chevron_right),
-                    ),
+                    IconButton(onPressed: _viewModel.goToNextMonth, icon: const Icon(Icons.chevron_right)),
                   ],
                 ),
               ),
-              _buildLegend(),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const [
+                    _LegendItem(color: AppColors.mint, label: 'Tudo OK'),
+                    _LegendItem(color: AppColors.lemon, label: 'Parcial'),
+                    _LegendItem(color: AppColors.coral, label: 'Falhou'),
+                    _LegendItem(color: AppColors.sky, label: 'Próximo'),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 8),
-              Expanded(child: _buildGrid()),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: _buildWeekdayHeader(),
+              ),
+
+              const SizedBox(height: 6),
+
+              Expanded(
+                child: _buildGrid(summaries, month),
+              ),
             ],
           );
         },
@@ -98,44 +115,42 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildLegend() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          _LegendItem(color: Colors.green, label: 'All taken'),
-          _LegendItem(color: Colors.orange, label: 'Partial'),
-          _LegendItem(color: Colors.red, label: 'Missed'),
-          _LegendItem(color: Colors.blue, label: 'Upcoming'),
-        ],
-      ),
+  Widget _buildWeekdayHeader() {
+    const weekdays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    return Row(
+      children: weekdays
+          .map((d) => Expanded(
+                child: Center(
+                  child: Text(
+                    d,
+                    style: TextStyle(color: AppColors.ink.withOpacity(0.75), fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                ),
+              ))
+          .toList(),
     );
   }
 
-  Widget _buildGrid() {
-    final summaries = _viewModel.summaries;
-    final month = _viewModel.currentMonth;
-    final firstWeekday = DateTime(
-      month.year,
-      month.month,
-      1,
-    ).weekday; // 1 = Mon
+  Widget _buildGrid(List<DaySummary> summaries, DateTime month) {
+    final firstWeekday = DateTime(month.year, month.month, 1).weekday; // 1 = Mon
     final daysInMonth = summaries.length;
 
     final rows = <Widget>[];
-    var dayIndex = 1 - (firstWeekday - 1); // start from Monday-based grid
+    var dayIndex = 1 - (firstWeekday - 1);
 
     while (dayIndex <= daysInMonth) {
       final children = <Widget>[];
       for (var col = 0; col < 7; col++) {
         if (dayIndex < 1 || dayIndex > daysInMonth) {
-          children.add(Expanded(child: Container()));
+          children.add(const Expanded(child: SizedBox()));
         } else {
           final summary = summaries[dayIndex - 1];
           children.add(
             Expanded(
-              child: _DayCell(summary: summary, onTap: _onDayTap),
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: AspectRatio(aspectRatio: 1, child: _DayCell(summary: summary, onTap: _onDayTap)),
+              ),
             ),
           );
         }
@@ -144,10 +159,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       rows.add(Row(children: children));
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Column(children: rows),
-    );
+    return Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: Column(children: rows));
   }
 
   void _onDayTap(DaySummary summary) {
@@ -156,49 +168,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
       builder: (_) {
         final all = <Widget>[];
         if (summary.scheduled.isEmpty && summary.logs.isEmpty) {
-          all.add(
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('No medication activity for this day.'),
-            ),
-          );
+          all.add(const Padding(padding: EdgeInsets.all(16), child: Text('Sem atividade de medicação neste dia.')));
         } else {
           for (final s in summary.scheduled) {
-            all.add(
-              ListTile(
-                leading: const Icon(Icons.schedule),
-                title: Text('${s.medicationName} • ${s.dosage}'),
-                subtitle: Text(
-                  'Scheduled: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}',
-                ),
-              ),
-            );
+            all.add(ListTile(leading: const Icon(Icons.schedule), title: Text('${s.medicationName} • ${s.dosage}'), subtitle: Text('Agendado: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}')));
           }
           for (final l in summary.logs) {
-            all.add(
-              ListTile(
-                leading: Icon(
-                  l.status == DoseLogStatus.taken
-                      ? Icons.check_circle
-                      : Icons.block,
-                  color: l.status == DoseLogStatus.taken
-                      ? Colors.green
-                      : Colors.orange,
-                ),
-                title: Text(l.medicationName ?? ''),
-                subtitle: Text(
-                  'Logged: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})',
-                ),
-              ),
-            );
+            all.add(ListTile(
+              leading: Icon(l.status == DoseLogStatus.taken ? Icons.check_circle : Icons.block, color: l.status == DoseLogStatus.taken ? AppColors.mint : AppColors.lemon),
+              title: Text(l.medicationName ?? ''),
+              subtitle: Text('Registado: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})'),
+            ));
           }
         }
 
-        return SafeArea(
-          child: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: all),
-          ),
-        );
+        return SafeArea(child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: all)));
       },
     );
   }
@@ -213,27 +197,24 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final day = summary.date.day;
     final today = DateTime.now();
-    final isToday =
-        summary.date.year == today.year &&
-        summary.date.month == today.month &&
-        summary.date.day == today.day;
+    final isToday = summary.date.year == today.year && summary.date.month == today.month && summary.date.day == today.day;
 
     Color? bg;
     switch (summary.status) {
       case DaySummaryStatus.allTaken:
-        bg = Colors.green.shade200;
+        bg = AppColors.mint.withOpacity(0.9);
         break;
       case DaySummaryStatus.partial:
-        bg = Colors.orange.shade200;
+        bg = AppColors.lemon.withOpacity(0.9);
         break;
       case DaySummaryStatus.missed:
-        bg = Colors.red.shade200;
+        bg = AppColors.coral.withOpacity(0.9);
         break;
       case DaySummaryStatus.upcoming:
-        bg = Colors.blue.shade200;
+        bg = AppColors.lemon.withOpacity(0.6);
         break;
       case DaySummaryStatus.none:
-        bg = null;
+        bg = AppColors.card;
         break;
     }
 
@@ -241,26 +222,30 @@ class _DayCell extends StatelessWidget {
       onTap: () => onTap(summary),
       child: Container(
         margin: const EdgeInsets.all(6),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         decoration: BoxDecoration(
-          color: isToday ? Colors.grey.shade300 : bg ?? Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
+          color: isToday ? AppColors.card : bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isToday ? AppColors.lemon : AppColors.ink.withOpacity(0.15), width: isToday ? 2 : 1),
         ),
-        child: Column(
-          children: [
-            Text(
-              day.toString(),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(day.toString(), style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.ink, fontSize: 16)),
+                const SizedBox(height: 6),
+                if (summary.status != DaySummaryStatus.none)
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.6), shape: BoxShape.circle),
+                    child: Icon(_iconFor(summary.status), size: 16, color: _colorFor(summary.status)),
+                  ),
+              ],
             ),
-            const SizedBox(height: 6),
-            if (summary.status != DaySummaryStatus.none)
-              Icon(
-                _iconFor(summary.status),
-                size: 18,
-                color: _colorFor(summary.status),
-              ),
-          ],
+          ),
         ),
       ),
     );
@@ -284,15 +269,15 @@ class _DayCell extends StatelessWidget {
   Color _colorFor(DaySummaryStatus s) {
     switch (s) {
       case DaySummaryStatus.allTaken:
-        return Colors.green;
+        return AppColors.mint;
       case DaySummaryStatus.partial:
-        return Colors.orange;
+        return AppColors.lemon;
       case DaySummaryStatus.missed:
-        return Colors.red;
+        return AppColors.coral;
       case DaySummaryStatus.upcoming:
-        return Colors.blue;
+        return AppColors.lemon;
       default:
-        return Colors.grey;
+        return AppColors.ink.withOpacity(0.6);
     }
   }
 }
@@ -306,16 +291,9 @@ class _LegendItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
+        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.ink, width: 1.5))),
         const SizedBox(width: 6),
-        Text(label),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
     );
   }
