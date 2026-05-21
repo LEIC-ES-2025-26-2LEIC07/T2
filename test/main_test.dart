@@ -58,7 +58,6 @@ void main() {
     GetIt.I.registerSingleton<DoseSchedulingService>(
       const DoseSchedulingService(),
     );
-    GetIt.I.registerSingleton<LocalNotificationGateway>(notificationGateway);
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
     GetIt.I.registerSingleton<AuthService>(_LoggedInAuth());
     GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
