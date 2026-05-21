@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/medication/presentation/widgets/medication_form_widgets.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
@@ -103,7 +102,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.paper,
+        backgroundColor: medPaper,
         body: SafeArea(
           child: AnimatedBuilder(
             animation: _viewModel,
@@ -237,7 +236,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: AppColors.ink,
+                color: medInk,
                 letterSpacing: -0.5,
               ),
             ),
@@ -249,12 +248,12 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: medCard,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.ink, width: 2),
-                boxShadow: BrutalDecor.shadowSm,
+                border: Border.all(color: medInk, width: 2),
+                boxShadow: const [medShadowSm],
               ),
-              child: const Icon(Icons.close, size: 18, color: AppColors.ink),
+              child: const Icon(Icons.close, size: 18, color: medInk),
             ),
           ),
         ],

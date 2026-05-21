@@ -13,7 +13,7 @@ Future<void> _setupDI({AuthService? authService}) async {
   GetIt.I.registerSingleton<AuthService>(authService ?? AlwaysSuccessAuth());
 }
 
-Widget _buildApp({String? successMessage}) {
+Widget _buildApp() {
   return MaterialApp(
     onGenerateRoute: (settings) {
       if (settings.name == AppRouter.home) {
@@ -28,7 +28,7 @@ Widget _buildApp({String? successMessage}) {
       }
       return null;
     },
-    home: LoginScreen(successMessage: successMessage),
+    home: const LoginScreen(),
   );
 }
 
@@ -45,40 +45,38 @@ void main() {
       expect(find.widgetWithText(TextField, 'Password'), findsOneWidget);
     });
 
-    testWidgets('renders hero, Entrar button and ESQUECI-ME link', (
+    testWidgets('renders title and sign in button', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome back'), findsOneWidget);
+      expect(find.text('Sign in'), findsOneWidget);
+    });
+
+    testWidgets('renders forgot password and create account links', (
       tester,
     ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('ClinicGO'), findsOneWidget);
-      expect(find.text('BEM-VINDA DE VOLTA'), findsOneWidget);
-      expect(find.text('Entrar'), findsOneWidget);
-      expect(find.text('ESQUECI-ME'), findsOneWidget);
+      expect(find.text('Forgot password?'), findsOneWidget);
+      expect(find.textContaining("Don't have an account"), findsOneWidget);
+      expect(find.text('Create one'), findsOneWidget);
     });
 
-    testWidgets('renders criar conta card', (tester) async {
-      await _setupDI();
-      await tester.pumpWidget(_buildApp());
-      await tester.pumpAndSettle();
-
-      expect(find.text('NOVO POR AQUI?'), findsOneWidget);
-      expect(find.text('Cria a tua conta'), findsOneWidget);
-      expect(find.text('CRIAR'), findsOneWidget);
-    });
-
-    testWidgets('shows error when Entrar tapped with empty fields', (
+    testWidgets('shows error when sign in tapped with empty fields', (
       tester,
     ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Entrar'));
+      await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('email e a password'), findsOneWidget);
+      expect(find.textContaining('Please fill in'), findsOneWidget);
     });
 
     testWidgets('shows error for invalid email format', (tester) async {
@@ -94,10 +92,10 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'secret',
       );
-      await tester.tap(find.text('Entrar'));
+      await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('email válido'), findsOneWidget);
+      expect(find.textContaining('valid email'), findsOneWidget);
     });
 
     testWidgets('shows error on failed sign in', (tester) async {
@@ -115,22 +113,10 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'wrong',
       );
-      await tester.tap(find.text('Entrar'));
+      await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('possível iniciar sessão'), findsOneWidget);
-    });
-
-    testWidgets('shows success banner when successMessage provided', (
-      tester,
-    ) async {
-      await _setupDI();
-      await tester.pumpWidget(
-        _buildApp(successMessage: 'Sessão terminada com sucesso.'),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Sessão terminada com sucesso.'), findsOneWidget);
+      expect(find.textContaining('Could not sign in'), findsOneWidget);
     });
 
     testWidgets('navigates to home after successful sign in', (tester) async {
@@ -146,7 +132,7 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'password',
       );
-      await tester.tap(find.text('Entrar'));
+      await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);

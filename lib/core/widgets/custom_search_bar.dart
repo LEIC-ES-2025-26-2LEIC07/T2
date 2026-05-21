@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final String hintText;
@@ -15,7 +14,7 @@ class CustomSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(

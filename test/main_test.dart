@@ -52,9 +52,7 @@ void main() {
       const DoseSchedulingService(),
     );
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
-    // AlwaysLoggedInAuth keeps MainScreen visible (isLoggedIn=true prevents the
-    // post-frame redirect to /login that would tear down the widget tree).
-    GetIt.I.registerSingleton<AuthService>(AlwaysLoggedInAuth());
+    GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
     GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
   });
 
@@ -137,37 +135,36 @@ void main() {
       expect(find.text('ClinicGO'), findsOneWidget);
     });
 
-    testWidgets('Profile tab shows profile card when logged in', (
+    testWidgets('Profile tab shows login form when not logged in', (
       tester,
     ) async {
       await pumpApp(tester);
-      await tester.tap(find.text('PROFILE'));
+      await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
-      // ProfileLoggedInCard shows 'USER_TEST' when displayName is empty
-      expect(find.text('USER_TEST'), findsOneWidget);
+      expect(find.text('Forgot password'), findsOneWidget);
     });
 
-    testWidgets('Profile tab shows Edit and Logout action buttons', (
-      tester,
-    ) async {
+    testWidgets('Profile tab shows "Create account" link', (tester) async {
       await pumpApp(tester);
-      await tester.tap(find.text('PROFILE'));
+      await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
-      expect(find.text('Edit'), findsOneWidget);
-      expect(find.text('Logout'), findsOneWidget);
+      expect(find.textContaining('Create one now'), findsOneWidget);
     });
 
-    testWidgets('Profile tab Edit button switches to edit mode', (
+    testWidgets('tapping "Create account" link opens SignUpSheet', (
       tester,
     ) async {
       await pumpApp(tester);
-      await tester.tap(find.text('PROFILE'));
+      await tester.tap(find.byIcon(Icons.person_outline));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Edit'));
-      await tester.pumpAndSettle();
+      final createAccountFinder = find.textContaining('Create one now');
+      await tester.ensureVisible(createAccountFinder);
 
-      expect(find.text('Save'), findsOneWidget);
+      await tester.tap(createAccountFinder);
+      await tester.pumpAndSettle();
+      expect(find.text('Create account'), findsWidgets);
+      expect(find.text('Sign up to start using ClinicGO.'), findsOneWidget);
     });
   });
 }

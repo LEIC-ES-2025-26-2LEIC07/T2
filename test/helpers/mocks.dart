@@ -42,44 +42,6 @@ class AlwaysSuccessAuth implements AuthService {
   }) async {}
 }
 
-class AlwaysLoggedInAuth implements AuthService {
-  @override
-  String? get currentUserEmail => 'test@test.com';
-
-  @override
-  Map<String, dynamic> get currentUserMetadata => const {};
-
-  @override
-  bool get isLoggedIn => true;
-
-  @override
-  Stream<bool> get authStateChanges => const Stream.empty();
-
-  @override
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {}
-
-  @override
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {}
-
-  @override
-  Future<void> signOut() async {}
-
-  @override
-  Future<void> resetPassword(String email) async {}
-
-  @override
-  Future<void> updateProfile({
-    required String email,
-    required Map<String, dynamic> metadata,
-  }) async {}
-}
-
 class AlwaysFailAuth implements AuthService {
   final Object error;
   AlwaysFailAuth({required this.error});

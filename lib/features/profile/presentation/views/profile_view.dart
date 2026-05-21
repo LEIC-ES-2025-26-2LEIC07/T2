@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 import 'package:clinic_go/features/profile/presentation/widgets/profile_widgets.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({super.key, this.onSignOut});
-
-  final VoidCallback? onSignOut;
+  const ProfileView({super.key});
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
@@ -68,7 +65,6 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _handleLogout() async {
-    widget.onSignOut?.call();
     await _viewModel.signOut();
   }
 
@@ -168,7 +164,7 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                     decoration: BoxDecoration(
                       color: _viewModel.isLoggedIn
-                          ? AppColors.card.withValues(alpha: 0.96)
+                          ? Colors.white.withValues(alpha: 0.96)
                           : const Color(0xFFF8F6F0),
                       borderRadius: BorderRadius.circular(
                         _viewModel.isLoggedIn ? 22 : 34,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
-import 'package:clinic_go/core/routing/app_router.dart';
+import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
 class ProfileStatusMessage extends StatelessWidget {
@@ -67,7 +67,7 @@ class ProfileLoginTextField extends StatelessWidget {
           fontWeight: FontWeight.w500,
         ),
         filled: true,
-        fillColor: AppColors.card,
+        fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 18,
@@ -158,9 +158,9 @@ class ProfileContinueButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
-          foregroundColor: AppColors.card,
+          foregroundColor: Colors.white,
           disabledBackgroundColor: AppColors.primaryColor,
-          disabledForegroundColor: AppColors.card,
+          disabledForegroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32),
@@ -171,7 +171,7 @@ class ProfileContinueButton extends StatelessWidget {
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: AppColors.card,
+                  color: Colors.white,
                   strokeWidth: 2.2,
                 ),
               )
@@ -238,7 +238,7 @@ class ProfileLoginForm extends StatelessWidget {
         TextButton(
           onPressed: viewModel.isLoading
               ? null
-              : () => Navigator.of(context).pushNamed(AppRouter.register),
+              : () => SignUpSheet.show(context),
           child: const Text.rich(
             TextSpan(
               text: "Don't have an account? ",
@@ -286,7 +286,7 @@ class ProfileActionButton extends StatelessWidget {
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
-                  color: AppColors.card,
+                  color: Colors.white,
                   strokeWidth: 2,
                 ),
               )
@@ -297,9 +297,9 @@ class ProfileActionButton extends StatelessWidget {
               ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
-          foregroundColor: AppColors.card,
+          foregroundColor: Colors.white,
           disabledBackgroundColor: AppColors.primaryColor,
-          disabledForegroundColor: AppColors.card,
+          disabledForegroundColor: Colors.white,
           elevation: 7,
           shadowColor: Colors.black.withValues(alpha: 0.22),
           shape: RoundedRectangleBorder(
@@ -503,7 +503,7 @@ class ProfileLoggedInCard extends StatelessWidget {
               onPressed: viewModel.isLoading ? null : onCancelPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCFCFCF),
-                foregroundColor: AppColors.card,
+                foregroundColor: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.black.withValues(alpha: 0.18),
                 shape: RoundedRectangleBorder(
