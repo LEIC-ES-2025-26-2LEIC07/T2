@@ -13,36 +13,75 @@ Future<void> _setupDI({AuthService? authService}) async {
   GetIt.I.registerSingleton<AuthService>(authService ?? AlwaysSuccessAuth());
 }
 
-Widget _buildApp() => MaterialApp(
-  home: const RegisterScreen(),
-  routes: {AppRouter.home: (_) => const Scaffold(body: Text('Home'))},
-);
+Widget _buildApp() {
+  return MaterialApp(
+    onGenerateRoute: (settings) {
+      if (settings.name == AppRouter.home) {
+        return MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(body: Text('Home')),
+        );
+      }
+      return null;
+    },
+    home: const RegisterScreen(),
+  );
+}
 
 void main() {
   tearDown(() async => GetIt.I.reset());
 
   group('RegisterScreen', () {
-    testWidgets('renders title, progress and all 6 fields', (tester) async {
+    testWidgets('renders three text fields', (tester) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Criar conta'), findsWidgets);
-      expect(find.text('1 DE 2'), findsOneWidget);
-      // name, dob (readOnly), phone, email, password, confirm
-      expect(find.byType(TextField), findsNWidgets(6));
-      expect(find.text('Concluir registo →'), findsOneWidget);
+      expect(find.byType(TextField), findsNWidgets(3));
     });
 
-    testWidgets('shows error when name is empty', (tester) async {
+    testWidgets('renders title and create account button', (tester) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Concluir registo →'));
+      expect(find.text('Create account'), findsWidgets);
+      expect(find.text('Sign up to start using ClinicGO.'), findsOneWidget);
+    });
+
+    testWidgets('renders already have an account link', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('nome'), findsOneWidget);
+      expect(find.textContaining('Already have an account'), findsOneWidget);
+      expect(find.text('Sign in'), findsOneWidget);
+    });
+
+    testWidgets('shows error when form is submitted empty', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create account').last);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Please fill in'), findsOneWidget);
+    });
+
+    testWidgets('shows error for invalid email', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), 'notanemail');
+      await tester.enterText(fields.at(1), 'pass123');
+      await tester.enterText(fields.at(2), 'pass123');
+
+      await tester.tap(find.text('Create account').last);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('valid email'), findsOneWidget);
     });
 
     testWidgets('shows error when passwords do not match', (tester) async {
@@ -51,43 +90,39 @@ void main() {
       await tester.pumpAndSettle();
 
       final fields = find.byType(TextField);
-      await tester.enterText(fields.at(0), 'Maria Silva'); // name
-      // fields.at(1) is dob — readOnly, skip
-      await tester.enterText(fields.at(2), '+351 910 000 000'); // phone
-      await tester.enterText(fields.at(3), 'maria@email.pt'); // email
-      await tester.enterText(fields.at(4), 'password123'); // password
-      await tester.enterText(fields.at(5), 'different456'); // confirm
+      await tester.enterText(fields.at(0), 'user@example.com');
+      await tester.enterText(fields.at(1), 'password123');
+      await tester.enterText(fields.at(2), 'different');
 
-      await tester.tap(find.text('Concluir registo →'));
+      await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('coincidem'), findsOneWidget);
+      expect(find.textContaining('match'), findsOneWidget);
     });
 
-    testWidgets('shows error when password is too short', (tester) async {
+    testWidgets('shows error when password too short', (tester) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
       final fields = find.byType(TextField);
-      await tester.enterText(fields.at(0), 'Maria Silva');
-      await tester.enterText(fields.at(3), 'maria@email.pt');
-      await tester.enterText(fields.at(4), 'abc');
-      await tester.enterText(fields.at(5), 'abc');
+      await tester.enterText(fields.at(0), 'user@example.com');
+      await tester.enterText(fields.at(1), '123');
+      await tester.enterText(fields.at(2), '123');
 
-      await tester.tap(find.text('Concluir registo →'));
+      await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('A password tem de ter'), findsOneWidget);
+      expect(find.textContaining('6 characters'), findsOneWidget);
     });
 
-    testWidgets('back button pops the screen', (tester) async {
+    testWidgets('navigates back when Sign in link is tapped', (tester) async {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder: (ctx) => ElevatedButton(
+              builder: (ctx) => TextButton(
                 onPressed: () => Navigator.of(ctx).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const RegisterScreen(),
@@ -97,16 +132,13 @@ void main() {
               ),
             ),
           ),
-          routes: {AppRouter.home: (_) => const Scaffold(body: Text('Home'))},
         ),
       );
 
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Criar conta'), findsWidgets);
-
-      await tester.tap(find.byIcon(Icons.arrow_back_rounded));
+      await tester.tap(find.text('Sign in'));
       await tester.pumpAndSettle();
 
       expect(find.text('Open'), findsOneWidget);

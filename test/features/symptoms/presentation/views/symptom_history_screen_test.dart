@@ -56,8 +56,7 @@ void main() {
       await tester.pumpWidget(_buildScreen(() => Future.value([])));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sem registos ainda'), findsOneWidget);
-      expect(find.text('Registar agora'), findsOneWidget);
+      expect(find.textContaining('No symptom logs yet'), findsOneWidget);
     });
   });
 

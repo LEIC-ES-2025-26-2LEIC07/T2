@@ -93,7 +93,7 @@ class _MedicationCardState extends State<MedicationCard> {
                   child: _expanded
                       ? Container(
                           key: const ValueKey(true),
-                          color: AppColors.card,
+                          color: Colors.white,
                           width: constraints.maxWidth,
                           child: _expandedView(med),
                         )
@@ -113,7 +113,7 @@ class _MedicationCardState extends State<MedicationCard> {
 
   Widget _collapsedView(Medication med) {
     final timeColor = med.color.computeLuminance() < 0.4
-        ? AppColors.card
+        ? Colors.white
         : AppColors.ink;
 
     return IntrinsicHeight(
@@ -135,7 +135,7 @@ class _MedicationCardState extends State<MedicationCard> {
           ),
           Expanded(
             child: Container(
-              color: AppColors.card,
+              color: Colors.white,
               padding: const EdgeInsets.fromLTRB(14, 13, 8, 13),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +179,7 @@ class _MedicationCardState extends State<MedicationCard> {
             ),
           ),
           Container(
-            color: AppColors.card,
+            color: Colors.white,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Center(
               child: _CardButton(
@@ -433,7 +433,7 @@ class _DeleteMedicationDialog extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.delete_outline,
-                    color: AppColors.card,
+                    color: Colors.white,
                     size: 22,
                   ),
                 ),
@@ -505,12 +505,12 @@ class _CardButton extends StatelessWidget {
     final enabled = onTap != null;
     final backgroundColor = switch (variant) {
       _CardButtonVariant.primary => AppColors.lemon,
-      _CardButtonVariant.secondary => AppColors.card,
+      _CardButtonVariant.secondary => Colors.white,
       _CardButtonVariant.danger => const Color(0xFFE53935),
     };
     final foregroundColor = switch (variant) {
       _CardButtonVariant.secondary => AppColors.ink,
-      _ => AppColors.card,
+      _ => Colors.white,
     };
 
     return GestureDetector(

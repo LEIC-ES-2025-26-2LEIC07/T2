@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
-import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/app_background.dart';
 import 'package:clinic_go/core/widgets/app_loading_button.dart';
+import 'package:clinic_go/core/widgets/auth_error_box.dart';
 import 'package:clinic_go/core/widgets/auth_text_field.dart';
-import 'package:clinic_go/core/widgets/status_banner.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/auth/presentation/view_models/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, this.successMessage});
-
-  final String? successMessage;
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -75,11 +72,76 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const _LoginHero(),
+                      const Text(
+                        'Welcome back',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Sign in to your ClinicGO account.',
+                        style: TextStyle(color: Color(0xFF8F8F8F)),
+                      ),
                       const SizedBox(height: 32),
-                      _formCard(),
+                      AuthTextField(
+                        controller: _emailController,
+                        hintText: 'Email',
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _passwordController,
+                        hintText: 'Password',
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _viewModel.isLoading
+                              ? null
+                              : () => _viewModel.resetPassword(
+                                  _emailController.text,
+                                ),
+                          child: const Text(
+                            'Forgot password?',
+                            style: TextStyle(color: Color(0xFF7F7F7F)),
+                          ),
+                        ),
+                      ),
+                      if (_viewModel.errorMessage != null) ...[
+                        const SizedBox(height: 4),
+                        AuthErrorBox(message: _viewModel.errorMessage!),
+                        const SizedBox(height: 12),
+                      ] else
+                        const SizedBox(height: 12),
+                      AppLoadingButton(
+                        label: 'Sign in',
+                        onPressed: _handleLogin,
+                        isLoading: _viewModel.isLoading,
+                      ),
                       const SizedBox(height: 16),
-                      _createAccountCard(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account?",
+                            style: TextStyle(color: Color(0xFF7F7F7F)),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pushNamed(AppRouter.register),
+                            child: const Text(
+                              'Create one',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },
@@ -88,190 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _formCard() {
-    final hasStatus =
-        widget.successMessage != null || _viewModel.errorMessage != null;
-
-    return Container(
-      decoration: BrutalDecor.box(),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AuthTextField(
-            controller: _emailController,
-            hintText: 'Email',
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          AuthTextField(
-            controller: _passwordController,
-            hintText: 'Password',
-            obscureText: true,
-          ),
-          const SizedBox(height: 12),
-          if (widget.successMessage != null)
-            StatusBanner(message: widget.successMessage!, isSuccess: true),
-          if (_viewModel.errorMessage != null)
-            StatusBanner(message: _viewModel.errorMessage!, isSuccess: false),
-          if (hasStatus) const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _viewModel.isLoading
-                  ? null
-                  : () => _viewModel.resetPassword(_emailController.text),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(0, 32),
-              ),
-              child: const Text(
-                'ESQUECI-ME',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.muted,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          AppLoadingButton(
-            label: 'Entrar',
-            onPressed: _handleLogin,
-            isLoading: _viewModel.isLoading,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _createAccountCard() {
-    return Container(
-      decoration: BrutalDecor.box(),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.lemon, width: 2),
-            ),
-            child: const Icon(
-              Icons.person_outline_rounded,
-              color: AppColors.lemon,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'NOVO POR AQUI?',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.muted,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Cria a tua conta',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.ink,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed(AppRouter.register),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-              decoration: BoxDecoration(
-                color: AppColors.ink,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: BrutalDecor.shadowSm,
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'CRIAR',
-                    style: TextStyle(
-                      color: AppColors.card,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_forward, color: AppColors.card, size: 14),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LoginHero extends StatelessWidget {
-  const _LoginHero();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: AppColors.lemon,
-            border: BrutalDecor.border,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: BrutalDecor.shadow,
-          ),
-          child: const Icon(
-            Icons.medication_rounded,
-            color: AppColors.card,
-            size: 36,
-          ),
-        ),
-        const SizedBox(height: 14),
-        const Text(
-          'ClinicGO',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: AppColors.lemon,
-            letterSpacing: -0.3,
-          ),
-        ),
-        const SizedBox(height: 4),
-        const Text(
-          'BEM-VINDA DE VOLTA',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: AppColors.muted,
-            letterSpacing: 1.4,
-          ),
-        ),
-      ],
     );
   }
 }
