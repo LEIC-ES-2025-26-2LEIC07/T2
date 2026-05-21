@@ -2,10 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
-/// ViewModel for the account-creation form.
-///
-/// Mirrors the shape of [LoginViewModel] so the sign-up sheet can follow
-/// exactly the same patterns and be tested without Supabase.
 class SignUpViewModel extends ChangeNotifier {
   SignUpViewModel({required AuthService authService}) : _auth = authService;
 
@@ -17,40 +13,42 @@ class SignUpViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-
-  /// True after a successful sign-up. The view should close the sheet and
-  /// show a confirmation message when this flips to true.
   bool get success => _success;
-
-  // ---------------------------------------------------------------------------
-  // Actions
-  // ---------------------------------------------------------------------------
 
   Future<void> signUp({
     required String email,
     required String password,
     required String confirmPassword,
+    String? fullName,
+    String phone = '',
+    String birthDate = '',
   }) async {
     final cleanEmail = email.trim();
     final cleanPassword = password.trim();
+    final cleanName = fullName?.trim() ?? '';
+
+    if (fullName != null && cleanName.isEmpty) {
+      _setError('Preenche o teu nome completo.');
+      return;
+    }
 
     if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
-      _setError('Please fill in email and password.');
+      _setError('Preenche o email e a password.');
       return;
     }
 
     if (!cleanEmail.contains('@')) {
-      _setError('Enter a valid email.');
+      _setError('Introduz um email válido.');
       return;
     }
 
-    if (cleanPassword.length < 6) {
-      _setError('Password must be at least 6 characters long.');
+    if (cleanPassword.length < 8) {
+      _setError('A password tem de ter pelo menos 8 caracteres.');
       return;
     }
 
     if (cleanPassword != confirmPassword.trim()) {
-      _setError('Passwords do not match.');
+      _setError('As passwords não coincidem.');
       return;
     }
 
@@ -59,12 +57,22 @@ class SignUpViewModel extends ChangeNotifier {
 
     try {
       await _auth.signUp(email: cleanEmail, password: cleanPassword);
+
+      final metadata = <String, dynamic>{
+        'full_name': cleanName,
+        if (phone.trim().isNotEmpty) 'phone': phone.trim(),
+        if (birthDate.isNotEmpty) 'birth_date': birthDate,
+      };
+      try {
+        await _auth.updateProfile(email: cleanEmail, metadata: metadata);
+      } catch (_) {}
+
       _success = true;
       notifyListeners();
     } on AuthException catch (e) {
       _setError(_friendlyAuthError(e.message));
     } catch (_) {
-      _setError('Could not create account. Please try again.');
+      _setError('Não foi possível criar a conta. Tenta novamente.');
     } finally {
       _setLoading(false);
     }
@@ -72,19 +80,15 @@ class SignUpViewModel extends ChangeNotifier {
 
   void clearError() => _clearError();
 
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
   String _friendlyAuthError(String supabaseMessage) {
     final msg = supabaseMessage.toLowerCase();
     if (msg.contains('already registered') || msg.contains('already in use')) {
-      return 'This email is already registered.';
+      return 'Este email já está registado.';
     }
     if (msg.contains('password')) {
-      return 'Password does not meet minimum requirements.';
+      return 'A password não cumpre os requisitos mínimos.';
     }
-    return 'Could not create account. Please try again.';
+    return 'Não foi possível criar a conta. Tenta novamente.';
   }
 
   void _setError(String message) {

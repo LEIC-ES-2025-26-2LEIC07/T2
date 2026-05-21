@@ -169,27 +169,25 @@ void main() {
       expect(find.text('ClinicGO'), findsOneWidget);
     });
 
-    testWidgets('Profile tab shows login form when not logged in', (
+    testWidgets('redirects to login screen when not logged in', (tester) async {
+      await pumpLoggedOutApp(tester);
+      expect(find.text('ESQUECI-ME'), findsOneWidget);
+    });
+
+    testWidgets('login screen shows CRIAR card when not logged in', (
       tester,
     ) async {
       await pumpLoggedOutApp(tester);
-      expect(find.text('Forgot password?'), findsOneWidget);
+      expect(find.text('NOVO POR AQUI?'), findsOneWidget);
     });
 
-    testWidgets('Profile tab shows "Create account" link', (tester) async {
-      await pumpLoggedOutApp(tester);
-      expect(find.textContaining("Don't have an account"), findsOneWidget);
-    });
-
-    testWidgets('tapping "Create account" link opens RegisterScreen', (
-      tester,
-    ) async {
+    testWidgets('tapping CRIAR navigates to register screen', (tester) async {
       await pumpLoggedOutApp(tester);
 
-      await tester.tap(find.text('Create one'));
+      await tester.tap(find.text('CRIAR'));
       await tester.pumpAndSettle();
-      expect(find.text('Create account'), findsWidgets);
-      expect(find.text('Sign up to start using ClinicGO.'), findsOneWidget);
+      expect(find.text('Criar conta'), findsWidgets);
+      expect(find.text('1 DE 2'), findsOneWidget);
     });
   });
 }
