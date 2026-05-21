@@ -56,7 +56,8 @@ void main() {
       await tester.pumpWidget(_buildScreen(() => Future.value([])));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('No symptom logs yet'), findsOneWidget);
+      expect(find.text('Sem registos ainda'), findsOneWidget);
+      expect(find.text('Registar agora'), findsOneWidget);
     });
   });
 
@@ -70,8 +71,8 @@ void main() {
       await tester.pumpWidget(_buildScreen(() => Future.value(logs)));
       await tester.pumpAndSettle();
 
-      expect(find.text('Headache'), findsOneWidget);
-      expect(find.text('Nausea'), findsOneWidget);
+      expect(find.text('Dor de cabeça'), findsOneWidget);
+      expect(find.text('Náusea'), findsOneWidget);
     });
 
     testWidgets('shows severity badge for each log', (tester) async {
@@ -80,7 +81,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Severity 7'), findsOneWidget);
+      expect(find.text('Gravidade 7'), findsOneWidget);
     });
 
     testWidgets('shows notes when present', (tester) async {
@@ -100,7 +101,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Headache'), findsOneWidget);
+      expect(find.text('Dor de cabeça'), findsOneWidget);
     });
   });
 
@@ -113,7 +114,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Unable to load'), findsOneWidget);
+      expect(find.textContaining('Não foi possível carregar'), findsOneWidget);
     });
   });
 }
