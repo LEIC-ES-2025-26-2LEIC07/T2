@@ -17,6 +17,12 @@ class _MemoryNotificationGateway implements LocalNotificationGateway {
 
   @override
   Future<void> schedule(NotificationRequest request) async {}
+
+  @override
+  Future<bool> hasPermissions() async => true;
+
+  @override
+  Future<bool> requestPermissions() async => true;
 }
 
 class _NoOpDoseLogRepository implements DoseLogRepository {
