@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
@@ -55,7 +56,7 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Medicamento atualizado com sucesso!'),
-          backgroundColor: Color(0xFF43A047),
+          backgroundColor: AppColors.successGreen,
         ),
       );
       Navigator.of(context).pop(true);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 class AuthErrorBox extends StatelessWidget {
   const AuthErrorBox({super.key, required this.message});
@@ -10,14 +11,14 @@ class AuthErrorBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFECEC),
+        color: AppColors.errorBgLight,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         message,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          color: Color(0xFFC62828),
+          color: AppColors.errorTextDark,
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -1,48 +1,67 @@
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
-import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
+import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
-import 'package:clinic_go/features/medication/models/medication_reminder.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
-import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
+import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
+import 'package:clinic_go/main.dart' as app;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get_it/get_it.dart';
-import 'package:clinic_go/main.dart' as app;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../test/helpers/medication_mocks.dart';
 
 class MockMedicationRepository extends Mock implements MedicationRepository {}
 
+class MockAuthService extends Mock implements AuthService {}
+
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
-class MockAuthService extends Mock implements AuthService {}
+final _testMed = Medication(
+  id: 'med-1',
+  userId: 'user-123',
+  name: 'Ibuprofeno',
+  dosageAmount: 400,
+  dosageUnit: 'mg',
+  color: Colors.blue,
+  createdAt: DateTime(2025),
+);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Missed Medication Journey Integration Test', () {
+  setUpAll(() {
+    registerFallbackValue(
+      const EditMedicationPayload(
+        medicationId: '',
+        name: '',
+        dosageAmount: 0,
+        dosageUnit: 'mg',
+        frequency: 'Daily',
+        color: Colors.blue,
+        daysOfWeek: [],
+        remindersToUpsert: [],
+        remindersToDelete: [],
+      ),
+    );
+  });
+
+  group('Edit & Delete Medication Journey', () {
     late MockMedicationRepository mockMedRepo;
-    late InMemoryDoseLogRepository mockLogRepo;
 
     setUp(() async {
       mockMedRepo = MockMedicationRepository();
-      mockLogRepo = InMemoryDoseLogRepository();
 
-      final getIt = GetIt.instance;
-      await getIt.reset();
-      getIt.allowReassignment = true;
+      SharedPreferences.setMockInitialValues({});
 
-      // Mock AppLinks
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockStreamHandler(
             const EventChannel('com.llfbandit.app_links/events'),
@@ -54,7 +73,9 @@ void main() {
             _MockStreamHandler(),
           );
 
-      SharedPreferences.setMockInitialValues({});
+      final getIt = GetIt.instance;
+      await getIt.reset();
+      getIt.allowReassignment = true;
 
       try {
         await Supabase.initialize(
@@ -62,47 +83,7 @@ void main() {
           anonKey: 'test-anon-key',
         );
       } catch (_) {}
-    });
 
-    testWidgets('Full Journey: Dashboard -> Log Overdue Dose', (tester) async {
-      final now = DateTime.now();
-      // Setup an overdue dose within the 2-hour window (e.g., 45 mins ago)
-      final overdueTime = now.subtract(const Duration(minutes: 45));
-      final overdueStr = DateFormat('HH:mm:ss').format(overdueTime);
-
-      final med = Medication(
-        id: 'med-123',
-        userId: 'user-123',
-        name: 'Lisinopril',
-        dosageAmount: 10,
-        dosageUnit: 'mg',
-        color: Colors.blue,
-        createdAt: now.subtract(const Duration(days: 1)),
-      );
-      final reminder = MedicationReminder(
-        id: 'rem-1',
-        medicationId: 'med-123',
-        reminderTime: overdueStr,
-        daysOfWeek: const [
-          'monday',
-          'tuesday',
-          'wednesday',
-          'thursday',
-          'friday',
-          'saturday',
-          'sunday',
-        ],
-      );
-
-      when(() => mockMedRepo.fetchMedications()).thenAnswer((_) async => [med]);
-      when(
-        () => mockMedRepo.fetchAllReminders(),
-      ).thenAnswer((_) async => [reminder]);
-
-      final getIt = GetIt.instance;
-      final navigatorKey = GlobalKey<NavigatorState>();
-
-      // Register mocks BEFORE building the app
       final mockAuth = MockAuthService();
       when(
         () => mockAuth.authStateChanges,
@@ -111,10 +92,22 @@ void main() {
       when(() => mockAuth.currentUserEmail).thenReturn('user@example.com');
       when(() => mockAuth.currentUserMetadata).thenReturn(const {});
 
+      when(
+        () => mockMedRepo.fetchMedications(),
+      ).thenAnswer((_) async => [_testMed]);
+      when(() => mockMedRepo.fetchAllReminders()).thenAnswer((_) async => []);
+      when(
+        () => mockMedRepo.fetchRemindersForMedication('med-1'),
+      ).thenAnswer((_) async => []);
+      when(() => mockMedRepo.editMedication(any())).thenAnswer((_) async {});
+      when(
+        () => mockMedRepo.deleteMedication('med-1'),
+      ).thenAnswer((_) async {});
+
       getIt.registerSingleton<AuthService>(mockAuth);
       getIt.registerSingleton<SupabaseClient>(MockSupabaseClient());
       getIt.registerSingleton<MedicationRepository>(mockMedRepo);
-      getIt.registerSingleton<DoseLogRepository>(mockLogRepo);
+      getIt.registerSingleton<DoseLogRepository>(InMemoryDoseLogRepository());
       getIt.registerLazySingleton<PendingNotificationStore>(
         () => const PendingNotificationStore(),
       );
@@ -132,26 +125,58 @@ void main() {
         ),
       );
       getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
+    });
 
-      await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-      // Give it time to initialize and run loadNextDose
+    Future<void> goToMedsTab(WidgetTester tester) async {
+      await tester.pumpWidget(
+        app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
+      );
       await tester.pumpAndSettle(const Duration(seconds: 1));
+      await tester.tap(find.byIcon(Icons.medication_outlined));
+      await tester.pumpAndSettle();
+    }
 
-      // Navigate to Home tab (index 2)
-      await tester.tap(find.byIcon(Icons.home_outlined));
+    testWidgets('expand card, edit medication, and save', (tester) async {
+      await goToMedsTab(tester);
+
+      // Expand the medication card
+      await tester.tap(find.text('INFO'));
       await tester.pumpAndSettle();
 
-      // Verify overdue dose card is visible
-      expect(find.text('PRÓXIMA DOSE'), findsOneWidget);
-      expect(find.textContaining('EM ATRASO'), findsWidgets);
-      expect(find.text('Lisinopril 10mg'), findsWidgets);
+      // Open EditMedicationScreen
+      await tester.tap(find.text('EDITAR'));
+      await tester.pumpAndSettle();
 
-      // Tap 'Tomar agora' to log the overdue dose inline
-      await tester.tap(find.text('Tomar agora'));
+      expect(find.text('Editar medicação'), findsOneWidget);
+
+      // Save without changes — just confirm the form submits
+      await tester.tap(find.text('Guardar alterações'));
       await tester.pumpAndSettle(const Duration(seconds: 1));
 
-      // The overdue badge is gone after logging
-      expect(find.textContaining('EM ATRASO ·'), findsNothing);
+      verify(() => mockMedRepo.editMedication(any())).called(1);
+    });
+
+    testWidgets('expand card, confirm delete, and see success snackbar', (
+      tester,
+    ) async {
+      await goToMedsTab(tester);
+
+      // Expand the medication card
+      await tester.tap(find.text('INFO'));
+      await tester.pumpAndSettle();
+
+      // Tap ELIMINAR to open confirmation dialog
+      await tester.tap(find.text('ELIMINAR'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Eliminar medicamento?'), findsOneWidget);
+
+      // Confirm deletion — tap the last 'ELIMINAR' (dialog button, not card button)
+      await tester.tap(find.text('ELIMINAR').last);
+      await tester.pumpAndSettle();
+
+      verify(() => mockMedRepo.deleteMedication('med-1')).called(1);
+      expect(find.textContaining('eliminado com sucesso'), findsOneWidget);
     });
   });
 }

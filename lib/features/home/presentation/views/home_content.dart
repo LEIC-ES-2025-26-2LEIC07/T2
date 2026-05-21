@@ -159,43 +159,14 @@ class _HomeContentState extends State<HomeContent> {
                 ],
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  const Text(
-                    'Plano de hoje',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await Navigator.of(context).push<bool>(
-                        MaterialPageRoute(
-                          builder: (_) => const DailyDosesScreen(),
-                        ),
-                      );
-                      await _onDoseLoggingResult(result);
-                    },
-                    child: const Text(
-                      'Ver tudo',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: AppColors.ink,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 2,
-                        decorationColor: AppColors.ink,
-                      ),
-                    ),
-                  ),
-                ],
+              const Text(
+                'Plano de hoje',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                  color: AppColors.ink,
+                ),
               ),
               const SizedBox(height: 10),
               if (_viewModel.todayDoses.isEmpty)

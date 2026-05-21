@@ -59,7 +59,7 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
         if (shouldDiscard && context.mounted) Navigator.of(context).pop();
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F6F3),
+        backgroundColor: AppColors.surfaceWarm,
         appBar: AppBar(
           title: const Text('Log Symptom'),
           backgroundColor: Colors.transparent,

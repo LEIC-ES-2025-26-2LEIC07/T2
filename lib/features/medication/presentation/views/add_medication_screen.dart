@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
@@ -45,7 +46,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Medication saved successfully!'),
-          backgroundColor: Color(0xFF43A047),
+          backgroundColor: AppColors.successGreen,
         ),
       );
       Navigator.of(context).pop(true);
