@@ -17,6 +17,12 @@ class _MemoryNotificationGateway implements LocalNotificationGateway {
 
   @override
   Future<void> schedule(NotificationRequest request) async {}
+
+  @override
+  Future<bool> hasPermissions() async => true;
+
+  @override
+  Future<bool> requestPermissions() async => true;
 }
 
 class _NoOpDoseLogRepository implements DoseLogRepository {
@@ -108,7 +114,7 @@ void main() {
       await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Please fill in'), findsOneWidget);
+      expect(find.textContaining('Preenche'), findsOneWidget);
     });
 
     testWidgets('shows error when passwords do not match', (tester) async {
@@ -133,13 +139,13 @@ void main() {
 
       final fields = find.byType(TextField);
       await tester.enterText(fields.at(0), 'a@b.com');
-      await tester.enterText(fields.at(1), 'abc123');
-      await tester.enterText(fields.at(2), 'different');
+      await tester.enterText(fields.at(1), 'abc12345');
+      await tester.enterText(fields.at(2), 'different9');
 
       await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('match'), findsOneWidget);
+      expect(find.textContaining('coincidem'), findsOneWidget);
     });
 
     testWidgets('closes sheet when "Already have an account" is tapped', (

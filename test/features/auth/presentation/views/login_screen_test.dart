@@ -50,33 +50,31 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Welcome back'), findsOneWidget);
-      expect(find.text('Sign in'), findsOneWidget);
+      expect(find.text('BEM-VINDA DE VOLTA'), findsOneWidget);
+      expect(find.text('Entrar'), findsOneWidget);
     });
 
-    testWidgets('renders forgot password and create account links', (
+    testWidgets('renders ESQUECI-ME link and CRIAR button', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('ESQUECI-ME'), findsOneWidget);
+      expect(find.text('NOVO POR AQUI?'), findsOneWidget);
+      expect(find.text('CRIAR'), findsOneWidget);
+    });
+
+    testWidgets('shows error when Entrar tapped with empty fields', (
       tester,
     ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Forgot password?'), findsOneWidget);
-      expect(find.textContaining("Don't have an account"), findsOneWidget);
-      expect(find.text('Create one'), findsOneWidget);
-    });
-
-    testWidgets('shows error when sign in tapped with empty fields', (
-      tester,
-    ) async {
-      await _setupDI();
-      await tester.pumpWidget(_buildApp());
+      await tester.tap(find.text('Entrar'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Sign in'));
-      await tester.pumpAndSettle();
-
-      expect(find.textContaining('Please fill in'), findsOneWidget);
+      expect(find.textContaining('Preenche'), findsOneWidget);
     });
 
     testWidgets('shows error for invalid email format', (tester) async {
@@ -92,10 +90,10 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'secret',
       );
-      await tester.tap(find.text('Sign in'));
+      await tester.tap(find.text('Entrar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('valid email'), findsOneWidget);
+      expect(find.textContaining('email válido'), findsOneWidget);
     });
 
     testWidgets('shows error on failed sign in', (tester) async {
@@ -113,10 +111,10 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'wrong',
       );
-      await tester.tap(find.text('Sign in'));
+      await tester.tap(find.text('Entrar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Could not sign in'), findsOneWidget);
+      expect(find.textContaining('possível'), findsOneWidget);
     });
 
     testWidgets('navigates to home after successful sign in', (tester) async {
@@ -132,7 +130,7 @@ void main() {
         find.widgetWithText(TextField, 'Password'),
         'password',
       );
-      await tester.tap(find.text('Sign in'));
+      await tester.tap(find.text('Entrar'));
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);

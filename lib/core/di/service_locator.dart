@@ -83,6 +83,9 @@ Future<NotificationPayload?> setupServiceLocator(
       notificationGateway: getIt<LocalNotificationGateway>(),
       doseLogRepository: getIt<DoseLogRepository>(),
       pendingNotificationStore: getIt<PendingNotificationStore>(),
+      medicationRepository: getIt<MedicationRepository>(),
+      schedulingService: getIt<DoseSchedulingService>(),
+      authService: getIt<AuthService>(),
     ),
   );
 

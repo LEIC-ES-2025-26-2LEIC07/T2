@@ -18,6 +18,10 @@ abstract class LocalNotificationGateway {
   Future<void> schedule(NotificationRequest request);
 
   Future<void> cancel(int notificationId);
+
+  Future<bool> requestPermissions();
+
+  Future<bool> hasPermissions();
 }
 
 class NoopLocalNotificationGateway implements LocalNotificationGateway {
@@ -28,4 +32,10 @@ class NoopLocalNotificationGateway implements LocalNotificationGateway {
 
   @override
   Future<void> schedule(NotificationRequest request) async {}
+
+  @override
+  Future<bool> requestPermissions() async => true;
+
+  @override
+  Future<bool> hasPermissions() async => true;
 }

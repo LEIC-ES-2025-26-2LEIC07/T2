@@ -13,7 +13,11 @@ void main() {
 
     test('sets errorMessage when email is blank', () async {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
-      await vm.signUp(email: '', password: 'abc123', confirmPassword: 'abc123');
+      await vm.signUp(
+        email: '',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
+      );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
     });
@@ -29,15 +33,15 @@ void main() {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
       await vm.signUp(
         email: 'notanemail',
-        password: 'abc123',
-        confirmPassword: 'abc123',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
       );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
     });
 
     test(
-      'sets errorMessage when password is shorter than 6 characters',
+      'sets errorMessage when password is shorter than 8 characters',
       () async {
         final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
         await vm.signUp(
@@ -54,10 +58,10 @@ void main() {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
       await vm.signUp(
         email: 'a@b.com',
-        password: 'abc123',
-        confirmPassword: 'xyz999',
+        password: 'abc12345',
+        confirmPassword: 'xyz99999',
       );
-      expect(vm.errorMessage, contains('match'));
+      expect(vm.errorMessage, contains('coincidem'));
       expect(vm.success, isFalse);
     });
 
@@ -71,10 +75,10 @@ void main() {
       );
       await vm.signUp(
         email: 'a@b.com',
-        password: 'abc123',
-        confirmPassword: 'abc123',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
       );
-      expect(vm.errorMessage, contains('registered'));
+      expect(vm.errorMessage, contains('registado'));
       expect(vm.success, isFalse);
     });
 
@@ -84,8 +88,8 @@ void main() {
       );
       await vm.signUp(
         email: 'a@b.com',
-        password: 'abc123',
-        confirmPassword: 'abc123',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
       );
       expect(vm.errorMessage, isNotNull);
       expect(vm.success, isFalse);
@@ -99,8 +103,8 @@ void main() {
         final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
         await vm.signUp(
           email: 'a@b.com',
-          password: 'abc123',
-          confirmPassword: 'abc123',
+          password: 'abc12345',
+          confirmPassword: 'abc12345',
         );
         expect(vm.success, isTrue);
         expect(vm.errorMessage, isNull);
@@ -111,15 +115,19 @@ void main() {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
       await vm.signUp(
         email: 'a@b.com',
-        password: 'abc123',
-        confirmPassword: 'abc123',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
       );
       expect(vm.isLoading, isFalse);
     });
 
     test('clearError removes the displayed error', () async {
       final vm = SignUpViewModel(authService: AlwaysSuccessAuth());
-      await vm.signUp(email: '', password: 'abc123', confirmPassword: 'abc123');
+      await vm.signUp(
+        email: '',
+        password: 'abc12345',
+        confirmPassword: 'abc12345',
+      );
       expect(vm.errorMessage, isNotNull);
 
       vm.clearError();

@@ -57,19 +57,18 @@ class _ClinicGOState extends State<ClinicGO> {
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      child: NotificationLifecycleWrapper(
-        child: MaterialApp(
-          title: 'ClinicGO',
-          debugShowCheckedModeBanner: false,
-          navigatorKey: widget.navigatorKey,
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.primaryColor,
-            ),
-          ),
-          onGenerateRoute: AppRouter.onGenerateRoute,
-          home: const SplashScreen(),
+      child: MaterialApp(
+        title: 'ClinicGO',
+        debugShowCheckedModeBanner: false,
+        navigatorKey: widget.navigatorKey,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+        ),
+        onGenerateRoute: AppRouter.onGenerateRoute,
+        home: const SplashScreen(),
+        builder: (context, child) => NotificationLifecycleWrapper(
+          child: child ?? const SizedBox.shrink(),
         ),
       ),
     );

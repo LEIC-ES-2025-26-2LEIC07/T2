@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 import '../data/dose_log_repository.dart';
+import '../data/medication_repository.dart';
 import '../models/notification_payload.dart';
 import '../models/pending_missed_dose_notification.dart';
 import '../models/scheduled_dose.dart';
+import 'dose_scheduling_service.dart';
+import '../../auth/domain/auth_service.dart';
 import 'local_notification_gateway.dart';
 import 'pending_notification_store.dart';
 
@@ -12,14 +15,23 @@ class MissedDoseNotificationController {
     required LocalNotificationGateway notificationGateway,
     required DoseLogRepository doseLogRepository,
     required PendingNotificationStore pendingNotificationStore,
+    MedicationRepository? medicationRepository,
+    DoseSchedulingService? schedulingService,
+    AuthService? authService,
     this.gracePeriod = const Duration(minutes: 30),
   }) : _notificationGateway = notificationGateway,
        _doseLogRepository = doseLogRepository,
-       _pendingNotificationStore = pendingNotificationStore;
+       _pendingNotificationStore = pendingNotificationStore,
+       _medicationRepository = medicationRepository,
+       _schedulingService = schedulingService,
+       _authService = authService;
 
   final LocalNotificationGateway _notificationGateway;
   final DoseLogRepository _doseLogRepository;
   final PendingNotificationStore _pendingNotificationStore;
+  final MedicationRepository? _medicationRepository;
+  final DoseSchedulingService? _schedulingService;
+  final AuthService? _authService;
   final Duration gracePeriod;
 
   Future<void> scheduleDoseReminder(ScheduledDose dose) async {
@@ -64,6 +76,43 @@ class MissedDoseNotificationController {
         scheduledTime: missedScheduledTime,
       ),
     );
+  }
+
+  Future<void> refreshScheduledMedicationReminders({
+    Duration horizon = const Duration(days: 14),
+  }) async {
+    final authService = _authService;
+    final medicationRepository = _medicationRepository;
+    final schedulingService = _schedulingService;
+
+    if (authService == null ||
+        medicationRepository == null ||
+        schedulingService == null ||
+        !authService.isLoggedIn) {
+      return;
+    }
+
+    final medications = await medicationRepository.fetchMedications();
+    final upcomingDoses = <ScheduledDose>[];
+
+    for (final medication in medications) {
+      final reminders = medication.reminders;
+      if (!medication.isActive || reminders == null) {
+        continue;
+      }
+
+      upcomingDoses.addAll(
+        schedulingService.calculateUpcomingDoses(
+          medication,
+          reminders,
+          duration: horizon,
+        ),
+      );
+    }
+
+    for (final dose in upcomingDoses) {
+      await scheduleDoseReminder(dose);
+    }
   }
 
   Future<void> logDose({

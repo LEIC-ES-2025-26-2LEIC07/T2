@@ -20,6 +20,12 @@ class MemoryNotificationGateway implements LocalNotificationGateway {
   Future<void> schedule(NotificationRequest request) async {
     scheduledRequests.add(request);
   }
+
+  @override
+  Future<bool> requestPermissions() async => true;
+
+  @override
+  Future<bool> hasPermissions() async => true;
 }
 
 class InMemoryDoseLogRepository implements DoseLogRepository {

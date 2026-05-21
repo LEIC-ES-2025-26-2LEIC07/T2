@@ -10,10 +10,12 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
   FlutterLocalNotificationGateway._(
     this._plugin, {
     required this.initialPayload,
-  });
+    required bool permissionsGranted,
+  }) : _permissionsGranted = permissionsGranted;
 
   final FlutterLocalNotificationsPlugin _plugin;
   final NotificationPayload? initialPayload;
+  bool _permissionsGranted;
 
   static bool _timeZonesInitialized = false;
 
@@ -39,22 +41,7 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
       },
     );
 
-    final androidPlugin = plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
-    await androidPlugin?.requestNotificationsPermission();
-    await androidPlugin?.requestExactAlarmsPermission();
-    await plugin
-        .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin
-        >()
-        ?.requestPermissions(alert: true, badge: true, sound: true);
-    await plugin
-        .resolvePlatformSpecificImplementation<
-          MacOSFlutterLocalNotificationsPlugin
-        >()
-        ?.requestPermissions(alert: true, badge: true, sound: true);
+    final permissionsGranted = await _requestPermissions(plugin);
 
     final launchDetails = await plugin.getNotificationAppLaunchDetails();
     final launchPayload = launchDetails?.didNotificationLaunchApp == true
@@ -63,10 +50,50 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
 
     return FlutterLocalNotificationGateway._(
       plugin,
+      permissionsGranted: permissionsGranted,
       initialPayload: launchPayload == null || launchPayload.isEmpty
           ? null
           : NotificationPayload.decode(launchPayload),
     );
+  }
+
+  @override
+  Future<bool> requestPermissions() async {
+    _permissionsGranted = await _requestPermissions(_plugin);
+    return _permissionsGranted;
+  }
+
+  @override
+  Future<bool> hasPermissions() async => _permissionsGranted;
+
+  static Future<bool> _requestPermissions(
+    FlutterLocalNotificationsPlugin plugin,
+  ) async {
+    final androidPlugin = plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final androidGranted =
+        await androidPlugin?.requestNotificationsPermission() ?? true;
+    await androidPlugin?.requestExactAlarmsPermission();
+
+    final iosGranted =
+        await plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >()
+            ?.requestPermissions(alert: true, badge: true, sound: true) ??
+        true;
+
+    final macGranted =
+        await plugin
+            .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin
+            >()
+            ?.requestPermissions(alert: true, badge: true, sound: true) ??
+        true;
+
+    return androidGranted && iosGranted && macGranted;
   }
 
   @override
