@@ -9,7 +9,10 @@ import 'package:clinic_go/features/medication/services/dose_scheduling_service.d
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
-import 'package:clinic_go/features/home/presentation/widgets/home_widgets.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_header_bar.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_next_dose_card.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_quick_action_box.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_today_plan.dart';
 
 class HomeContent extends StatefulWidget {
   const HomeContent({
