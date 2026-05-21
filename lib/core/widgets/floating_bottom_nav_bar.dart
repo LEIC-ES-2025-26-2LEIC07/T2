@@ -30,7 +30,7 @@ class FloatingBottomNavBar extends StatelessWidget {
             _NavItem(
               index: 0,
               currentIndex: currentIndex,
-              label: 'PROFILE',
+              label: 'PERFIL',
               icon: _ProfileIcon(),
               onTap: onTap,
             ),
@@ -44,21 +44,21 @@ class FloatingBottomNavBar extends StatelessWidget {
             _NavItem(
               index: 2,
               currentIndex: currentIndex,
-              label: 'HOME',
+              label: 'INÍCIO',
               icon: _HomeIcon(),
               onTap: onTap,
             ),
             _NavItem(
               index: 3,
               currentIndex: currentIndex,
-              label: 'PLAN',
+              label: 'PLANO',
               icon: _CalIcon(),
               onTap: onTap,
             ),
             _NavItem(
               index: 4,
               currentIndex: currentIndex,
-              label: 'SETTINGS',
+              label: 'CONFIG',
               icon: _SettingsIcon(),
               onTap: onTap,
             ),
