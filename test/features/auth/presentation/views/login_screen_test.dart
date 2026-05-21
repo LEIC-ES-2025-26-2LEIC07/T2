@@ -138,20 +138,22 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
     });
 
-    testWidgets('ESQUECI-ME with blank email shows error message', (
+    testWidgets('Forgot password with blank email shows error message', (
       tester,
     ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('ESQUECI-ME'));
+      await tester.tap(find.text('Forgot password?'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('email para recuperar'), findsOneWidget);
+      expect(find.textContaining('email to recover'), findsOneWidget);
     });
 
-    testWidgets('ESQUECI-ME with valid email clears error', (tester) async {
+    testWidgets('Forgot password with valid email clears error', (
+      tester,
+    ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
@@ -160,19 +162,21 @@ void main() {
         find.widgetWithText(TextField, 'Email'),
         'user@example.com',
       );
-      await tester.tap(find.text('ESQUECI-ME'));
+      await tester.tap(find.text('Forgot password?'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('recuperar'), findsNothing);
-      expect(find.textContaining('possível enviar'), findsNothing);
+      expect(find.textContaining('email to recover'), findsNothing);
+      expect(find.textContaining('Could not send'), findsNothing);
     });
 
-    testWidgets('CRIAR button navigates to register screen', (tester) async {
+    testWidgets('Create one button navigates to register screen', (
+      tester,
+    ) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('CRIAR'));
+      await tester.tap(find.text('Create one'));
       await tester.pumpAndSettle();
 
       expect(find.text('Register'), findsOneWidget);

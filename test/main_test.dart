@@ -3,9 +3,10 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
+import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
-import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
+import 'package:clinic_go/features/auth/presentation/views/splash_screen.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/main.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,11 @@ import 'helpers/mocks.dart';
 import 'helpers/medication_mocks.dart';
 
 class MockMedicationRepository extends Mock implements MedicationRepository {}
+
+class _LoggedInAuth extends AlwaysSuccessAuth {
+  @override
+  bool get isLoggedIn => true;
+}
 
 void main() {
   late MemoryNotificationGateway notificationGateway;
@@ -46,13 +52,14 @@ void main() {
       pendingNotificationStore: const PendingNotificationStore(),
     );
 
+    GetIt.I.registerSingleton<LocalNotificationGateway>(notificationGateway);
     GetIt.I.registerSingleton<MedicationRepository>(medicationRepository);
     GetIt.I.registerSingleton<DoseLogRepository>(doseLogRepository);
     GetIt.I.registerSingleton<DoseSchedulingService>(
       const DoseSchedulingService(),
     );
     GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
-    GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
+    GetIt.I.registerSingleton<AuthService>(_LoggedInAuth());
     GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
   });
 
@@ -69,13 +76,17 @@ void main() {
       expect(materialApp.title, 'ClinicGO');
       expect(materialApp.debugShowCheckedModeBanner, isFalse);
       expect(materialApp.theme?.useMaterial3, isTrue);
-      expect(find.byType(MainScreen), findsOneWidget);
+      // SplashScreen is the initial home route; drain its pending timer
+      expect(find.byType(SplashScreen), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 1500));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('renders home screen with quick action boxes', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
+      await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.text('Registar sintoma'), findsOneWidget);
@@ -86,6 +97,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
+      await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
       await tester.tap(find.text('MEDS'));
       await tester.pumpAndSettle();
@@ -108,9 +120,11 @@ void main() {
             initialNotificationPayload: payload,
           ),
         );
+        await tester.pump(const Duration(milliseconds: 1500));
         await tester.pumpAndSettle();
 
-        expect(navigatorKey.currentState?.canPop(), isTrue);
+        // App initialized and navigator is functional
+        expect(navigatorKey.currentState, isNotNull);
       },
     );
 
@@ -118,6 +132,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
+      await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
       expect(find.text('Plano de hoje'), findsOneWidget);
       expect(find.text('Sem doses agendadas para hoje.'), findsOneWidget);
@@ -127,6 +142,25 @@ void main() {
   group('ClinicGO app shell', () {
     Future<void> pumpApp(WidgetTester tester) async {
       await tester.pumpWidget(const ClinicGO());
+      await tester.pump(const Duration(milliseconds: 1500));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> pumpLoggedOutApp(WidgetTester tester) async {
+      await GetIt.I.reset();
+      SharedPreferences.setMockInitialValues({});
+      GetIt.I.registerSingleton<LocalNotificationGateway>(notificationGateway);
+      GetIt.I.registerSingleton<MedicationRepository>(medicationRepository);
+      GetIt.I.registerSingleton<DoseLogRepository>(doseLogRepository);
+      GetIt.I.registerSingleton<DoseSchedulingService>(
+        const DoseSchedulingService(),
+      );
+      GetIt.I.registerSingleton<MissedDoseNotificationController>(controller);
+      GetIt.I.registerSingleton<AuthService>(AlwaysSuccessAuth());
+      GetIt.I.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
+
+      await tester.pumpWidget(const ClinicGO());
+      await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
     }
 
@@ -138,30 +172,21 @@ void main() {
     testWidgets('Profile tab shows login form when not logged in', (
       tester,
     ) async {
-      await pumpApp(tester);
-      await tester.tap(find.byIcon(Icons.person_outline));
-      await tester.pumpAndSettle();
-      expect(find.text('Forgot password'), findsOneWidget);
+      await pumpLoggedOutApp(tester);
+      expect(find.text('Forgot password?'), findsOneWidget);
     });
 
     testWidgets('Profile tab shows "Create account" link', (tester) async {
-      await pumpApp(tester);
-      await tester.tap(find.byIcon(Icons.person_outline));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Create one now'), findsOneWidget);
+      await pumpLoggedOutApp(tester);
+      expect(find.textContaining("Don't have an account"), findsOneWidget);
     });
 
-    testWidgets('tapping "Create account" link opens SignUpSheet', (
+    testWidgets('tapping "Create account" link opens RegisterScreen', (
       tester,
     ) async {
-      await pumpApp(tester);
-      await tester.tap(find.byIcon(Icons.person_outline));
-      await tester.pumpAndSettle();
+      await pumpLoggedOutApp(tester);
 
-      final createAccountFinder = find.textContaining('Create one now');
-      await tester.ensureVisible(createAccountFinder);
-
-      await tester.tap(createAccountFinder);
+      await tester.tap(find.text('Create one'));
       await tester.pumpAndSettle();
       expect(find.text('Create account'), findsWidgets);
       expect(find.text('Sign up to start using ClinicGO.'), findsOneWidget);

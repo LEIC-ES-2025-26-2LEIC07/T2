@@ -122,14 +122,11 @@ void main() {
       await tester.pumpAndSettle();
 
       final fields = find.byType(TextField);
-      await tester.enterText(fields.at(0), 'Maria Silva');
-      // fields.at(1) is dob — readOnly, skip
-      await tester.enterText(fields.at(2), '+351 910 000 000');
-      await tester.enterText(fields.at(3), 'maria@email.pt');
-      await tester.enterText(fields.at(4), 'Password1');
-      await tester.enterText(fields.at(5), 'Password1');
+      await tester.enterText(fields.at(0), 'user@example.com');
+      await tester.enterText(fields.at(1), 'Password1');
+      await tester.enterText(fields.at(2), 'Password1');
 
-      await tester.tap(find.text('Concluir registo →'));
+      await tester.tap(find.text('Create account').last);
       await tester.pumpAndSettle();
 
       expect(find.text('Home'), findsOneWidget);
