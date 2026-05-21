@@ -116,6 +116,25 @@ void main() {
       expect(find.textContaining('6 characters'), findsOneWidget);
     });
 
+    testWidgets('successful registration navigates to home', (tester) async {
+      await _setupDI();
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), 'Maria Silva');
+      // fields.at(1) is dob — readOnly, skip
+      await tester.enterText(fields.at(2), '+351 910 000 000');
+      await tester.enterText(fields.at(3), 'maria@email.pt');
+      await tester.enterText(fields.at(4), 'Password1');
+      await tester.enterText(fields.at(5), 'Password1');
+
+      await tester.tap(find.text('Concluir registo →'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Home'), findsOneWidget);
+    });
+
     testWidgets('navigates back when Sign in link is tapped', (tester) async {
       await _setupDI();
       await tester.pumpWidget(

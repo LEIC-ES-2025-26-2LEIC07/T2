@@ -360,4 +360,109 @@ void main() {
       ).called(1);
     });
   });
+
+  group('DailyDosesViewModel – dose disappears after refresh', () {
+    test('taken dose is absent after refresh', () async {
+      final scheduling = MockDoseSchedulingService();
+      final dose = _dose();
+      final logRepo = InMemoryDoseLogRepository();
+
+      final vm = _vmWithDose(
+        scheduling: scheduling,
+        logRepo: logRepo,
+        dose: dose,
+      );
+
+      await vm.loadTodayDoses();
+      expect(vm.doses, hasLength(1));
+
+      await vm.logDose(dose: dose, status: DoseLogStatus.taken);
+      await vm.refresh();
+
+      expect(vm.doses, isEmpty);
+    });
+
+    test('skipped dose is absent after refresh', () async {
+      final scheduling = MockDoseSchedulingService();
+      final dose = _dose();
+      final logRepo = InMemoryDoseLogRepository();
+
+      final vm = _vmWithDose(
+        scheduling: scheduling,
+        logRepo: logRepo,
+        dose: dose,
+      );
+
+      await vm.loadTodayDoses();
+      await vm.logDose(dose: dose, status: DoseLogStatus.skipped);
+      await vm.refresh();
+
+      expect(vm.doses, isEmpty);
+    });
+
+    test(
+      'only logged dose is removed, other doses remain after refresh',
+      () async {
+        final scheduling = MockDoseSchedulingService();
+        final doseA = _dose(id: 'dose-a');
+        final doseB = _dose(id: 'dose-b');
+        final logRepo = InMemoryDoseLogRepository();
+
+        _stubScheduling(scheduling, [doseA, doseB]);
+
+        final vm = DailyDosesViewModel(
+          repository: _StubMedRepo(meds: [_med()], reminders: [_reminder()]),
+          schedulingService: scheduling,
+          logRepository: logRepo,
+        );
+
+        await vm.loadTodayDoses();
+        expect(vm.doses, hasLength(2));
+
+        await vm.logDose(dose: doseA, status: DoseLogStatus.taken);
+        await vm.refresh();
+
+        expect(vm.doses, hasLength(1));
+        expect(vm.doses.first.dose.id, 'dose-b');
+      },
+    );
+
+    test('taken dose via notification controller is absent after refresh '
+        'when controller shares the log repository', () async {
+      final scheduling = MockDoseSchedulingService();
+      final dose = _dose();
+      final logRepo = InMemoryDoseLogRepository();
+      final mockController = MockMissedDoseNotificationController();
+
+      // Controller writes to the shared logRepo so refresh sees the persisted log.
+      when(
+        () => mockController.logDose(
+          dose: any(named: 'dose'),
+          status: any(named: 'status'),
+          loggedAt: any(named: 'loggedAt'),
+        ),
+      ).thenAnswer((invocation) async {
+        await logRepo.insertDoseLog(
+          dose: invocation.namedArguments[#dose] as ScheduledDose,
+          status: invocation.namedArguments[#status] as DoseLogStatus,
+          loggedAt: invocation.namedArguments[#loggedAt] as DateTime,
+        );
+      });
+
+      final vm = _vmWithDose(
+        scheduling: scheduling,
+        logRepo: logRepo,
+        dose: dose,
+        notificationController: mockController,
+      );
+
+      await vm.loadTodayDoses();
+      expect(vm.doses, hasLength(1));
+
+      await vm.logDose(dose: dose, status: DoseLogStatus.taken);
+      await vm.refresh();
+
+      expect(vm.doses, isEmpty);
+    });
+  });
 }

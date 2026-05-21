@@ -5,7 +5,7 @@ import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/core/widgets/notification_lifecycle_wrapper.dart';
-import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
+import 'package:clinic_go/features/auth/presentation/views/splash_screen.dart';
 import 'package:clinic_go/features/medication/models/notification_payload.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -69,7 +69,7 @@ class _ClinicGOState extends State<ClinicGO> {
             ),
           ),
           onGenerateRoute: AppRouter.onGenerateRoute,
-          home: const MainScreen(),
+          home: const SplashScreen(),
         ),
       ),
     );

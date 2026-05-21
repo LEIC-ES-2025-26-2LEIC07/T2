@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 
 class AppBackground extends StatelessWidget {
+  const AppBackground({
+    super.key,
+    required this.child,
+    this.wallpaper = 'assets/images/wallpaper-paper.png',
+  });
+
   final Widget child;
-  const AppBackground({super.key, required this.child});
+  final String wallpaper;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
       child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: Color(0xFFF0F4F8),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF0F4F8),
           image: DecorationImage(
-            image: AssetImage('assets/images/wallpaper-paper.png'),
+            image: AssetImage(wallpaper),
             fit: BoxFit.cover,
             alignment: Alignment.center,
           ),

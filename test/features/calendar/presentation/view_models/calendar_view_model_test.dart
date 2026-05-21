@@ -113,6 +113,41 @@ void main() {
       expect(s.status, DaySummaryStatus.allTaken);
     });
 
+    test('allTaken for today when every dose is logged as taken', () {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final s = DaySummary(date: today);
+      s.logs.add(
+        _entry(scheduledTime: DateTime(today.year, today.month, today.day, 8)),
+      );
+      s.logs.add(
+        _entry(
+          scheduledTime: DateTime(today.year, today.month, today.day, 20),
+          id: 'log-2',
+        ),
+      );
+      expect(s.status, DaySummaryStatus.allTaken);
+    });
+
+    test('none for today when some scheduled doses are still pending', () {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final s = DaySummary(date: today);
+      s.logs.add(
+        _entry(scheduledTime: DateTime(today.year, today.month, today.day, 8)),
+      );
+      s.scheduled.add(
+        ScheduledDose(
+          id: 'sd-today',
+          medicationId: 'med-1',
+          medicationName: 'Aspirin',
+          dosage: '100mg',
+          scheduledTime: DateTime(today.year, today.month, today.day, 20),
+        ),
+      );
+      expect(s.status, DaySummaryStatus.none);
+    });
+
     test('partial when some logs taken and some skipped', () {
       final s = DaySummary(date: DateTime(2025, 1, 1));
       s.logs.add(_entry(scheduledTime: DateTime(2025, 1, 1, 9), id: 'l1'));
@@ -221,6 +256,62 @@ void main() {
       await loading;
       expect(states.last, isFalse);
     });
+
+    test(
+      'day shows allTaken when all scheduled doses have matching log entries',
+      () async {
+        // Verifies the dedup fix: ScheduledDose.id = "reminderId_epochSeconds"
+        // must be matched against the plain reminderId from DoseLogEntry.
+        const reminderId = 'rem-dedup-test';
+        final scheduledAt = DateTime(2026, 4, 15, 8);
+
+        final med = Medication(
+          id: 'med-dedup',
+          userId: 'u1',
+          name: 'Aspirin',
+          dosageAmount: 100,
+          dosageUnit: 'mg',
+          color: Colors.blue,
+          createdAt: DateTime(2025, 1, 1),
+        );
+        final reminder = MedicationReminder(
+          id: reminderId,
+          medicationId: 'med-dedup',
+          reminderTime: '08:00:00',
+          daysOfWeek: const [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+          ],
+        );
+        final logEntry = DoseLogEntry(
+          id: 'log-dedup',
+          status: DoseLogStatus.taken,
+          scheduledTime: scheduledAt,
+          reminderId: reminderId,
+          medicationId: 'med-dedup',
+          medicationName: 'Aspirin',
+          dosage: '100mg',
+        );
+
+        final vm = _vm(
+          calRepo: _FakeCalendarRepo([logEntry]),
+          medRepo: _FakeMedRepo(meds: [med], reminders: [reminder]),
+        );
+        await vm.loadMonth(DateTime(2026, 4, 1));
+
+        final summary = vm.daySummaryFor(DateTime(2026, 4, 15));
+        expect(summary, isNotNull);
+        // Dedup must remove the scheduled dose so it doesn't double-count.
+        expect(summary!.scheduled, isEmpty);
+        expect(summary.logs, hasLength(1));
+        expect(summary.status, DaySummaryStatus.allTaken);
+      },
+    );
 
     test('uses scheduled doses from reminders in day summaries', () async {
       final med = Medication(

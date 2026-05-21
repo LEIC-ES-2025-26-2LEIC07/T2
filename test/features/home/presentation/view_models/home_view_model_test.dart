@@ -163,6 +163,59 @@ void main() {
       },
     );
 
+    test(
+      'nextDose is null when today doses are all logged even if tomorrow has doses',
+      () async {
+        // Verifies that tomorrow's pending dose does not suppress "all done today".
+        final now = DateTime.now();
+        const reminderId = 'rem-tomorrow-test';
+
+        final med = Medication(
+          id: 'med-1',
+          userId: 'u1',
+          name: 'Aspirin',
+          dosageAmount: 100,
+          dosageUnit: 'mg',
+          color: Colors.red,
+          createdAt: DateTime(2026, 1, 1),
+        );
+        final reminders = [
+          MedicationReminder(
+            id: reminderId,
+            medicationId: 'med-1',
+            reminderTime: '12:00:00',
+            daysOfWeek: const [
+              'monday',
+              'tuesday',
+              'wednesday',
+              'thursday',
+              'friday',
+              'saturday',
+              'sunday',
+            ],
+          ),
+        ];
+
+        when(
+          () => mockRepository.fetchMedications(),
+        ).thenAnswer((_) async => [med]);
+        when(
+          () => mockRepository.fetchAllReminders(),
+        ).thenAnswer((_) async => reminders);
+
+        // Seed today's noon dose as logged.
+        final todayNoon = DateTime(now.year, now.month, now.day, 12);
+        final timestamp = todayNoon.millisecondsSinceEpoch ~/ 1000;
+        mockLogRepository.seedLoggedDose('${reminderId}_$timestamp');
+
+        await viewModel.loadNextDose();
+
+        // Before fix: nextDose pointed to tomorrow's noon dose (bug).
+        // After fix:  nextDose is null — "all done for today" state.
+        expect(viewModel.nextDose, isNull);
+      },
+    );
+
     test('loadNextDose: [Empty result] → ignores doses already logged', () async {
       // Use a mid-day time to avoid date-wraps during test execution
       final baseDate = DateTime.now();

@@ -75,6 +75,12 @@ class _LoadedRepo implements MedicationRepository {
   ) async => [];
 }
 
+class _FailDeleteRepo extends _LoadedRepo {
+  @override
+  Future<void> deleteMedication(String id) async =>
+      throw Exception('Delete failed');
+}
+
 class _ErrorRepo implements MedicationRepository {
   @override
   Future<SavedMedicationResult> addMedication(AddMedicationPayload p) async =>
@@ -175,5 +181,65 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Retry'), findsOneWidget);
+  });
+
+  testWidgets(
+    'tapping ELIMINAR → confirm dialog → removes card and shows snackbar',
+    (tester) async {
+      await tester.pumpWidget(_buildScreen(_LoadedRepo()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('INFO').first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('ELIMINAR').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Eliminar medicamento?'), findsOneWidget);
+
+      // Confirm — dialog's ELIMINAR is the last instance in the tree
+      await tester.tap(find.text('ELIMINAR').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lisinopril'), findsNothing);
+      expect(find.text('Aspirin'), findsOneWidget);
+      expect(find.text('Medicamento eliminado com sucesso.'), findsOneWidget);
+    },
+  );
+
+  testWidgets('tapping ELIMINAR → cancel dialog → card stays', (tester) async {
+    await tester.pumpWidget(_buildScreen(_LoadedRepo()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('INFO').first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('ELIMINAR').first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('CANCELAR'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lisinopril'), findsOneWidget);
+    expect(find.text('Eliminar medicamento?'), findsNothing);
+  });
+
+  testWidgets('delete failure shows error snackbar', (tester) async {
+    await tester.pumpWidget(_buildScreen(_FailDeleteRepo()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('INFO').first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('ELIMINAR').first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('ELIMINAR').last);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Não foi possível eliminar o medicamento. Tenta novamente.'),
+      findsOneWidget,
+    );
   });
 }
