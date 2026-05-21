@@ -8,12 +8,16 @@ Skipped tests are marked with `[skip]`.
 ## Table of Contents
 
 - [App Shell](#app-shell)
+- [Core — DI](#core--di)
 - [Core — Routing](#core--routing)
 - [Supabase Config](#supabase-config)
 - [Auth](#auth)
 - [Calendar](#calendar)
 - [Medication](#medication)
 - [Home](#home)
+  - [view_models](#features/home/presentation/view_models)
+  - [views](#features/home/presentation/views)
+  - [widgets](#features/home/presentation/widgets)
 - [Profile](#profile)
 - [Symptoms](#symptoms)
 
@@ -34,6 +38,17 @@ Skipped tests are marked with `[skip]`.
 | ClinicGO app shell | Profile tab shows login form when not logged in | |
 | ClinicGO app shell | Profile tab shows "Create account" link | |
 | ClinicGO app shell | tapping "Create account" link opens SignUpSheet | |
+
+---
+
+## Core — DI
+
+### `core/di/service_locator_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| setupServiceLocator | registers lazy singletons before Supabase resolution fails |
+| setupServiceLocator | notification gateway falls back to NoopLocalNotificationGateway in test env |
 
 ---
 
@@ -455,17 +470,59 @@ Skipped tests are marked with `[skip]`.
 | HomeViewModel – loadNextDose | Success state → identifies the next upcoming dose |
 | HomeViewModel – loadNextDose | Overdue state → identifies an overdue dose |
 | HomeViewModel – loadNextDose | Empty result → handles case with no medications safely |
+| HomeViewModel – loadNextDose | nextDose is null when today doses are all logged even if tomorrow has doses |
 | HomeViewModel – loadNextDose | Empty result → ignores doses already logged |
+| HomeViewModel – loadNextDose error handling | loadNextDose when repository throws → clears state and isLoading false |
+| HomeViewModel – logDose | logDose success (no notificationController) → inserts log |
+| HomeViewModel – logDose | logDose error path → restores state and rethrows |
+| HomeViewModel – logDose | logDose delegates to notificationController when provided |
+| HomeViewModel – doseLogged | doseLogged clears nextDose and isOverdue |
 
 ### `features/home/presentation/views/main_screen_widget_test.dart`
 
-| Group | Test case | Skip |
-|-------|-----------|------|
-| HomeContent Widget Tests | Loading state → spinner is visible | |
-| HomeContent Widget Tests | Empty state → "No upcoming doses" message is visible | ✓ |
-| HomeContent Widget Tests | Success state (Upcoming) → dose card is rendered correctly | ✓ |
-| HomeContent Widget Tests | Success state (Overdue) → warning icon and red text are visible | ✓ |
-| HomeContent Widget Tests | User interactions → tapping Log Dose triggers navigation | ✓ |
+| Group | Test case |
+|-------|-----------|
+| HomeContent Widget Tests | Loading state → spinner is visible |
+| HomeContent Widget Tests | Empty state → "Sem doses agendadas." message is visible |
+| HomeContent Widget Tests | Success state (Upcoming) → dose card is rendered correctly |
+| HomeContent Widget Tests | Success state (Overdue) → overdue badge and Tomar agora are visible |
+| HomeContent Widget Tests | User interactions → tapping Tomar agora invokes logDose |
+| HomeContent Widget Tests | Quick actions → Registar sintoma and Histórico are visible |
+| HomeContent Widget Tests | All done state → shows "Tudo feito por hoje!" when hadDosesToday and no nextDose |
+| HomeContent Widget Tests | Today plan with entries → renders dose entries |
+
+### `features/home/presentation/widgets/home_brutal_button_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| HomeBrutalButton | renders label text |
+| HomeBrutalButton | isLoading: shows CircularProgressIndicator, hides label |
+| HomeBrutalButton | onPressed null: tapping does not invoke any callback |
+| HomeBrutalButton | onPressed: tapping invokes callback once |
+
+### `features/home/presentation/widgets/home_next_dose_card_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| HomeNextDoseCard | null nextDose + hadDosesToday false → shows "Sem doses agendadas." |
+| HomeNextDoseCard | null nextDose + hadDosesToday true → shows "Tudo feito por hoje!" |
+| HomeNextDoseCard | upcoming dose → shows PRÓXIMA DOSE, med name, "Agendado às" |
+| HomeNextDoseCard | overdue dose → shows EM ATRASO badge and "Era às" |
+| HomeNextDoseCard | isLoggingDose true → shows loading indicator, logDose not invoked |
+| HomeNextDoseCard | tapping Tomar agora calls logDose with status taken |
+| HomeNextDoseCard | tapping Saltar calls logDose with status skipped |
+
+### `features/home/presentation/widgets/home_today_plan_test.dart`
+
+| Group | Test case |
+|-------|-----------|
+| HomeEmptyPlanCard | renders empty plan message |
+| HomeTodayPlanCard | renders all entries by medication name |
+| HomeTodayPlanRow – status badges | done (isPending=false) → badge shows FEITO |
+| HomeTodayPlanRow – status badges | overdue (isPending=true, isOverdue=true) → badge shows EM ATRASO |
+| HomeTodayPlanRow – status badges | upcoming < 60 min → badge shows EM Xm |
+| HomeTodayPlanRow – status badges | upcoming 1–19h → badge shows EM Xh |
+| HomeTodayPlanRow – status badges | upcoming ≥ 20h → badge shows ESTA NOITE |
 
 ---
 
