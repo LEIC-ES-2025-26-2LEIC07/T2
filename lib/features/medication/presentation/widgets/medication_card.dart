@@ -473,6 +473,7 @@ class _DeleteMedicationDialog extends StatelessWidget {
                     variant: _CardButtonVariant.secondary,
                   ),
                   _CardButton(
+                    key: const Key('delete_confirm_button'),
                     label: 'ELIMINAR',
                     onTap: () => Navigator.of(context).pop(true),
                     variant: _CardButtonVariant.danger,
@@ -491,6 +492,7 @@ enum _CardButtonVariant { primary, secondary, danger }
 
 class _CardButton extends StatelessWidget {
   const _CardButton({
+    super.key,
     required this.label,
     required this.onTap,
     this.variant = _CardButtonVariant.primary,

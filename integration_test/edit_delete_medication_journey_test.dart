@@ -127,6 +127,10 @@ void main() {
       getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
     });
 
+    tearDown(() async {
+      await GetIt.instance.reset();
+    });
+
     Future<void> goToMedsTab(WidgetTester tester) async {
       await tester.pumpWidget(
         app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
@@ -171,8 +175,8 @@ void main() {
 
       expect(find.text('Eliminar medicamento?'), findsOneWidget);
 
-      // Confirm deletion — tap the last 'ELIMINAR' (dialog button, not card button)
-      await tester.tap(find.text('ELIMINAR').last);
+      // Confirm deletion — tap the dialog's confirm button (not the card button)
+      await tester.tap(find.byKey(const Key('delete_confirm_button')));
       await tester.pumpAndSettle();
 
       verify(() => mockMedRepo.deleteMedication('med-1')).called(1);

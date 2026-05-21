@@ -25,14 +25,14 @@ class ProfileStatusMessage extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: isError ? AppColors.errorBgLight : const Color(0xFFE9F6EC),
+        color: isError ? AppColors.errorBgLight : AppColors.successBgLight,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         errorMessage ?? infoMessage ?? '',
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: isError ? AppColors.errorTextDark : const Color(0xFF2E7D32),
+          color: isError ? AppColors.errorTextDark : AppColors.successTextDark,
           fontWeight: FontWeight.w600,
         ),
       ),

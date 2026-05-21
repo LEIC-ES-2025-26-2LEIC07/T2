@@ -111,6 +111,10 @@ void main() {
       getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
     });
 
+    tearDown(() async {
+      await GetIt.instance.reset();
+    });
+
     testWidgets('navigates to add form, submits, and returns to list', (
       tester,
     ) async {

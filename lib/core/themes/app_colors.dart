@@ -25,6 +25,8 @@ class AppColors {
 
   // ── Semantic feedback colours ──────────────────────────────────────────────
   static const successGreen = Color(0xFF43A047);
+  static const successBgLight = Color(0xFFDFF2E8);
+  static const successTextDark = Color(0xFF1A7A4A);
   static const dangerRed = Color(0xFFE53935);
   static const errorBgLight = Color(0xFFFFECEC);
   static const errorTextDark = Color(0xFFC62828);

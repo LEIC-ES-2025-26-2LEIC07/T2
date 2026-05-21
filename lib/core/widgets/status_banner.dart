@@ -13,8 +13,8 @@ class StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isSuccess ? const Color(0xFFDFF2E8) : AppColors.errorBgLight;
-    final fg = isSuccess ? const Color(0xFF1A7A4A) : AppColors.errorTextDark;
+    final bg = isSuccess ? AppColors.successBgLight : AppColors.errorBgLight;
+    final fg = isSuccess ? AppColors.successTextDark : AppColors.errorTextDark;
     final icon = isSuccess ? Icons.check_circle_outline : Icons.error_outline;
 
     return Container(

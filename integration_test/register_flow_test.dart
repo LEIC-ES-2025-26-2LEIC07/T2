@@ -77,17 +77,20 @@ void main() {
       } catch (_) {}
     });
 
+    _InMemoryAuthService? authService;
+
     tearDown(() async {
+      await authService?.dispose();
       await GetIt.instance.reset();
     });
 
     testWidgets(
       'fills registration form and navigates to main screen on success',
       (tester) async {
-        final authService = _InMemoryAuthService();
+        authService = _InMemoryAuthService();
 
         final getIt = GetIt.instance;
-        getIt.registerSingleton<AuthService>(authService);
+        getIt.registerSingleton<AuthService>(authService!);
         getIt.registerSingleton<SupabaseClient>(_MockSupabaseClient());
         getIt.registerSingleton<MedicationRepository>(_EmptyMedicationRepo());
         getIt.registerSingleton<DoseLogRepository>(InMemoryDoseLogRepository());
@@ -157,6 +160,8 @@ class _InMemoryAuthService implements AuthService {
   bool _isLoggedIn = false;
   String _email = '';
   final StreamController<bool> _ctrl = StreamController<bool>.broadcast();
+
+  Future<void> dispose() => _ctrl.close();
 
   @override
   Stream<bool> get authStateChanges async* {

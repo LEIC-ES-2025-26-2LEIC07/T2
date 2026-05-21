@@ -61,7 +61,7 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
       child: Scaffold(
         backgroundColor: AppColors.surfaceWarm,
         appBar: AppBar(
-          title: const Text('Log Symptom'),
+          title: const Text('Registar sintoma'),
           backgroundColor: Colors.transparent,
         ),
         body: SafeArea(
