@@ -215,7 +215,9 @@ class _SymptomEmptyIllustration extends StatelessWidget {
         color: AppColors.card,
         border: Border.all(color: AppColors.ink, width: 2),
         borderRadius: BorderRadius.circular(28),
-        boxShadow: const [BoxShadow(color: AppColors.ink, offset: Offset(4, 4))],
+        boxShadow: const [
+          BoxShadow(color: AppColors.ink, offset: Offset(4, 4)),
+        ],
       ),
       child: Center(
         child: SizedBox(
