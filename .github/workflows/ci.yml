@@ -213,7 +213,7 @@ jobs:
         run: touch .env
 
       - name: Build web application
-        run: |
-          flutter build web --release \
-            --dart-define="NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
-            --dart-define="SB_PV_KEY=${{ secrets.SB_PV_KEY }}"
+        run: >-
+          flutter build web --release
+          --dart-define=NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+          --dart-define=SB_PV_KEY=placeholder
