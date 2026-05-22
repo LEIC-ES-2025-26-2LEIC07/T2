@@ -38,49 +38,61 @@ class MissedDoseNotificationController {
   final EmergencyAlertRepository? _emergencyAlertRepository;
   final Duration gracePeriod;
 
-  Future<void> scheduleDoseReminder(ScheduledDose dose) async {
+  Future<void> scheduleDoseReminder(ScheduledDose dose, {DateTime? now}) async {
+    final currentTime = now ?? DateTime.now();
+
+    // Never schedule notifications for doses from previous days.
+    if (_startOfDay(dose.scheduledTime).isBefore(_startOfDay(currentTime))) {
+      return;
+    }
+
     final primaryPayload = NotificationPayload(
       route: buildDoseLoggingRoute(dose),
       status: 'scheduled',
       doseId: dose.id,
     );
-    final missedPayload = NotificationPayload(
-      route: buildDoseLoggingRoute(dose, isOverdue: true),
-      status: 'overdue',
-      doseId: dose.id,
-    );
 
-    await _notificationGateway.schedule(
-      NotificationRequest(
-        id: primaryNotificationIdForDose(dose.id),
-        title: 'Hora do Medicamento',
-        body: 'Toma ${dose.dosage} de ${dose.medicationName}',
-        scheduledTime: dose.scheduledTime,
-        payload: primaryPayload.encode(),
-      ),
-    );
+    if (dose.scheduledTime.isAfter(currentTime)) {
+      await _notificationGateway.schedule(
+        NotificationRequest(
+          id: primaryNotificationIdForDose(dose.id),
+          title: 'Hora do Medicamento',
+          body: 'Toma ${dose.dosage} de ${dose.medicationName}',
+          scheduledTime: dose.scheduledTime,
+          payload: primaryPayload.encode(),
+        ),
+      );
+    }
 
     final missedScheduledTime = dose.scheduledTime.add(gracePeriod);
-    final missedNotificationId = missedNotificationIdForDose(dose.id);
-    await _notificationGateway.schedule(
-      NotificationRequest(
-        id: missedNotificationId,
-        title: 'Medicamento em Atraso',
-        body:
-            'Tens ${gracePeriod.inMinutes} min de atraso para ${dose.medicationName}',
-        scheduledTime: missedScheduledTime,
-        payload: missedPayload.encode(),
-      ),
-    );
-
-    await _pendingNotificationStore.upsert(
-      PendingMissedDoseNotification(
-        dose: dose,
-        notificationId: missedNotificationId,
-        scheduledTime: missedScheduledTime,
-      ),
-    );
+    if (missedScheduledTime.isAfter(currentTime)) {
+      final missedPayload = NotificationPayload(
+        route: buildDoseLoggingRoute(dose, isOverdue: true),
+        status: 'overdue',
+        doseId: dose.id,
+      );
+      final missedNotificationId = missedNotificationIdForDose(dose.id);
+      await _notificationGateway.schedule(
+        NotificationRequest(
+          id: missedNotificationId,
+          title: 'Medicamento em Atraso',
+          body:
+              'Tens ${gracePeriod.inMinutes} min de atraso para ${dose.medicationName}',
+          scheduledTime: missedScheduledTime,
+          payload: missedPayload.encode(),
+        ),
+      );
+      await _pendingNotificationStore.upsert(
+        PendingMissedDoseNotification(
+          dose: dose,
+          notificationId: missedNotificationId,
+          scheduledTime: missedScheduledTime,
+        ),
+      );
+    }
   }
+
+  static DateTime _startOfDay(DateTime d) => DateTime(d.year, d.month, d.day);
 
   Future<void> refreshScheduledMedicationReminders({
     Duration horizon = const Duration(days: 14),

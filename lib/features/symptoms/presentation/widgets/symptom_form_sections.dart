@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 
-// TODO(team): extend this map when new symptom keys are added on the backend.
 String _ptLabel(String symptom) {
   const labels = {
     'headache': 'Dor de cabeça',

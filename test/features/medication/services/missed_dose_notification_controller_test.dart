@@ -42,11 +42,14 @@ void main() {
     await GetIt.I.reset();
   });
 
+  // Simulates calling scheduleDoseReminder one hour before the dose fires.
+  final beforeDose = demoDose.scheduledTime.subtract(const Duration(hours: 1));
+
   group('MissedDoseNotificationController', () {
     test(
       'schedules primary and missed notifications with deterministic IDs',
       () async {
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
 
         expect(notificationGateway.scheduledRequests, hasLength(2));
         expect(
@@ -74,7 +77,7 @@ void main() {
     test(
       'cancels the pending missed notification after logging a dose',
       () async {
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
 
         await controller.logDose(dose: demoDose, status: DoseLogStatus.taken);
 
@@ -100,7 +103,7 @@ void main() {
           pendingNotificationStore: const PendingNotificationStore(),
         );
 
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
 
         await expectLater(
           controller.logDose(dose: demoDose, status: DoseLogStatus.taken),
@@ -119,7 +122,7 @@ void main() {
     test(
       'startup sync cancels locally pending missed notifications logged on another device',
       () async {
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
         doseLogRepository.seedLoggedDose(demoDose.id);
 
         await controller.syncPendingMissedNotifications();
@@ -143,7 +146,7 @@ void main() {
     test(
       'sync skips notifications whose dose has not been logged yet',
       () async {
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
 
         await controller.syncPendingMissedNotifications();
 
@@ -154,7 +157,7 @@ void main() {
     test(
       'cancelMissedDoseNotification cancels the correct notification ID',
       () async {
-        await controller.scheduleDoseReminder(demoDose);
+        await controller.scheduleDoseReminder(demoDose, now: beforeDose);
 
         await controller.cancelMissedDoseNotification(demoDose.id);
 
@@ -205,7 +208,7 @@ void main() {
 
     test('logDose with explicit loggedAt uses that timestamp', () async {
       final loggedAt = DateTime(2026, 4, 16, 9);
-      await controller.scheduleDoseReminder(demoDose);
+      await controller.scheduleDoseReminder(demoDose, now: beforeDose);
       await controller.logDose(
         dose: demoDose,
         status: DoseLogStatus.skipped,
@@ -224,7 +227,10 @@ void main() {
         gracePeriod: Duration.zero,
       );
 
-      await controllerWithAlerts.scheduleDoseReminder(demoDose);
+      await controllerWithAlerts.scheduleDoseReminder(
+        demoDose,
+        now: beforeDose,
+      );
       await controllerWithAlerts.syncPendingMissedNotifications();
 
       expect(alertRepo.createdAlerts, hasLength(1));
@@ -246,11 +252,77 @@ void main() {
         gracePeriod: Duration.zero,
       );
 
-      await controllerWithAlerts.scheduleDoseReminder(demoDose);
+      await controllerWithAlerts.scheduleDoseReminder(
+        demoDose,
+        now: beforeDose,
+      );
       doseLogRepository.seedLoggedDose(demoDose.id);
       await controllerWithAlerts.syncPendingMissedNotifications();
 
       expect(alertRepo.createdAlerts, isEmpty);
+    });
+
+    group('day-boundary guards', () {
+      test(
+        'does not schedule anything for a dose from a previous day',
+        () async {
+          final yesterday = DateTime.now().subtract(const Duration(days: 1));
+          final pastDose = ScheduledDose(
+            id: 'past-dose',
+            medicationId: 'med-1',
+            medicationName: 'Aspirina',
+            dosage: '100 mg',
+            scheduledTime: yesterday,
+          );
+
+          await controller.scheduleDoseReminder(pastDose);
+
+          expect(notificationGateway.scheduledRequests, isEmpty);
+        },
+      );
+
+      test(
+        'does not schedule missed notification when grace period already passed today',
+        () async {
+          final now = DateTime.now();
+          final doseEarlierToday = ScheduledDose(
+            id: 'today-past-grace',
+            medicationId: 'med-1',
+            medicationName: 'Metformina',
+            dosage: '500 mg',
+            scheduledTime: now.subtract(const Duration(hours: 2)),
+          );
+          // Grace period of 30 min has long passed (2h ago), so no missed notification.
+          // Primary notification time is also in the past, so nothing is scheduled.
+          await controller.scheduleDoseReminder(doseEarlierToday);
+
+          expect(notificationGateway.scheduledRequests, isEmpty);
+        },
+      );
+
+      test(
+        'schedules only missed notification when primary time passed but grace period has not',
+        () async {
+          final now = DateTime.now();
+          final doseJustMissed = ScheduledDose(
+            id: 'today-in-grace',
+            medicationId: 'med-1',
+            medicationName: 'Metformina',
+            dosage: '500 mg',
+            scheduledTime: now.subtract(const Duration(minutes: 10)),
+          );
+          // 10 min ago — still within the 30-min grace window.
+          await controller.scheduleDoseReminder(doseJustMissed);
+
+          expect(notificationGateway.scheduledRequests, hasLength(1));
+          expect(
+            notificationGateway.scheduledRequests.first.id,
+            MissedDoseNotificationController.missedNotificationIdForDose(
+              doseJustMissed.id,
+            ),
+          );
+        },
+      );
     });
   });
 }
