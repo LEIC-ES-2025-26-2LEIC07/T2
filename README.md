@@ -474,9 +474,40 @@ You can find below information and references related to the project management 
 <div align="center" justify="center">
 <img width="544" height="964" alt="image" src="https://github.com/user-attachments/assets/1ae3f8a4-ec18-4e7e-9f71-881ea8aff23d" />
   <p>Start of Sprint 3</p>
-  <!--<p>End of Sprint 3</p> -->
-  </div>
+  <!-- TODO: replace with actual end-of-sprint board screenshot -->
+  <p>End of Sprint 3</p>
+</div>
 
+#### Sprint 3 Review
+
+Sprint 3 was demonstrated to the TP teacher and the full team. Key deliverables shown:
+
+- Neo-brutalist visual redesign applied to the profile, medications list, add medication, edit medication, and login/register screens, delivering a cohesive design system ahead of Pitch & Demo.
+- Symptom history view allowing users to review previously logged symptoms.
+- Splash screen with ClinicGO branding shown on app launch.
+- Notification lifecycle management with runtime permission handling and dose reminder scheduling.
+- Expanded automated test suite covering add medication, edit/delete medication, and register user journeys.
+- Avatar photo upload from gallery for profile customisation.
+
+Feedback: overall positive on visual consistency and test coverage. Suggestion to close remaining open PBIs (#106 Calendar refac, #107 Settings refac, #113 Log symptom screen) during stabilization before Pitch & Demo.
+
+#### Sprint 3 Retrospective
+
+* **Did well:**
+    * **Visual consistency:** The neo-brutalist design system was applied uniformly across all redesigned screens, significantly improving the app's visual identity with no hardcoded colours — all tokens via `AppColors`.
+    * **Test coverage:** Unit, widget, and integration tests all expanded. New integration test journeys (add medication, edit/delete, register flow) added; all 45 profile tests and 376 total tests passing.
+    * **AI usage discipline:** All AI-generated commits prefixed `[MISTER AI]`; Sprint 3 AI report committed to `docs/ai_report/sprint3AI.md`. MisterAI labels applied on relevant PBIs.
+    * **CI/CD improvement:** Targeted test runs on PRs and full suite on merge to `main`, with PR comment reporting test results.
+
+* **Do differently:**
+    * **Sprint planning quality:** One epic (#102) was in the Sprint Backlog at planning time, and #105 had no Effort estimate — both violations caught and fixed mid-sprint. These should be caught at kickoff.
+    * **Scope management:** Three PBIs (#106, #107, #113) remain open at sprint end, indicating the sprint was overcommitted relative to past velocity.
+    * **PR review timing:** Several PRs were reviewed and merged under time pressure in the final days. A review deadline before sprint end would help.
+
+* **Improvements for next sprint:**
+    * At sprint planning, verify no epics in the Sprint Backlog, all items have Effort estimates, and total effort does not exceed the previous sprint's velocity.
+    * Set a PR review deadline of 48 hours before sprint end to avoid last-minute merges.
+    * Close carry-over PBIs (#106, #107, #113) in the stabilization period before starting new Sprint 4 scope.
 
 ### Sprint 4
 
