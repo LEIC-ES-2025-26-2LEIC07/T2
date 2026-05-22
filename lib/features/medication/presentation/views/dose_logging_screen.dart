@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -27,12 +26,6 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
   bool _isSubmitting = false;
   DoseLogStatus? _completedStatus;
   DateTime? _completedAt;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(widget.controller.dismissNotifications(widget.dose.id));
-  }
 
   @override
   Widget build(BuildContext context) {

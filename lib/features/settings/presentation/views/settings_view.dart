@@ -1,14 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
-import 'package:clinic_go/features/settings/presentation/view_models/settings_view_model.dart';
-import 'package:clinic_go/features/settings/presentation/views/health_conditions_screen.dart';
-import 'package:clinic_go/features/settings/presentation/views/routine_schedules_screen.dart';
-import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -18,87 +12,9 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  late final SettingsViewModel _viewModel;
-  StreamSubscription<bool>? _authSub;
-
   bool _notificationsEnabled = true;
   bool _snoozeEnabled = true;
   bool _syncHealthEnabled = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel = SettingsViewModel(authService: getIt<AuthService>());
-    _authSub = getIt<AuthService>().authStateChanges.listen((_) {
-      if (mounted) _viewModel.reload();
-    });
-  }
-
-  @override
-  void dispose() {
-    _authSub?.cancel();
-    _viewModel.dispose();
-    super.dispose();
-  }
-
-  String? get _healthSubtitle {
-    final all = [..._viewModel.conditions, ..._viewModel.allergies];
-    if (all.isEmpty) return null;
-    if (all.length <= 3) return all.join(' · ');
-    return '${all.take(2).join(' · ')} +${all.length - 2}';
-  }
-
-  String? get _schedulesSubtitle {
-    final schedules = _viewModel.schedules;
-    if (schedules.isEmpty) return null;
-    String fmt(TimeOfDay t) =>
-        '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
-    if (schedules.length <= 3) return schedules.map(fmt).join(' · ');
-    return '${schedules.take(2).map(fmt).join(' · ')} +${schedules.length - 2}';
-  }
-
-  Future<void> _openRoutineSchedules() async {
-    final result = await Navigator.of(context).push<List<TimeOfDay>>(
-      MaterialPageRoute(
-        builder: (_) => RoutineSchedulesScreen(schedules: _viewModel.schedules),
-      ),
-    );
-    if (result != null) {
-      await _viewModel.saveSchedules(result);
-      _showSaveError();
-    }
-  }
-
-  Future<void> _openHealthConditions() async {
-    final result = await Navigator.of(context).push<HealthData>(
-      MaterialPageRoute(
-        builder: (_) => HealthConditionsScreen(
-          conditions: _viewModel.conditions,
-          allergies: _viewModel.allergies,
-        ),
-      ),
-    );
-    if (result != null) {
-      await _viewModel.saveConditionsAndAllergies(
-        result.conditions,
-        result.allergies,
-      );
-      _showSaveError();
-    }
-  }
-
-  void _showSaveError() {
-    final err = _viewModel.errorMessage;
-    if (err == null || !mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(err),
-        backgroundColor: AppColors.coral,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    _viewModel.clearError();
-  }
 
   Future<void> _handleLogout() async {
     final confirmed = await showDialog<bool>(
@@ -151,13 +67,6 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _viewModel,
-      builder: (context, _) => _buildContent(),
-    );
-  }
-
-  Widget _buildContent() {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
@@ -211,8 +120,8 @@ class _SettingsViewState extends State<SettingsView> {
                   iconBg: AppColors.lemon,
                   icon: Icons.access_time_outlined,
                   title: 'Horários habituais',
-                  subtitle: _schedulesSubtitle,
-                  onTap: _openRoutineSchedules,
+                  subtitle: '3 horas configuradas',
+                  onTap: () {},
                 ),
               ],
             ),
@@ -225,8 +134,8 @@ class _SettingsViewState extends State<SettingsView> {
                   iconBg: AppColors.mint,
                   icon: Icons.favorite_border,
                   title: 'Condições e alergias',
-                  subtitle: _healthSubtitle,
-                  onTap: _openHealthConditions,
+                  subtitle: 'Diabetes tipo 2 · Penicilina',
+                  onTap: () {},
                 ),
                 const _RowDivider(),
                 _ToggleRow(
@@ -249,63 +158,7 @@ class _SettingsViewState extends State<SettingsView> {
                   icon: Icons.lock_outline,
                   title: 'Privacidade',
                   subtitle: 'Gestão de dados pessoais',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => Scaffold(
-                        backgroundColor: AppColors.paper,
-                        body: SafeArea(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  16,
-                                  16,
-                                  4,
-                                ),
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => Navigator.of(ctx).pop(),
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.card,
-                                          border: BrutalDecor.border,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          boxShadow: BrutalDecor.shadowSm,
-                                        ),
-                                        child: const Icon(
-                                          Icons.arrow_back,
-                                          color: AppColors.ink,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    const Text(
-                                      'Perfil',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: -0.3,
-                                        color: AppColors.ink,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Expanded(child: ProfileView()),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  onTap: () {},
                 ),
               ],
             ),
@@ -471,14 +324,14 @@ class _ChevronRow extends StatelessWidget {
     required this.iconBg,
     required this.icon,
     required this.title,
-    this.subtitle,
+    required this.subtitle,
     required this.onTap,
   });
 
   final Color iconBg;
   final IconData icon;
   final String title;
-  final String? subtitle;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
@@ -504,17 +357,15 @@ class _ChevronRow extends StatelessWidget {
                       color: AppColors.ink,
                     ),
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle!,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.muted,
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.muted,
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),

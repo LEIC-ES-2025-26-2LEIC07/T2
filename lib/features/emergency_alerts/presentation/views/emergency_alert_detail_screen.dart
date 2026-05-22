@@ -114,9 +114,11 @@ class _EmergencyAlertDetailScreenState
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () {
-                        unawaited(_controller.acknowledge(alert.id));
-                        Navigator.of(context).maybePop();
+                      onPressed: () async {
+                        await _controller.acknowledge(alert.id);
+                        if (context.mounted) {
+                          Navigator.of(context).maybePop();
+                        }
                       },
                       icon: const Icon(Icons.check_circle_outline),
                       label: const Text(

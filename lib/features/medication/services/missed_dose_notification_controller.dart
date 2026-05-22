@@ -154,15 +154,6 @@ class MissedDoseNotificationController {
     await _pendingNotificationStore.removeByDoseId(doseId);
   }
 
-  Future<void> dismissNotifications(String doseId) async {
-    try {
-      await _notificationGateway.cancel(primaryNotificationIdForDose(doseId));
-      await _notificationGateway.cancel(missedNotificationIdForDose(doseId));
-    } catch (error) {
-      debugPrint('Failed to dismiss notifications for dose $doseId: $error');
-    }
-  }
-
   Future<void> syncPendingMissedNotifications() async {
     final pendingNotifications = await _pendingNotificationStore.loadPending();
 
