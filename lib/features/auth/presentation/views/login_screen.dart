@@ -263,7 +263,7 @@ class _LoginHero extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         const Text(
-          'BEM-VINDA DE VOLTA',
+          'BEM-VINDO DE VOLTA',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
