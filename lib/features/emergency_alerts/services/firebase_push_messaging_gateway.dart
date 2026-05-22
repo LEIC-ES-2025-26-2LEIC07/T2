@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import '../../../firebase_options.dart';
 import 'push_messaging_gateway.dart';
 
 @pragma('vm:entry-point')
@@ -10,7 +11,9 @@ Future<void> clinicGoFirebaseMessagingBackgroundHandler(
   RemoteMessage message,
 ) async {
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (_) {}
 }
 
@@ -21,7 +24,9 @@ class FirebasePushMessagingGateway implements PushMessagingGateway {
   final PushMessage? _initialMessage;
 
   static Future<FirebasePushMessagingGateway> initialize() async {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     FirebaseMessaging.onBackgroundMessage(
       clinicGoFirebaseMessagingBackgroundHandler,
     );
