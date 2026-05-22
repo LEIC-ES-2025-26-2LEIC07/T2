@@ -3,6 +3,7 @@ import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/settings/presentation/views/health_conditions_screen.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -15,6 +16,33 @@ class _SettingsViewState extends State<SettingsView> {
   bool _notificationsEnabled = true;
   bool _snoozeEnabled = true;
   bool _syncHealthEnabled = true;
+
+  List<String> _conditions = [];
+  List<String> _allergies = [];
+
+  String? get _healthSubtitle {
+    final all = [..._conditions, ..._allergies];
+    if (all.isEmpty) return null;
+    if (all.length <= 3) return all.join(' · ');
+    return '${all.take(2).join(' · ')} +${all.length - 2}';
+  }
+
+  Future<void> _openHealthConditions() async {
+    final result = await Navigator.of(context).push<HealthData>(
+      MaterialPageRoute(
+        builder: (_) => HealthConditionsScreen(
+          conditions: _conditions,
+          allergies: _allergies,
+        ),
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        _conditions = result.conditions;
+        _allergies = result.allergies;
+      });
+    }
+  }
 
   Future<void> _handleLogout() async {
     final confirmed = await showDialog<bool>(
@@ -134,8 +162,8 @@ class _SettingsViewState extends State<SettingsView> {
                   iconBg: AppColors.mint,
                   icon: Icons.favorite_border,
                   title: 'Condições e alergias',
-                  subtitle: 'Diabetes tipo 2 · Penicilina',
-                  onTap: () {},
+                  subtitle: _healthSubtitle,
+                  onTap: _openHealthConditions,
                 ),
                 const _RowDivider(),
                 _ToggleRow(
@@ -324,14 +352,14 @@ class _ChevronRow extends StatelessWidget {
     required this.iconBg,
     required this.icon,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     required this.onTap,
   });
 
   final Color iconBg;
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final VoidCallback onTap;
 
   @override
@@ -357,15 +385,17 @@ class _ChevronRow extends StatelessWidget {
                       color: AppColors.ink,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.muted,
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.muted,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
