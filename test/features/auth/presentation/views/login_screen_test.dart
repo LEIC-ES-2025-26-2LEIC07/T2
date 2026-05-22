@@ -51,7 +51,7 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('BEM-VINDA DE VOLTA'), findsOneWidget);
+      expect(find.text('BEM-VINDO DE VOLTA'), findsOneWidget);
       expect(find.text('Entrar'), findsOneWidget);
     });
 

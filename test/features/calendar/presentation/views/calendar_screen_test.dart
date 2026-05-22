@@ -84,13 +84,14 @@ Widget _wrap(CalendarViewModel vm) => MaterialApp(
 DoseLogEntry _entry({
   required DateTime scheduledTime,
   DoseLogStatus status = DoseLogStatus.taken,
+  String medicationName = 'Aspirin',
 }) => DoseLogEntry(
   id: 'log-1',
   status: status,
   scheduledTime: scheduledTime,
   takenTime: scheduledTime,
   medicationId: 'med-1',
-  medicationName: 'Aspirin',
+  medicationName: medicationName,
   dosage: '100mg',
 );
 
@@ -137,12 +138,22 @@ void main() {
   });
 
   group('CalendarScreen – header and legend', () {
-    testWidgets('displays the formatted month header', (tester) async {
+    testWidgets('displays PLANO title', (tester) async {
       final vm = await _loadedVM();
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
 
-      expect(find.text('May 2026'), findsOneWidget);
+      expect(find.text('PLANO'), findsOneWidget);
+    });
+
+    testWidgets('displays the formatted month header in Portuguese', (
+      tester,
+    ) async {
+      final vm = await _loadedVM();
+      await tester.pumpWidget(_wrap(vm));
+      await tester.pump();
+
+      expect(find.text('MAI 2026'), findsOneWidget);
     });
 
     testWidgets('displays all four legend labels', (tester) async {
@@ -154,6 +165,15 @@ void main() {
       expect(find.text('Parcial'), findsOneWidget);
       expect(find.text('Falhadas'), findsOneWidget);
       expect(find.text('Próximas'), findsOneWidget);
+    });
+
+    testWidgets('displays weekday row headers', (tester) async {
+      final vm = await _loadedVM();
+      await tester.pumpWidget(_wrap(vm));
+      await tester.pump();
+
+      expect(find.text('SEG'), findsOneWidget);
+      expect(find.text('DOM'), findsOneWidget);
     });
   });
 
@@ -167,22 +187,10 @@ void main() {
       expect(find.text('31'), findsOneWidget);
       expect(find.text('32'), findsNothing);
     });
-
-    testWidgets('shows check_circle icon on a day with all doses taken', (
-      tester,
-    ) async {
-      final vm = await _loadedVM(
-        logs: [_entry(scheduledTime: DateTime(2026, 5, 10, 9))],
-      );
-      await tester.pumpWidget(_wrap(vm));
-      await tester.pump();
-
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
-    });
   });
 
-  group('CalendarScreen – day tap bottom sheet', () {
-    testWidgets('shows "no activity" message for an empty day', (tester) async {
+  group('CalendarScreen – doses panel', () {
+    testWidgets('shows "Sem doses" for a day with no activity', (tester) async {
       final vm = await _loadedVM();
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
@@ -190,15 +198,15 @@ void main() {
       await tester.tap(find.text('3'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Sem atividade de medicação para este dia.'),
-        findsOneWidget,
-      );
+      expect(find.text('Sem doses para este dia.'), findsOneWidget);
     });
 
-    testWidgets('shows log entry details in the bottom sheet', (tester) async {
-      final logDay = DateTime(2026, 5, 8, 9);
-      final vm = await _loadedVM(logs: [_entry(scheduledTime: logDay)]);
+    testWidgets('shows medication name in panel after tapping a logged day', (
+      tester,
+    ) async {
+      final vm = await _loadedVM(
+        logs: [_entry(scheduledTime: DateTime(2026, 5, 8, 9))],
+      );
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
 
@@ -206,12 +214,49 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Aspirin'), findsOneWidget);
-      expect(find.textContaining('taken'), findsWidgets);
+    });
+
+    testWidgets('shows "tomada" status badge for a taken dose', (tester) async {
+      final vm = await _loadedVM(
+        logs: [
+          _entry(
+            scheduledTime: DateTime(2026, 5, 8, 9),
+            status: DoseLogStatus.taken,
+          ),
+        ],
+      );
+      await tester.pumpWidget(_wrap(vm));
+      await tester.pump();
+
+      await tester.tap(find.text('8'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('tomada'), findsOneWidget);
+    });
+
+    testWidgets('shows "falhada" status badge for a skipped dose', (
+      tester,
+    ) async {
+      final vm = await _loadedVM(
+        logs: [
+          _entry(
+            scheduledTime: DateTime(2026, 5, 8, 9),
+            status: DoseLogStatus.skipped,
+          ),
+        ],
+      );
+      await tester.pumpWidget(_wrap(vm));
+      await tester.pump();
+
+      await tester.tap(find.text('8'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('falhada'), findsOneWidget);
     });
   });
 
   group('CalendarScreen – navigation buttons', () {
-    testWidgets('chevron_right advances to June 2026', (tester) async {
+    testWidgets('chevron_right advances to JUN 2026', (tester) async {
       final vm = await _loadedVM();
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
@@ -219,10 +264,10 @@ void main() {
       await tester.tap(find.byIcon(Icons.chevron_right));
       await tester.pumpAndSettle();
 
-      expect(find.text('June 2026'), findsOneWidget);
+      expect(find.text('JUN 2026'), findsOneWidget);
     });
 
-    testWidgets('chevron_left goes back to April 2026', (tester) async {
+    testWidgets('chevron_left goes back to ABR 2026', (tester) async {
       final vm = await _loadedVM();
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
@@ -230,7 +275,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.chevron_left));
       await tester.pumpAndSettle();
 
-      expect(find.text('April 2026'), findsOneWidget);
+      expect(find.text('ABR 2026'), findsOneWidget);
     });
   });
 }
