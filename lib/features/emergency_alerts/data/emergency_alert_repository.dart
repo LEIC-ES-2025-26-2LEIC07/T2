@@ -12,4 +12,10 @@ abstract class EmergencyAlertRepository {
   Future<void> syncPushToken(String token, String platform);
 
   Future<void> removePushToken(String token);
+
+  Future<void> createMissedDoseAlert({
+    required String medicationName,
+    required String dosage,
+    required DateTime scheduledTime,
+  });
 }

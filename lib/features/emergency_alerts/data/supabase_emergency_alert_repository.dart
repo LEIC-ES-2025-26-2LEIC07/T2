@@ -83,4 +83,25 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
   Future<void> removePushToken(String token) async {
     await _client.from('device_push_tokens').delete().eq('token', token);
   }
+
+  @override
+  Future<void> createMissedDoseAlert({
+    required String medicationName,
+    required String dosage,
+    required DateTime scheduledTime,
+  }) async {
+    final user = _client.auth.currentUser;
+    if (user == null) return;
+
+    final timeStr =
+        '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}';
+
+    await _client.from('alerts').insert({
+      'user_id': user.id,
+      'title': 'Dose esquecida',
+      'message': 'Não tomou $dosage de $medicationName às $timeStr.',
+      'severity': 'high',
+      'metadata': {'type': 'missed_dose', 'medication': medicationName},
+    });
+  }
 }

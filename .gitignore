@@ -60,3 +60,8 @@ app.*.map.json
 .claude
 .codex
 claude-obsidian/
+
+# Firebase — contains API keys, never commit
+**/google-services.json
+**/GoogleService-Info.plist
+lib/firebase_options.dart

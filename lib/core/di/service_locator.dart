@@ -111,6 +111,7 @@ Future<NotificationPayload?> setupServiceLocator(
       medicationRepository: getIt<MedicationRepository>(),
       schedulingService: getIt<DoseSchedulingService>(),
       authService: getIt<AuthService>(),
+      emergencyAlertRepository: getIt<EmergencyAlertRepository>(),
     ),
   );
 

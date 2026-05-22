@@ -7,6 +7,7 @@ import '../models/pending_missed_dose_notification.dart';
 import '../models/scheduled_dose.dart';
 import 'dose_scheduling_service.dart';
 import '../../auth/domain/auth_service.dart';
+import '../../emergency_alerts/data/emergency_alert_repository.dart';
 import 'local_notification_gateway.dart';
 import 'pending_notification_store.dart';
 
@@ -18,13 +19,15 @@ class MissedDoseNotificationController {
     MedicationRepository? medicationRepository,
     DoseSchedulingService? schedulingService,
     AuthService? authService,
+    EmergencyAlertRepository? emergencyAlertRepository,
     this.gracePeriod = const Duration(minutes: 30),
   }) : _notificationGateway = notificationGateway,
        _doseLogRepository = doseLogRepository,
        _pendingNotificationStore = pendingNotificationStore,
        _medicationRepository = medicationRepository,
        _schedulingService = schedulingService,
-       _authService = authService;
+       _authService = authService,
+       _emergencyAlertRepository = emergencyAlertRepository;
 
   final LocalNotificationGateway _notificationGateway;
   final DoseLogRepository _doseLogRepository;
@@ -32,6 +35,7 @@ class MissedDoseNotificationController {
   final MedicationRepository? _medicationRepository;
   final DoseSchedulingService? _schedulingService;
   final AuthService? _authService;
+  final EmergencyAlertRepository? _emergencyAlertRepository;
   final Duration gracePeriod;
 
   Future<void> scheduleDoseReminder(ScheduledDose dose) async {
@@ -156,6 +160,9 @@ class MissedDoseNotificationController {
     for (final notification in pendingNotifications) {
       final alreadyLogged = await _safeHasDoseLog(notification.dose.id);
       if (!alreadyLogged) {
+        if (notification.scheduledTime.isBefore(DateTime.now())) {
+          await _safeCreateMissedDoseAlert(notification.dose);
+        }
         continue;
       }
 
@@ -207,6 +214,18 @@ class MissedDoseNotificationController {
     } catch (error) {
       debugPrint('Failed to read dose log state for $doseId: $error');
       return false;
+    }
+  }
+
+  Future<void> _safeCreateMissedDoseAlert(ScheduledDose dose) async {
+    try {
+      await _emergencyAlertRepository?.createMissedDoseAlert(
+        medicationName: dose.medicationName,
+        dosage: dose.dosage,
+        scheduledTime: dose.scheduledTime,
+      );
+    } catch (error) {
+      debugPrint('Failed to create missed dose alert for ${dose.id}: $error');
     }
   }
 }
