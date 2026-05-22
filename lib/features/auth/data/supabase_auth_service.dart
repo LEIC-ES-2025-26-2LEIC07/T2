@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
@@ -77,6 +78,33 @@ class SupabaseAuthService implements AuthService {
 
       throw AuthServiceException(AuthFailureType.unknown, error.toString());
     }
+  }
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) {
+      throw const AuthServiceException(
+        AuthFailureType.unknown,
+        'Not authenticated',
+      );
+    }
+
+    final path = '$userId/avatar.$fileExtension';
+    final contentType = fileExtension == 'png' ? 'image/png' : 'image/jpeg';
+
+    await _client.storage
+        .from('avatars')
+        .uploadBinary(
+          path,
+          Uint8List.fromList(bytes),
+          fileOptions: FileOptions(contentType: contentType, upsert: true),
+        );
+
+    return _client.storage.from('avatars').getPublicUrl(path);
   }
 
   AuthFailureType _authFailureTypeFor(AuthException error) {

@@ -268,9 +268,14 @@ class ProfileLoginForm extends StatelessWidget {
 }
 
 class _ProfileAvatar extends StatelessWidget {
-  const _ProfileAvatar({required this.name, this.onEditPressed});
+  const _ProfileAvatar({
+    required this.name,
+    required this.avatarUrl,
+    this.onEditPressed,
+  });
 
   final String name;
+  final String avatarUrl;
   final VoidCallback? onEditPressed;
 
   @override
@@ -281,21 +286,19 @@ class _ProfileAvatar extends StatelessWidget {
         Container(
           width: 80,
           height: 80,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.sky,
             border: Border.all(color: AppColors.ink, width: 2.5),
           ),
-          child: Center(
-            child: Text(
-              _initials(name),
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: AppColors.ink,
-              ),
-            ),
-          ),
+          child: avatarUrl.isNotEmpty
+              ? Image.network(
+                  avatarUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stack) => _initialsView,
+                )
+              : _initialsView,
         ),
         Positioned(
           right: -2,
@@ -317,6 +320,17 @@ class _ProfileAvatar extends StatelessWidget {
       ],
     );
   }
+
+  Widget get _initialsView => Center(
+    child: Text(
+      _initials(name),
+      style: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        color: AppColors.ink,
+      ),
+    ),
+  );
 }
 
 class _ProfileInfoRow extends StatelessWidget {
@@ -503,6 +517,7 @@ class ProfileLoggedInCard extends StatelessWidget {
     required this.onCancelPressed,
     required this.onSavePressed,
     required this.onLogoutPressed,
+    required this.onAvatarPressed,
   });
 
   final ProfileViewModel viewModel;
@@ -513,6 +528,7 @@ class ProfileLoggedInCard extends StatelessWidget {
   final VoidCallback onCancelPressed;
   final Future<void> Function() onSavePressed;
   final Future<void> Function() onLogoutPressed;
+  final Future<void> Function() onAvatarPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -531,7 +547,8 @@ class ProfileLoggedInCard extends StatelessWidget {
             children: [
               _ProfileAvatar(
                 name: name,
-                onEditPressed: isEditing ? null : onEditPressed,
+                avatarUrl: viewModel.avatarUrl,
+                onEditPressed: viewModel.isLoading ? null : onAvatarPressed,
               ),
               const SizedBox(height: 12),
               Text(

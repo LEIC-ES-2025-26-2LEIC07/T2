@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// ViewModel for the Profile screen.
 ///
@@ -32,6 +33,8 @@ class ProfileViewModel extends ChangeNotifier {
   String get phone => _metadataString(profileMetadata, 'phone');
 
   String get preferences => _metadataString(profileMetadata, 'preferences');
+
+  String get avatarUrl => _metadataString(profileMetadata, 'avatar_url');
 
   Future<void> signIn({required String email, required String password}) async {
     final cleanEmail = email.trim();
@@ -137,6 +140,28 @@ class ProfileViewModel extends ChangeNotifier {
       _errorMessage = _profileUpdateMessageFor(error);
     } catch (_) {
       _errorMessage = 'Something went wrong while updating your profile.';
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> uploadAvatar(XFile image) async {
+    _setLoading(true);
+    _clearMessages(notify: false);
+
+    try {
+      final bytes = await image.readAsBytes();
+      final ext = image.name.split('.').last.toLowerCase();
+      final url = await _auth.uploadAvatar(bytes: bytes, fileExtension: ext);
+
+      await _auth.updateProfile(
+        email: currentUserEmail ?? '',
+        metadata: {...profileMetadata, 'avatar_url': url},
+      );
+      _infoMessage = 'Foto de perfil atualizada.';
+    } catch (e, st) {
+      debugPrint('uploadAvatar error: $e\n$st');
+      _errorMessage = 'Erro ao atualizar a foto de perfil.';
     } finally {
       _setLoading(false);
     }

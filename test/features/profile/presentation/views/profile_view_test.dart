@@ -66,6 +66,12 @@ class _LoggedInAuth implements AuthService {
   }) async {
     if (updateError != null) throw updateError!;
   }
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
 }
 
 void main() {

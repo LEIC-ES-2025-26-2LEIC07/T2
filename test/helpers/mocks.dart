@@ -40,6 +40,12 @@ class AlwaysSuccessAuth implements AuthService {
     required String email,
     required Map<String, dynamic> metadata,
   }) async {}
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
 }
 
 class AlwaysFailAuth implements AuthService {
@@ -80,5 +86,11 @@ class AlwaysFailAuth implements AuthService {
   Future<void> updateProfile({
     required String email,
     required Map<String, dynamic> metadata,
+  }) async => throw error;
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
   }) async => throw error;
 }

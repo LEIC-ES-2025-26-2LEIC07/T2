@@ -244,6 +244,12 @@ class _InMemoryAuthService implements AuthService {
     _metadata = Map<String, dynamic>.from(metadata);
   }
 
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
+
   void dispose() {
     _authStateController.close();
   }

@@ -252,4 +252,10 @@ class _MockAuthService implements AuthService {
     required String email,
     required Map<String, dynamic> metadata,
   }) async {}
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
 }

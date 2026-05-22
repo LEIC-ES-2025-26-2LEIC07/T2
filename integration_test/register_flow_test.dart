@@ -206,6 +206,12 @@ class _InMemoryAuthService implements AuthService {
     required String email,
     required Map<String, dynamic> metadata,
   }) async {}
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
 }
 
 class _MockStreamHandler extends MockStreamHandler {

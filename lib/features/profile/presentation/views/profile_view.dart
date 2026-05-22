@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 import 'package:clinic_go/features/profile/presentation/widgets/profile_widgets.dart';
@@ -82,6 +83,18 @@ class _ProfileViewState extends State<ProfileView> {
     setState(() => _isEditingProfile = true);
   }
 
+  Future<void> _pickAndUploadAvatar() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (image == null || !mounted) return;
+    await _viewModel.uploadAvatar(image);
+  }
+
   void _cancelEditingProfile() {
     _syncProfileControllers(force: true);
     _viewModel.clearMessages();
@@ -120,6 +133,7 @@ class _ProfileViewState extends State<ProfileView> {
                 onCancelPressed: _cancelEditingProfile,
                 onSavePressed: _handleSaveProfile,
                 onLogoutPressed: _handleLogout,
+                onAvatarPressed: _pickAndUploadAvatar,
               ),
             );
           }
