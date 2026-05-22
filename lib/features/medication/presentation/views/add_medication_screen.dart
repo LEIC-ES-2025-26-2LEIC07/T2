@@ -6,6 +6,8 @@ import 'package:clinic_go/features/medication/presentation/view_models/add_medic
 import 'package:clinic_go/features/medication/presentation/widgets/medication_form_widgets.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
+import 'package:clinic_go/features/settings/presentation/view_models/settings_view_model.dart';
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
 class AddMedicationScreen extends StatefulWidget {
   const AddMedicationScreen({super.key});
@@ -16,6 +18,7 @@ class AddMedicationScreen extends StatefulWidget {
 
 class _AddMedicationScreenState extends State<AddMedicationScreen> {
   late final AddMedicationViewModel _viewModel;
+  late final SettingsViewModel _settingsViewModel;
   final _nameController = TextEditingController();
   final _dosageAmountController = TextEditingController();
   final _notesController = TextEditingController();
@@ -29,12 +32,14 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
       schedulingService: getIt<DoseSchedulingService>(),
     );
     _viewModel.addListener(_onViewModelChanged);
+    _settingsViewModel = SettingsViewModel(authService: getIt<AuthService>());
   }
 
   @override
   void dispose() {
     _viewModel.removeListener(_onViewModelChanged);
     _viewModel.dispose();
+    _settingsViewModel.dispose();
     _nameController.dispose();
     _dosageAmountController.dispose();
     _notesController.dispose();
@@ -88,8 +93,29 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
 
   Future<void> _pickReminderTime(int index) async {
     final current = _viewModel.reminderTimes[index];
-    final picked = await showTimePicker(context: context, initialTime: current);
-    if (picked != null) _viewModel.setReminderTime(index, picked);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) => MedTimePickerSheet(
+        current: current,
+        userSchedules: _settingsViewModel.schedules,
+        onSelected: (t) {
+          _viewModel.setReminderTime(index, t);
+          Navigator.of(sheetContext).pop();
+        },
+        onPickCustom: () async {
+          Navigator.of(sheetContext).pop();
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: current,
+          );
+          if (picked != null) _viewModel.setReminderTime(index, picked);
+        },
+      ),
+    );
   }
 
   @override
