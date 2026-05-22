@@ -86,7 +86,7 @@ class CapturingEmergencyAlertRepository implements EmergencyAlertRepository {
       'medicationName': medicationName,
       'dosage': dosage,
       'scheduledTime': scheduledTime,
-      'doseId': doseId,
+      'dose_id': doseId,
     });
   }
 

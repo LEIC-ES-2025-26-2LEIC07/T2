@@ -124,7 +124,7 @@ class _NotificationLifecycleWrapperState
       children: [
         MaterialBanner(
           content: const Text(
-            'Medication reminders are disabled. Enable notifications in your device settings to receive alerts.',
+            'Os lembretes de medicação estão desativados. Ativa as notificações nas definições do dispositivo para receber alertas.',
           ),
           actions: [
             TextButton(
@@ -133,7 +133,7 @@ class _NotificationLifecycleWrapperState
                   _showPermissionWarning = false;
                 });
               },
-              child: const Text('DISMISS'),
+              child: const Text('FECHAR'),
             ),
           ],
         ),

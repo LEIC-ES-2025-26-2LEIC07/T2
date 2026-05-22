@@ -188,8 +188,10 @@ class EmergencyAlertController extends ChangeNotifier {
 
     alert ??= EmergencyAlert(
       id: alertId,
-      title: message.title ?? 'Emergency alert',
-      message: message.body ?? 'A critical health alert needs your attention.',
+      title: message.title ?? 'Alerta de emergência',
+      message:
+          message.body ??
+          'Um alerta de saúde crítico necessita da tua atenção.',
       createdAt: DateTime.now(),
     );
 

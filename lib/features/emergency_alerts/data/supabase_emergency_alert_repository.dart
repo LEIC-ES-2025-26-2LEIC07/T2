@@ -120,7 +120,7 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
       'metadata': {
         'type': 'missed_dose',
         'medication': medicationName,
-        'dose_id': doseId,
+        'dose_id': ?doseId,
       },
     });
   }

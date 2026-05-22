@@ -41,12 +41,12 @@ class ProfileViewModel extends ChangeNotifier {
     final cleanPassword = password.trim();
 
     if (cleanEmail.isEmpty || cleanPassword.isEmpty) {
-      _setError('Please fill in email and password.');
+      _setError('Preenche o email e a palavra-passe.');
       return;
     }
 
     if (!cleanEmail.contains('@')) {
-      _setError('Enter a valid email.');
+      _setError('Introduz um email válido.');
       return;
     }
 
@@ -55,9 +55,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.signIn(email: cleanEmail, password: cleanPassword);
-      _infoMessage = 'Successfully logged in.';
+      _infoMessage = 'Sessão iniciada com sucesso.';
     } catch (_) {
-      _errorMessage = 'Invalid credentials.';
+      _errorMessage = 'Credenciais inválidas.';
     } finally {
       _setLoading(false);
     }
@@ -67,7 +67,7 @@ class ProfileViewModel extends ChangeNotifier {
     final cleanEmail = email.trim();
 
     if (cleanEmail.isEmpty) {
-      _setError('Enter your email to recover your password.');
+      _setError('Introduz o teu email para recuperar a palavra-passe.');
       return;
     }
 
@@ -76,9 +76,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.resetPassword(cleanEmail);
-      _infoMessage = 'We sent an email to reset your password.';
+      _infoMessage = 'Enviámos um email para redefinir a tua palavra-passe.';
     } catch (_) {
-      _errorMessage = 'Could not send recovery email.';
+      _errorMessage = 'Não foi possível enviar o email de recuperação.';
     } finally {
       _setLoading(false);
     }
@@ -90,9 +90,9 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       await _auth.signOut();
-      _infoMessage = 'Successfully signed out.';
+      _infoMessage = 'Sessão terminada com sucesso.';
     } catch (_) {
-      _errorMessage = 'Could not sign out.';
+      _errorMessage = 'Não foi possível terminar a sessão.';
     } finally {
       _setLoading(false);
     }
@@ -112,12 +112,12 @@ class ProfileViewModel extends ChangeNotifier {
     final cleanPreferences = preferences.trim();
 
     if (cleanName.isEmpty) {
-      _setError('Please enter your name.');
+      _setError('Introduz o teu nome.');
       return;
     }
 
     if (cleanEmail.isEmpty || !cleanEmail.contains('@')) {
-      _setError('Enter a valid email.');
+      _setError('Introduz um email válido.');
       return;
     }
 
@@ -135,11 +135,11 @@ class ProfileViewModel extends ChangeNotifier {
           'preferences': cleanPreferences,
         },
       );
-      _infoMessage = 'Profile updated successfully.';
+      _infoMessage = 'Perfil atualizado com sucesso.';
     } on AuthServiceException catch (error) {
       _errorMessage = _profileUpdateMessageFor(error);
     } catch (_) {
-      _errorMessage = 'Something went wrong while updating your profile.';
+      _errorMessage = 'Ocorreu um erro ao atualizar o perfil.';
     } finally {
       _setLoading(false);
     }
@@ -196,11 +196,10 @@ class ProfileViewModel extends ChangeNotifier {
   String _profileUpdateMessageFor(AuthServiceException error) {
     return switch (error.type) {
       AuthFailureType.validation =>
-        'Please check your profile details and try again.',
+        'Verifica os dados do perfil e tenta novamente.',
       AuthFailureType.network =>
-        'Could not update profile. Check your internet connection.',
-      AuthFailureType.unknown =>
-        'Something went wrong while updating your profile.',
+        'Não foi possível atualizar o perfil. Verifica a tua ligação à internet.',
+      AuthFailureType.unknown => 'Ocorreu um erro ao atualizar o perfil.',
     };
   }
 }

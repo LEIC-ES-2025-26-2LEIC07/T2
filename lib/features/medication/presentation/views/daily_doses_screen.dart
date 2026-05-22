@@ -48,7 +48,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Today's Schedule")),
+      appBar: AppBar(title: const Text('Agenda de Hoje')),
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, _) {
@@ -65,7 +65,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                   const SizedBox(height: 12),
                   OutlinedButton(
                     onPressed: _viewModel.loadTodayDoses,
-                    child: const Text('Retry'),
+                    child: const Text('Tentar novamente'),
                   ),
                 ],
               ),
@@ -84,7 +84,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                     color: Colors.black38,
                   ),
                   const SizedBox(height: 12),
-                  const Text('No scheduled doses for today.'),
+                  const Text('Sem doses agendadas para hoje.'),
                 ],
               ),
             );
@@ -160,7 +160,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                           messenger.showSnackBar(
                                             const SnackBar(
                                               content: Text(
-                                                'Dose marked as taken.',
+                                                'Dose marcada como tomada.',
                                               ),
                                             ),
                                           );
@@ -170,7 +170,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                           messenger.showSnackBar(
                                             const SnackBar(
                                               content: Text(
-                                                'Network error. Please try again.',
+                                                'Erro de rede. Tenta novamente.',
                                               ),
                                             ),
                                           );
@@ -184,7 +184,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Text('Take'),
+                                    : const Text('Tomar'),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -205,7 +205,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                         messenger.showSnackBar(
                                           const SnackBar(
                                             content: Text(
-                                              'Dose marked as skipped.',
+                                              'Dose marcada como ignorada.',
                                             ),
                                           ),
                                         );
@@ -221,7 +221,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                                         );
                                       }
                                     },
-                              child: const Text('Skip'),
+                              child: const Text('Ignorar'),
                             ),
                           ],
                         )
@@ -229,7 +229,7 @@ class _DailyDosesScreenState extends State<DailyDosesScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 6.0),
                           child: Text(
-                            'Completed at ${item.takenTime != null ? TimeOfDay.fromDateTime(item.takenTime!).format(context) : ''}',
+                            'Concluído às ${item.takenTime != null ? TimeOfDay.fromDateTime(item.takenTime!).format(context) : ''}',
                             style: const TextStyle(color: Colors.black54),
                           ),
                         ),

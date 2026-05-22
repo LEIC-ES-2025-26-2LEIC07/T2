@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 12),
           AuthTextField(
             controller: _passwordController,
-            hintText: 'Password',
+            hintText: 'Palavra-passe',
             obscureText: true,
           ),
           const SizedBox(height: 12),

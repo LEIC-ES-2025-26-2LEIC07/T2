@@ -45,7 +45,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
     if (_viewModel.isSuccess && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Medication saved successfully!'),
+          content: Text('Medicamento guardado com sucesso!'),
           backgroundColor: AppColors.successGreen,
         ),
       );
@@ -56,10 +56,10 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
   Future<bool> _confirmDiscard() => showDiscardChangesDialog(
     context,
     isDirty: _viewModel.isDirty,
-    title: 'Discard changes?',
-    content: 'Your unsaved medication data will be lost.',
-    cancelLabel: 'Keep editing',
-    discardLabel: 'Discard',
+    title: 'Descartar alterações?',
+    content: 'Os dados do medicamento não guardados serão perdidos.',
+    cancelLabel: 'Continuar a editar',
+    discardLabel: 'Descartar',
   );
 
   Future<void> _cancelAndPop() async {
@@ -77,7 +77,7 @@ class _AddMedicationScreenState extends State<AddMedicationScreen> {
       ),
       builder: (_) => MedColorPickerSheet(
         selected: _viewModel.selectedColor,
-        title: 'Choose a colour',
+        title: 'Escolhe uma cor',
         onSelected: (c) {
           _viewModel.setColor(c);
           Navigator.of(context).pop();

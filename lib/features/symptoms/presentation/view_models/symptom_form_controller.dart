@@ -81,14 +81,14 @@ class SymptomFormController extends Notifier<SymptomFormState> {
   Future<bool> submitSymptomLog() async {
     final user = ref.read(currentUserProvider);
     if (user == null) {
-      state = state.copyWith(errorMessage: 'Sign in to save a symptom log.');
+      state = state.copyWith(
+        errorMessage: 'Inicia sessão para guardar um registo de sintomas.',
+      );
       return false;
     }
 
     if (state.selectedSymptom == null) {
-      state = state.copyWith(
-        errorMessage: 'Please select at least one symptom.',
-      );
+      state = state.copyWith(errorMessage: 'Seleciona pelo menos um sintoma.');
       return false;
     }
 
@@ -108,7 +108,8 @@ class SymptomFormController extends Notifier<SymptomFormState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to save symptom. Please check your connection.',
+        errorMessage:
+            'Não foi possível guardar o sintoma. Verifica a tua ligação.',
       );
       return false;
     }

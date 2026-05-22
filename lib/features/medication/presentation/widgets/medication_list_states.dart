@@ -74,7 +74,10 @@ class MedListErrorState extends StatelessWidget {
             style: const TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 16),
-          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: const Text('Tentar novamente'),
+          ),
         ],
       ),
     );

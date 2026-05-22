@@ -107,8 +107,8 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
     await androidPlugin?.createNotificationChannel(
       const AndroidNotificationChannel(
         'emergency_alerts',
-        'Emergency alerts',
-        description: 'Critical health alerts that require immediate action',
+        'Alertas de emergência',
+        description: 'Alertas de saúde críticos que requerem ação imediata',
         importance: Importance.max,
         playSound: true,
         enableVibration: true,
@@ -145,11 +145,11 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
               ? 'missed_medication_alerts'
               : 'medication_reminders',
           isMissedDoseAlert
-              ? 'Missed medication alerts'
-              : 'Medication reminders',
+              ? 'Alertas de medicação em atraso'
+              : 'Lembretes de medicação',
           channelDescription: isMissedDoseAlert
-              ? 'Urgent alerts for overdue scheduled doses'
-              : 'Scheduled reminders for upcoming medication doses',
+              ? 'Alertas urgentes para doses agendadas em atraso'
+              : 'Lembretes agendados para doses de medicação próximas',
           importance: Importance.max,
           priority: Priority.high,
           category: AndroidNotificationCategory.reminder,

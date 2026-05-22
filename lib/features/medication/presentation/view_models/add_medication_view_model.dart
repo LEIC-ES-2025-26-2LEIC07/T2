@@ -23,12 +23,12 @@ class AddMedicationViewModel extends ChangeNotifier with MedicationFormFields {
 
   // ── Constants ────────────────────────────────────────────────────
   static const List<String> frequencyOptions = [
-    'Once daily',
-    'Twice daily',
-    'Three times daily',
-    'Every other day',
-    'Weekly',
-    'As needed',
+    'Uma vez por dia',
+    'Duas vezes por dia',
+    'Três vezes por dia',
+    'Em dias alternados',
+    'Semanalmente',
+    'Conforme necessário',
   ];
 
   static const List<String> dosageUnits = ['mg', 'g', 'ml', 'mcg', 'IU'];
@@ -119,7 +119,7 @@ class AddMedicationViewModel extends ChangeNotifier with MedicationFormFields {
       errorMessage = e.message;
     } catch (e, stackTrace) {
       debugPrint('Error saving medication: $e\n$stackTrace');
-      errorMessage = 'Could not save medication. Please try again.';
+      errorMessage = 'Não foi possível guardar o medicamento. Tenta novamente.';
     } finally {
       isLoading = false;
       notifyListeners();

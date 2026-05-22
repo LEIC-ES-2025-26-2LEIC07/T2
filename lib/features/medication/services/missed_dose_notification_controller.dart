@@ -53,8 +53,8 @@ class MissedDoseNotificationController {
     await _notificationGateway.schedule(
       NotificationRequest(
         id: primaryNotificationIdForDose(dose.id),
-        title: 'Time for Medication',
-        body: 'Take ${dose.dosage} of ${dose.medicationName}',
+        title: 'Hora do Medicamento',
+        body: 'Toma ${dose.dosage} de ${dose.medicationName}',
         scheduledTime: dose.scheduledTime,
         payload: primaryPayload.encode(),
       ),
@@ -65,9 +65,9 @@ class MissedDoseNotificationController {
     await _notificationGateway.schedule(
       NotificationRequest(
         id: missedNotificationId,
-        title: 'Missed Medication',
+        title: 'Medicamento em Atraso',
         body:
-            'You are ${gracePeriod.inMinutes} mins late for ${dose.medicationName}',
+            'Tens ${gracePeriod.inMinutes} min de atraso para ${dose.medicationName}',
         scheduledTime: missedScheduledTime,
         payload: missedPayload.encode(),
       ),

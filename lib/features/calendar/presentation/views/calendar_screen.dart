@@ -43,7 +43,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Calendar')),
+      appBar: AppBar(title: const Text('Calendário')),
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, _) {
@@ -104,10 +104,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: const [
-          _LegendItem(color: Colors.green, label: 'All taken'),
-          _LegendItem(color: Colors.orange, label: 'Partial'),
-          _LegendItem(color: Colors.red, label: 'Missed'),
-          _LegendItem(color: Colors.blue, label: 'Upcoming'),
+          _LegendItem(color: Colors.green, label: 'Todas tomadas'),
+          _LegendItem(color: Colors.orange, label: 'Parcial'),
+          _LegendItem(color: Colors.red, label: 'Falhadas'),
+          _LegendItem(color: Colors.blue, label: 'Próximas'),
         ],
       ),
     );
@@ -159,7 +159,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           all.add(
             const Padding(
               padding: EdgeInsets.all(16),
-              child: Text('No medication activity for this day.'),
+              child: Text('Sem atividade de medicação para este dia.'),
             ),
           );
         } else {
@@ -169,7 +169,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 leading: const Icon(Icons.schedule),
                 title: Text('${s.medicationName} • ${s.dosage}'),
                 subtitle: Text(
-                  'Scheduled: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}',
+                  'Agendada: ${TimeOfDay.fromDateTime(s.scheduledTime).format(context)}',
                 ),
               ),
             );
@@ -187,7 +187,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 title: Text(l.medicationName ?? ''),
                 subtitle: Text(
-                  'Logged: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})',
+                  'Registada: ${l.takenTime != null ? TimeOfDay.fromDateTime(l.takenTime!).format(context) : ''} (${l.status.name})',
                 ),
               ),
             );

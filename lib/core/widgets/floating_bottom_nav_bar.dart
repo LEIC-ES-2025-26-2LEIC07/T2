@@ -37,7 +37,7 @@ class FloatingBottomNavBar extends StatelessWidget {
             _NavItem(
               index: 1,
               currentIndex: currentIndex,
-              label: 'MEDS',
+              label: 'MEDICAÇÃO',
               icon: _MedsIcon(),
               onTap: onTap,
             ),

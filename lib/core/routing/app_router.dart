@@ -51,7 +51,7 @@ class AppRouter {
 
     if (routeName == login) {
       final successMessage = settings.arguments is String
-          ? settings.arguments! as String
+          ? settings.arguments as String
           : null;
 
       return MaterialPageRoute<void>(

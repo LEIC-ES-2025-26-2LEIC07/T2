@@ -140,7 +140,7 @@ void main() {
       await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
-      expect(find.textContaining('select'), findsOneWidget);
+      expect(find.textContaining('Seleciona'), findsOneWidget);
     });
 
     testWidgets('tapping Guardar when not signed in shows sign-in error', (
@@ -157,7 +157,7 @@ void main() {
       await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
-      expect(find.textContaining('Sign in'), findsAtLeastNWidgets(1));
+      expect(find.textContaining('Inicia sessão'), findsAtLeastNWidgets(1));
     });
   });
 

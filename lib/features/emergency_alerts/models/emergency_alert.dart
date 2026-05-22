@@ -49,9 +49,9 @@ class EmergencyAlert {
 
     return EmergencyAlert(
       id: _string(json, 'id'),
-      title: title.isEmpty ? 'Emergency alert' : title,
+      title: title.isEmpty ? 'Alerta de emergência' : title,
       message: message.isEmpty
-          ? 'A critical health alert needs your attention.'
+          ? 'Um alerta de saúde crítico necessita da tua atenção.'
           : message,
       severity: _string(json, 'severity').isEmpty
           ? 'critical'

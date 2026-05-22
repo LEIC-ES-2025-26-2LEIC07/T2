@@ -160,7 +160,7 @@ class EditMedicationViewModel extends ChangeNotifier with MedicationFormFields {
       isDirty = false;
     } catch (e) {
       debugPrint('Edit medication error: $e');
-      errorMessage = 'Could not save changes. Please try again.';
+      errorMessage = 'Não foi possível guardar as alterações. Tenta novamente.';
     } finally {
       isLoading = false;
       notifyListeners();
@@ -178,7 +178,8 @@ class EditMedicationViewModel extends ChangeNotifier with MedicationFormFields {
       isSuccess = true;
     } catch (e) {
       debugPrint('Delete medication error: $e');
-      errorMessage = 'Could not delete medication. Please try again.';
+      errorMessage =
+          'Não foi possível eliminar o medicamento. Tenta novamente.';
     } finally {
       isLoading = false;
       notifyListeners();
