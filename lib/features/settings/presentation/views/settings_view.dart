@@ -4,6 +4,7 @@ import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/settings/presentation/views/health_conditions_screen.dart';
+import 'package:clinic_go/features/settings/presentation/views/routine_schedules_screen.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -19,12 +20,32 @@ class _SettingsViewState extends State<SettingsView> {
 
   List<String> _conditions = [];
   List<String> _allergies = [];
+  List<TimeOfDay> _schedules = [];
 
   String? get _healthSubtitle {
     final all = [..._conditions, ..._allergies];
     if (all.isEmpty) return null;
     if (all.length <= 3) return all.join(' · ');
     return '${all.take(2).join(' · ')} +${all.length - 2}';
+  }
+
+  String? get _schedulesSubtitle {
+    if (_schedules.isEmpty) return null;
+    String fmt(TimeOfDay t) =>
+        '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+    if (_schedules.length <= 3) return _schedules.map(fmt).join(' · ');
+    return '${_schedules.take(2).map(fmt).join(' · ')} +${_schedules.length - 2}';
+  }
+
+  Future<void> _openRoutineSchedules() async {
+    final result = await Navigator.of(context).push<List<TimeOfDay>>(
+      MaterialPageRoute(
+        builder: (_) => RoutineSchedulesScreen(schedules: _schedules),
+      ),
+    );
+    if (result != null) {
+      setState(() => _schedules = result);
+    }
   }
 
   Future<void> _openHealthConditions() async {
@@ -148,8 +169,8 @@ class _SettingsViewState extends State<SettingsView> {
                   iconBg: AppColors.lemon,
                   icon: Icons.access_time_outlined,
                   title: 'Horários habituais',
-                  subtitle: '3 horas configuradas',
-                  onTap: () {},
+                  subtitle: _schedulesSubtitle,
+                  onTap: _openRoutineSchedules,
                 ),
               ],
             ),
