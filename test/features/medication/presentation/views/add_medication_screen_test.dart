@@ -1,3 +1,4 @@
+import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
@@ -13,6 +14,8 @@ class MockMissedDoseNotificationController extends Mock
     implements MissedDoseNotificationController {}
 
 class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
+
+class MockAuthService extends Mock implements AuthService {}
 
 class FakeMedication extends Fake implements Medication {}
 
@@ -61,14 +64,22 @@ Widget _buildScreen(MedicationRepository repo) {
 
   final mockController = MockMissedDoseNotificationController();
   final mockService = MockDoseSchedulingService();
+  final mockAuthService = MockAuthService();
 
   when(() => mockService.calculateUpcomingDoses(any(), any())).thenReturn([]);
+  when(() => mockAuthService.currentUserMetadata).thenReturn({});
+  when(
+    () => mockAuthService.authStateChanges,
+  ).thenAnswer((_) => const Stream.empty());
 
   if (!GetIt.I.isRegistered<MissedDoseNotificationController>()) {
     GetIt.I.registerSingleton<MissedDoseNotificationController>(mockController);
   }
   if (!GetIt.I.isRegistered<DoseSchedulingService>()) {
     GetIt.I.registerSingleton<DoseSchedulingService>(mockService);
+  }
+  if (!GetIt.I.isRegistered<AuthService>()) {
+    GetIt.I.registerSingleton<AuthService>(mockAuthService);
   }
 
   return MaterialApp(

@@ -41,6 +41,7 @@ void main() {
 
   setUp(() {
     controller = MockMissedDoseNotificationController();
+    when(() => controller.dismissNotifications(any())).thenAnswer((_) async {});
   });
 
   void stubLogDoseSuccess() {
