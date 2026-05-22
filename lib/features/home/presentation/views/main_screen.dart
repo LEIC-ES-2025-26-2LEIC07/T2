@@ -16,6 +16,7 @@ import 'package:clinic_go/features/medication/services/missed_dose_notification_
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
 import 'package:clinic_go/features/home/presentation/views/home_content.dart';
+import 'package:clinic_go/features/settings/presentation/views/settings_view.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key, this.homeViewModel});
@@ -103,7 +104,7 @@ class _MainScreenState extends State<MainScreen> {
         onGoToMeds: () => setState(() => _currentIndex = 1),
       ),
       CalendarScreen(viewModel: _calendarViewModel),
-      const Center(child: Text('Definições')),
+      const SettingsView(),
     ];
 
     return AppBackground(
