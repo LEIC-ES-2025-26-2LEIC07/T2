@@ -416,7 +416,7 @@ Sprint 0 was demonstrated to the TP teacher and the full team. Key deliverables 
 - High-level MVVM architecture design with Supabase as the backend.
 - v0 prototype: bottom navigation shell, profile screen stub, Supabase auth configuration, and routing foundations.
 
-Feedback: product vision was clear and well-scoped. Architecture choice was validated. Suggestion to ensure the full team is contributing equally to avoid bottlenecks in subsequent sprints.
+Feedback: product vision was clear and well-scoped. Architecture choice was validated and the AI-generated images need to be changed.
 
 #### Sprint 0 Retrospective
 
@@ -450,7 +450,6 @@ Feedback: product vision was clear and well-scoped. Architecture choice was vali
 Sprint 1 was demonstrated to the TP teacher and the full team. Key deliverables shown:
 
 - Medication management: add medications with dosage, frequency, and reminder time.
-- Notification scheduling: missed medication alerts using `flutter_local_notifications` with exact alarm support.
 - Dose tracking: mark individual doses as taken or skipped from the home screen.
 - Login and registration screens with Supabase authentication and session persistence.
 - v0.1 GitHub release with APK and CHANGELOG.
@@ -496,25 +495,21 @@ Sprint 2 was demonstrated to the TP teacher and the full team. Key deliverables 
 - Expanded automated test suite covering authentication, medications, calendar, and profile flows.
 - v0.2 GitHub release with APK and CHANGELOG.
 
-Feedback: significant feature expansion delivered. UAT score dropped slightly due to integration tests breaking after the neo-brutalist redesign — identified as a gap to fix in Sprint 3.
+Feedback: significant feature expansion delivered.
 
 #### Sprint 2 Retrospective
 
 * **Did well:**
-    * **Balanced Workload:** Significant improvement in team participation compared to Sprint 0. Task distribution was more equitable, reducing knowledge silos and burnout risk.
     * **Peer Review Culture:** Mandatory PRs were adopted by the full team. Active code reviews led to fewer integration bugs and a more consistent coding style.
     * **Feature Scope:** All planned user stories were delivered, expanding the app from basic medication CRUD to a full daily management flow.
 
 * **Do differently:**
     * **Persistent End-of-Sprint Crunch:** Tasks were again backloaded to the final days, preventing thorough testing of the last features before the deadline.
     * **Delayed Problem Signaling:** Without scheduled sync sessions, technical blockers were kept private too long, creating unnecessary bottlenecks.
-    * **Integration Test Maintenance:** Neo-brutalist redesign broke existing integration tests and the issue was not caught until Sprint 3 review.
 
 * **Improvements for Sprint 3:**
     * Implement one weekly 60-minute sync session for progress alignment and early blocker resolution.
     * Integration tests must be updated in the same PR as any UI change — broken tests block merge.
-    * Set a soft feature-complete target 2 days before sprint end to allow time for testing and fixes.
-
 
 ### Sprint 3
 
@@ -536,25 +531,21 @@ Sprint 3 was demonstrated to the TP teacher and the full team. Key deliverables 
 - Expanded automated test suite covering add medication, edit/delete medication, and register user journeys.
 - Avatar photo upload from gallery for profile customisation.
 
-Feedback: overall positive on visual consistency and test coverage. Suggestion to close remaining open PBIs (#106 Calendar refac, #107 Settings refac, #113 Log symptom screen) during stabilization before Pitch & Demo.
+Feedback: overall positive on visual consistency and test coverage. Suggestion to close remaining open MUST HAVE Users Stories about notifications.
 
 #### Sprint 3 Retrospective
 
 * **Did well:**
-    * **Visual consistency:** The neo-brutalist design system was applied uniformly across all redesigned screens, significantly improving the app's visual identity with no hardcoded colours — all tokens via `AppColors`.
-    * **Test coverage:** Unit, widget, and integration tests all expanded. New integration test journeys (add medication, edit/delete, register flow) added; all 45 profile tests and 376 total tests passing.
-    * **AI usage discipline:** All AI-generated commits prefixed `[MISTER AI]`; Sprint 3 AI report committed to `docs/ai_report/sprint3AI.md`. MisterAI labels applied on relevant PBIs.
     * **CI/CD improvement:** Targeted test runs on PRs and full suite on merge to `main`, with PR comment reporting test results.
+    * **Visual consistency:** The neo-brutalist design system was applied uniformly across all redesigned screens, significantly improving the app's visual identity with no hardcoded colours — all tokens via `AppColors`.
+    * **AI usage discipline:** All AI-generated commits prefixed `[MISTER AI]`; Sprint 3 AI report committed to `docs/ai_report/sprint3AI.md`. MisterAI labels applied on relevant PBIs.
 
 * **Do differently:**
     * **Sprint planning quality:** One epic (#102) was in the Sprint Backlog at planning time, and #105 had no Effort estimate — both violations caught and fixed mid-sprint. These should be caught at kickoff.
-    * **Scope management:** Three PBIs (#106, #107, #113) remain open at sprint end, indicating the sprint was overcommitted relative to past velocity.
-    * **PR review timing:** Several PRs were reviewed and merged under time pressure in the final days. A review deadline before sprint end would help.
 
 * **Improvements for next sprint:**
     * At sprint planning, verify no epics in the Sprint Backlog, all items have Effort estimates, and total effort does not exceed the previous sprint's velocity.
     * Set a PR review deadline of 48 hours before sprint end to avoid last-minute merges.
-    * Close carry-over PBIs (#106, #107, #113) in the stabilization period before starting new Sprint 4 scope.
 
 ### Sprint 4
 
