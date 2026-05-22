@@ -369,11 +369,7 @@ class _ChevronRow extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.muted,
-              size: 22,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.muted, size: 22),
           ],
         ),
       ),
