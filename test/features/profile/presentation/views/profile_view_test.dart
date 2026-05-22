@@ -193,21 +193,21 @@ void main() {
   });
 
   group('ProfileView — logged in', () {
-    testWidgets('renders user name uppercased', (tester) async {
+    testWidgets('renders user name', (tester) async {
       await _setupDI(authService: _LoggedInAuth());
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('ALICE TEST'), findsOneWidget);
+      expect(find.text('Alice Test'), findsWidgets);
     });
 
-    testWidgets('renders Edit and Logout buttons', (tester) async {
+    testWidgets('renders Editar perfil and Sair buttons', (tester) async {
       await _setupDI(authService: _LoggedInAuth());
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Edit'), findsOneWidget);
-      expect(find.text('Logout'), findsOneWidget);
+      expect(find.text('Editar perfil'), findsOneWidget);
+      expect(find.text('Sair'), findsOneWidget);
     });
 
     testWidgets('renders profile field labels in view mode', (tester) async {
@@ -215,10 +215,8 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Nome'), findsOneWidget);
-      expect(find.text('Nascimento'), findsOneWidget);
-      expect(find.text('Telefone'), findsOneWidget);
-      expect(find.text('Preferências'), findsOneWidget);
+      expect(find.text('NOME'), findsOneWidget);
+      expect(find.text('EMAIL'), findsOneWidget);
     });
 
     testWidgets('shows email value in profile view', (tester) async {
@@ -229,48 +227,45 @@ void main() {
       expect(find.text('alice@example.com'), findsOneWidget);
     });
 
-    testWidgets('tapping Edit switches to edit mode with Save and Cancel', (
+    testWidgets('tapping Editar perfil switches to edit mode', (tester) async {
+      await _setupDI(authService: _LoggedInAuth());
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Editar perfil'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Guardar'), findsOneWidget);
+      expect(find.text('Cancelar'), findsOneWidget);
+    });
+
+    testWidgets('tapping Cancelar reverts to view mode', (tester) async {
+      await _setupDI(authService: _LoggedInAuth());
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Editar perfil'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Editar perfil'), findsOneWidget);
+      expect(find.text('Guardar'), findsNothing);
+      expect(find.text('Cancelar'), findsNothing);
+    });
+
+    testWidgets('edit mode shows text fields for Nome and Email', (
       tester,
     ) async {
       await _setupDI(authService: _LoggedInAuth());
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Edit'));
+      await tester.tap(find.text('Editar perfil'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Save'), findsOneWidget);
-      expect(find.text('Cancel'), findsOneWidget);
-    });
-
-    testWidgets('tapping Cancel reverts to view mode', (tester) async {
-      await _setupDI(authService: _LoggedInAuth());
-      await tester.pumpWidget(_buildApp());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Edit'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Edit'), findsOneWidget);
-      expect(find.text('Save'), findsNothing);
-      expect(find.text('Cancel'), findsNothing);
-    });
-
-    testWidgets('edit mode shows text fields for profile fields', (
-      tester,
-    ) async {
-      await _setupDI(authService: _LoggedInAuth());
-      await tester.pumpWidget(_buildApp());
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Edit'));
-      await tester.pumpAndSettle();
-
-      // In edit mode, profile fields become TextFields with labelText
       expect(find.widgetWithText(TextField, 'Nome'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Telefone'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
     });
 
     testWidgets('successful logout shows info message', (tester) async {
@@ -278,7 +273,7 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Logout'));
+      await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('signed out'), findsOneWidget);
@@ -291,18 +286,18 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Logout'));
+      await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Could not sign out'), findsOneWidget);
     });
 
-    testWidgets('user with no name falls back to USER_TEST', (tester) async {
+    testWidgets('user with no name falls back to Utilizador', (tester) async {
       await _setupDI(authService: _LoggedInAuth(metadata: const {}));
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('USER_TEST'), findsOneWidget);
+      expect(find.text('Utilizador'), findsWidgets);
     });
 
     testWidgets('successful profile save exits edit mode', (tester) async {
@@ -310,14 +305,14 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Edit'));
+      await tester.tap(find.text('Editar perfil'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Edit'), findsOneWidget);
-      expect(find.text('Save'), findsNothing);
+      expect(find.text('Editar perfil'), findsOneWidget);
+      expect(find.text('Guardar'), findsNothing);
     });
 
     testWidgets('failed profile save shows error message', (tester) async {
@@ -327,10 +322,10 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Edit'));
+      await tester.tap(find.text('Editar perfil'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Something went wrong'), findsOneWidget);
