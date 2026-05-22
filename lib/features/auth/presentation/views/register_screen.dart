@@ -18,11 +18,9 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   late final SignUpViewModel _viewModel;
   final _nameController = TextEditingController();
-  final _dobController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
-  String? _dobIso;
   bool _obscurePassword = true;
 
   @override
@@ -37,7 +35,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _viewModel.removeListener(_onViewModelChanged);
     _viewModel.dispose();
     _nameController.dispose();
-    _dobController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
@@ -52,23 +49,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime(now.year - 25, now.month, now.day),
-      firstDate: DateTime(1900),
-      lastDate: now,
-    );
-    if (picked == null || !mounted) return;
-    setState(() {
-      _dobController.text =
-          '${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}';
-      _dobIso =
-          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-    });
-  }
-
   Future<void> _handleSignUp() async {
     FocusScope.of(context).unfocus();
     await _viewModel.signUp(
@@ -76,7 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       password: _passwordController.text,
       confirmPassword: _confirmController.text,
       fullName: _nameController.text, // non-null → validated by ViewModel
-      birthDate: _dobIso ?? '',
     );
   }
 
@@ -120,40 +99,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        '1 DE 2',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.muted.withValues(alpha: 0.7),
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: 0.5,
-                      minHeight: 4,
-                      backgroundColor: AppColors.lemon.withValues(alpha: 0.15),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.lemon,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
@@ -167,19 +112,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: 'NOME COMPLETO',
                           controller: _nameController,
                           hint: 'ex: Maria Silva',
-                        ),
-                        const SizedBox(height: 12),
-                        _labeledField(
-                          label: 'DATA DE NASCIMENTO',
-                          controller: _dobController,
-                          hint: 'DD / MM / AAAA',
-                          suffix: const Icon(
-                            Icons.calendar_today_outlined,
-                            size: 18,
-                            color: Color(0xFFB0B0B0),
-                          ),
-                          readOnly: true,
-                          onTap: _pickDate,
                         ),
                         const SizedBox(height: 12),
                         _labeledField(

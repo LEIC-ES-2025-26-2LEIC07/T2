@@ -187,7 +187,8 @@ void main() {
       await tester.tap(find.text('CRIAR'));
       await tester.pumpAndSettle();
       expect(find.text('Criar conta'), findsWidgets);
-      expect(find.text('1 DE 2'), findsOneWidget);
+      expect(find.text('1 DE 2'), findsNothing);
+      expect(find.text('DATA DE NASCIMENTO'), findsNothing);
     });
   });
 }

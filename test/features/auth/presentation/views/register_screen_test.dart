@@ -23,15 +23,16 @@ void main() {
   tearDown(() async => GetIt.I.reset());
 
   group('RegisterScreen', () {
-    testWidgets('renders title, progress and all 6 fields', (tester) async {
+    testWidgets('renders title and all 4 fields', (tester) async {
       await _setupDI();
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
       expect(find.text('Criar conta'), findsWidgets);
-      expect(find.text('1 DE 2'), findsOneWidget);
-      // name, dob (readOnly), email, password, confirm
-      expect(find.byType(TextField), findsNWidgets(5));
+      expect(find.text('1 DE 2'), findsNothing);
+      expect(find.text('DATA DE NASCIMENTO'), findsNothing);
+      // name, email, password, confirm
+      expect(find.byType(TextField), findsNWidgets(4));
       expect(find.text('Concluir registo →'), findsOneWidget);
     });
 
@@ -53,10 +54,9 @@ void main() {
 
       final fields = find.byType(TextField);
       await tester.enterText(fields.at(0), 'Maria Silva'); // name
-      // fields.at(1) is dob — readOnly, skip
-      await tester.enterText(fields.at(2), 'maria@email.pt'); // email
-      await tester.enterText(fields.at(3), 'password123'); // password
-      await tester.enterText(fields.at(4), 'different456'); // confirm
+      await tester.enterText(fields.at(1), 'maria@email.pt'); // email
+      await tester.enterText(fields.at(2), 'password123'); // password
+      await tester.enterText(fields.at(3), 'different456'); // confirm
 
       await tester.tap(find.text('Concluir registo →'));
       await tester.pumpAndSettle();
@@ -71,9 +71,9 @@ void main() {
 
       final fields = find.byType(TextField);
       await tester.enterText(fields.at(0), 'Maria Silva');
-      await tester.enterText(fields.at(2), 'maria@email.pt');
+      await tester.enterText(fields.at(1), 'maria@email.pt');
+      await tester.enterText(fields.at(2), 'abc');
       await tester.enterText(fields.at(3), 'abc');
-      await tester.enterText(fields.at(4), 'abc');
 
       await tester.tap(find.text('Concluir registo →'));
       await tester.pumpAndSettle();
