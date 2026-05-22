@@ -5,6 +5,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/emergency_alert.dart';
 import 'emergency_alert_repository.dart';
 
+const _missedDoseTitle = 'Dose esquecida';
+const _missedDoseMessageTemplate =
+    'Não tomou {dosage} de {medication} às {time}.';
+
 class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
   SupabaseEmergencyAlertRepository(this._client);
 
@@ -54,10 +58,16 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
           schema: 'public',
           table: 'alerts',
           callback: (payload) {
-            controller.add(EmergencyAlert.fromJson(payload.newRecord));
+            try {
+              controller.add(EmergencyAlert.fromJson(payload.newRecord));
+            } catch (e) {
+              controller.addError(e);
+            }
           },
         )
-        .subscribe();
+        .subscribe((status, [error]) {
+          if (error != null) controller.addError(error);
+        });
 
     controller.onCancel = () {
       _client.removeChannel(channel);
@@ -96,10 +106,15 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
     final timeStr =
         '${scheduledTime.hour.toString().padLeft(2, '0')}:${scheduledTime.minute.toString().padLeft(2, '0')}';
 
+    final message = _missedDoseMessageTemplate
+        .replaceAll('{dosage}', dosage)
+        .replaceAll('{medication}', medicationName)
+        .replaceAll('{time}', timeStr);
+
     await _client.from('alerts').insert({
       'user_id': user.id,
-      'title': 'Dose esquecida',
-      'message': 'Não tomou $dosage de $medicationName às $timeStr.',
+      'title': _missedDoseTitle,
+      'message': message,
       'severity': 'high',
       'metadata': {'type': 'missed_dose', 'medication': medicationName},
     });

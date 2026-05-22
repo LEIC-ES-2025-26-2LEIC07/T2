@@ -65,7 +65,8 @@ class AppRouter {
 
     if (routeName != null && routeName.startsWith('$emergencyAlertPrefix/')) {
       final uri = Uri.parse(routeName);
-      final alertId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+      final rawId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+      final alertId = rawId != null ? Uri.decodeComponent(rawId) : null;
       if (alertId == null || alertId.isEmpty) return null;
 
       return MaterialPageRoute<void>(

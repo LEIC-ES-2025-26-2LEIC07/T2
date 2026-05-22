@@ -74,7 +74,13 @@ async function getAccessToken(serviceAccount: ServiceAccount): Promise<string> {
     body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
   });
 
+  if (!tokenResponse.ok) {
+    const errText = await tokenResponse.text();
+    throw new Error(`FCM token request failed (${tokenResponse.status}): ${errText}`);
+  }
+
   const { access_token } = await tokenResponse.json();
+  if (!access_token) throw new Error("FCM token response missing access_token");
   return access_token;
 }
 

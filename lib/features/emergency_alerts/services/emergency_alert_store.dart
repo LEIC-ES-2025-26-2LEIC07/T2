@@ -30,7 +30,11 @@ class EmergencyAlertStore {
   }
 
   Future<void> replaceAll(List<EmergencyAlert> alerts) async {
-    await _save(alerts.where((alert) => !alert.isAcknowledged).toList());
+    final byId = <String, EmergencyAlert>{};
+    for (final alert in alerts.where((alert) => !alert.isAcknowledged)) {
+      byId[alert.id] = alert;
+    }
+    await _save(byId.values.toList());
   }
 
   Future<void> remove(String id) async {

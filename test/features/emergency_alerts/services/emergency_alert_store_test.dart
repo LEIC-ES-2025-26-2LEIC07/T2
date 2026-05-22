@@ -36,6 +36,30 @@ void main() {
       expect(await store.loadUnacknowledged(), isEmpty);
     });
 
+    test(
+      'replaceAll with duplicate IDs keeps only the last occurrence',
+      () async {
+        final older = EmergencyAlert(
+          id: 'dup',
+          title: 'Old',
+          message: 'Old message',
+          createdAt: DateTime(2026, 5, 22, 8),
+        );
+        final newer = EmergencyAlert(
+          id: 'dup',
+          title: 'New',
+          message: 'New message',
+          createdAt: DateTime(2026, 5, 22, 9),
+        );
+
+        await store.replaceAll([older, newer]);
+        final loaded = await store.loadUnacknowledged();
+
+        expect(loaded, hasLength(1));
+        expect(loaded.first.title, 'New');
+      },
+    );
+
     test('replaceAll filters acknowledged alerts', () async {
       await store.replaceAll([
         EmergencyAlert(

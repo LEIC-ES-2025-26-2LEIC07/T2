@@ -78,12 +78,7 @@ class EmergencyAlertController extends ChangeNotifier {
   }
 
   Future<void> acknowledge(String id) async {
-    try {
-      await _repository.acknowledgeAlert(id);
-    } catch (error) {
-      debugPrint('EmergencyAlertController.acknowledge failed: $error');
-    }
-
+    await _repository.acknowledgeAlert(id);
     _alerts.removeWhere((alert) => alert.id == id);
     await _store.remove(id);
     notifyListeners();
