@@ -5,7 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(Widget widget) {
     return pumpWidget(
-      MaterialApp(home: widget, theme: ThemeData(useMaterial3: true)),
+      MaterialApp(
+        home: widget,
+        theme: ThemeData(
+          useMaterial3: true,
+          splashFactory: NoSplash.splashFactory,
+        ),
+      ),
     );
   }
 }

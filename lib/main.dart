@@ -64,6 +64,7 @@ class _ClinicGOState extends State<ClinicGO> {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryColor),
+          splashFactory: InkRipple.splashFactory,
         ),
         onGenerateRoute: AppRouter.onGenerateRoute,
         home: const SplashScreen(),

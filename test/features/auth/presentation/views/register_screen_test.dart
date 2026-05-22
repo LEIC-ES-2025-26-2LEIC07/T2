@@ -14,6 +14,7 @@ Future<void> _setupDI({AuthService? authService}) async {
 }
 
 Widget _buildApp() => MaterialApp(
+  theme: ThemeData(splashFactory: NoSplash.splashFactory),
   home: const RegisterScreen(),
   routes: {AppRouter.home: (_) => const Scaffold(body: Text('Home'))},
 );
@@ -84,6 +85,7 @@ void main() {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           home: Scaffold(
             body: Builder(
               builder: (ctx) => ElevatedButton(

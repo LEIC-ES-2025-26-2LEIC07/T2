@@ -15,6 +15,7 @@ Future<void> _setupDI({AuthService? authService}) async {
 
 Widget _buildApp() {
   return MaterialApp(
+    theme: ThemeData(splashFactory: NoSplash.splashFactory),
     onGenerateRoute: (settings) {
       if (settings.name == AppRouter.home) {
         return MaterialPageRoute<void>(
