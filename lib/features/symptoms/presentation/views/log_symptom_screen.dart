@@ -59,70 +59,72 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
         if (shouldDiscard && context.mounted) Navigator.of(context).pop();
       },
       child: Scaffold(
-        backgroundColor: AppColors.surfaceWarm,
-        appBar: AppBar(
-          title: const Text('Registar sintoma'),
-          backgroundColor: Colors.transparent,
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        backgroundColor: AppColors.paper,
+        body: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: AppColors.paper,
+            image: DecorationImage(
+              image: AssetImage('assets/images/wallpaper-sky.png'),
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+            ),
+          ),
+          child: SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (state.errorMessage != null) ...[
-                  SymptomFormBanner(message: state.errorMessage!),
-                  const SizedBox(height: 16),
-                ],
-                SymptomSearchCard(
-                  filteredSymptoms: controller.filteredSymptoms,
-                  selectedSymptom: state.selectedSymptom,
-                  searchController: _searchController,
-                  isLoading: state.isLoading,
-                  onSearchChanged: controller.setSearchQuery,
-                  onSymptomSelected: controller.selectSymptom,
-                ),
-                const SizedBox(height: 16),
-                SeverityCard(
-                  severity: state.severity,
-                  severityColor: severityColor,
-                  isLoading: state.isLoading,
-                  onChanged: state.isLoading ? null : controller.setSeverity,
-                ),
-                const SizedBox(height: 16),
-                DateTimeCard(
-                  occurredAt: state.occurredAt,
-                  isLoading: state.isLoading,
-                  onPick: () =>
-                      _pickOccurredAt(context, controller, state.occurredAt),
-                ),
-                const SizedBox(height: 16),
-                NotesCard(
-                  notesController: _notesController,
-                  isLoading: state.isLoading,
-                  onChanged: controller.setNotes,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: state.isLoading
-                        ? null
-                        : () => _submit(context, ref),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: severityColor,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                const _LogSymptomHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state.errorMessage != null) ...[
+                          SymptomFormBanner(message: state.errorMessage!),
+                          const SizedBox(height: 16),
+                        ],
+                        SymptomSearchCard(
+                          filteredSymptoms: controller.filteredSymptoms,
+                          selectedSymptom: state.selectedSymptom,
+                          searchController: _searchController,
+                          isLoading: state.isLoading,
+                          onSearchChanged: controller.setSearchQuery,
+                          onSymptomSelected: controller.selectSymptom,
+                        ),
+                        const SizedBox(height: 16),
+                        SeverityCard(
+                          severity: state.severity,
+                          severityColor: severityColor,
+                          isLoading: state.isLoading,
+                          onChanged: state.isLoading
+                              ? null
+                              : controller.setSeverity,
+                        ),
+                        const SizedBox(height: 16),
+                        DateTimeCard(
+                          occurredAt: state.occurredAt,
+                          isLoading: state.isLoading,
+                          onPick: () => _pickOccurredAt(
+                            context,
+                            controller,
+                            state.occurredAt,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        NotesCard(
+                          notesController: _notesController,
+                          isLoading: state.isLoading,
+                          onChanged: controller.setNotes,
+                        ),
+                        const SizedBox(height: 28),
+                        _SubmitButton(
+                          isLoading: state.isLoading,
+                          onPressed: state.isLoading
+                              ? null
+                              : () => _submit(context, ref),
+                        ),
+                      ],
                     ),
-                    child: state.isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.4,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('Save symptom'),
                   ),
                 ),
               ],
@@ -164,7 +166,7 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
     if (!context.mounted) return;
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Symptom saved successfully.')),
+        const SnackBar(content: Text('Sintoma guardado com sucesso.')),
       );
       Navigator.of(context).pop();
     }
@@ -174,22 +176,113 @@ class _LogSymptomScreenState extends ConsumerState<LogSymptomScreen> {
     return await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Discard changes?'),
+            title: const Text('Descartar alterações?'),
             content: const Text(
-              'You have unsaved symptom details. If you go back now, they will be lost.',
+              'Tens dados não guardados. Se saires agora, serão perdidos.',
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Keep editing'),
+                child: const Text('Continuar a editar'),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Discard'),
+                child: const Text('Descartar'),
               ),
             ],
           ),
         ) ??
         false;
+  }
+}
+
+class _LogSymptomHeader extends StatelessWidget {
+  const _LogSymptomHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 14, 24, 0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 38,
+            height: 38,
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => Navigator.of(context).maybePop(),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(color: AppColors.ink, width: 2),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+              ),
+              icon: const Icon(
+                Icons.chevron_left,
+                color: AppColors.ink,
+                size: 30,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'Registar sintoma',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                height: 1,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubmitButton extends StatelessWidget {
+  const _SubmitButton({required this.isLoading, required this.onPressed});
+
+  final bool isLoading;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          color: onPressed == null ? AppColors.muted : AppColors.lemon,
+          border: BrutalDecor.border,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: onPressed == null ? null : BrutalDecor.shadow,
+        ),
+        child: Center(
+          child: isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.4,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text(
+                  'Guardar sintoma',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+        ),
+      ),
+    );
   }
 }
