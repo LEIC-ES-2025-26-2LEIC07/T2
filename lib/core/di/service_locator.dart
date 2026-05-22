@@ -125,6 +125,9 @@ Future<NotificationPayload?> setupServiceLocator(
         if (navigator == null) return;
         navigator.pushNamed(route);
       },
+      onCancelDoseNotification: (doseId) =>
+          getIt<MissedDoseNotificationController>()
+              .cancelMissedDoseNotification(doseId),
     ),
   );
 

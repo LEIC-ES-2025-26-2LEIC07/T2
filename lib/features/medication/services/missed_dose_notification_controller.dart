@@ -223,6 +223,7 @@ class MissedDoseNotificationController {
         medicationName: dose.medicationName,
         dosage: dose.dosage,
         scheduledTime: dose.scheduledTime,
+        doseId: dose.id,
       );
     } catch (error) {
       debugPrint('Failed to create missed dose alert for ${dose.id}: $error');

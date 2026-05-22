@@ -233,6 +233,7 @@ void main() {
         demoDose.medicationName,
       );
       expect(alertRepo.createdAlerts.first['dosage'], demoDose.dosage);
+      expect(alertRepo.createdAlerts.first['doseId'], demoDose.id);
     });
 
     test('sync does not create alert when dose was already logged', () async {

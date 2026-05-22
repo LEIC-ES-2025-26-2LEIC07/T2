@@ -17,5 +17,6 @@ abstract class EmergencyAlertRepository {
     required String medicationName,
     required String dosage,
     required DateTime scheduledTime,
+    String? doseId,
   });
 }
