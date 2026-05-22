@@ -13,10 +13,11 @@ class FloatingBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final systemNavHeight = MediaQuery.of(context).padding.bottom;
     return Positioned(
       left: 12,
       right: 12,
-      bottom: 14,
+      bottom: 14 + systemNavHeight,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.card,
