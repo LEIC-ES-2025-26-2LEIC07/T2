@@ -69,29 +69,32 @@ void main() {
       await tester.pumpWidget(_buildScreen());
       await tester.pumpAndSettle();
 
-      expect(find.text('How are you feeling?'), findsOneWidget);
-      expect(find.textContaining('Severity'), findsOneWidget);
-      expect(find.text('When did it happen?'), findsOneWidget);
-      expect(find.text('Additional notes'), findsOneWidget);
+      expect(find.text('Como te sentes?'), findsOneWidget);
+      expect(find.textContaining('Gravidade'), findsOneWidget);
+      expect(find.text('Quando aconteceu?'), findsOneWidget);
+      expect(find.text('Notas adicionais'), findsOneWidget);
     });
 
-    testWidgets('shows symptom chips including Headache and Nausea', (
+    testWidgets('shows symptom chips including Dor de cabeça and Náusea', (
       tester,
     ) async {
       await tester.pumpWidget(_buildScreen());
       await tester.pumpAndSettle();
 
-      expect(find.text('Headache'), findsOneWidget);
-      expect(find.text('Nausea'), findsOneWidget);
-      expect(find.text('Fatigue'), findsOneWidget);
+      expect(find.text('Dor de cabeça'), findsOneWidget);
+      expect(find.text('Náusea'), findsOneWidget);
+      expect(find.text('Fadiga'), findsOneWidget);
     });
 
-    testWidgets('shows search field and Save button', (tester) async {
+    testWidgets('shows search field and Guardar button', (tester) async {
       await tester.pumpWidget(_buildScreen());
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(TextField, 'Search symptoms'), findsOneWidget);
-      expect(find.text('Save symptom'), findsOneWidget);
+      expect(
+        find.widgetWithText(TextField, 'Pesquisar sintomas'),
+        findsOneWidget,
+      );
+      expect(find.text('Guardar sintoma'), findsOneWidget);
     });
   });
 
@@ -101,61 +104,60 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(
-        find.widgetWithText(TextField, 'Search symptoms'),
+        find.widgetWithText(TextField, 'Pesquisar sintomas'),
         'brain',
       );
       await tester.pump();
 
-      expect(find.text('Brain Fog'), findsOneWidget);
-      expect(find.text('Headache'), findsNothing);
+      expect(find.text('Confusão mental'), findsOneWidget);
+      expect(find.text('Dor de cabeça'), findsNothing);
     });
 
     testWidgets('clearing search restores all chips', (tester) async {
       await tester.pumpWidget(_buildScreen());
       await tester.pumpAndSettle();
 
-      final searchField = find.widgetWithText(TextField, 'Search symptoms');
+      final searchField = find.widgetWithText(TextField, 'Pesquisar sintomas');
       await tester.enterText(searchField, 'brain');
       await tester.pump();
 
       await tester.enterText(searchField, '');
       await tester.pump();
 
-      expect(find.text('Headache'), findsOneWidget);
+      expect(find.text('Dor de cabeça'), findsOneWidget);
     });
   });
 
   group('LogSymptomScreen – validation', () {
-    testWidgets('tapping Save with no symptom selected shows error banner', (
+    testWidgets('tapping Guardar with no symptom selected shows error banner', (
       tester,
     ) async {
       await tester.pumpWidget(_buildScreen(user: MockUser()..stubId()));
       await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Save symptom'));
+      await tester.ensureVisible(find.text('Guardar sintoma'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Save symptom'));
+      await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
-      expect(find.textContaining('select'), findsOneWidget);
+      expect(find.textContaining('Seleciona'), findsOneWidget);
     });
 
-    testWidgets('tapping Save when not signed in shows sign-in error', (
+    testWidgets('tapping Guardar when not signed in shows sign-in error', (
       tester,
     ) async {
       await tester.pumpWidget(_buildScreen(user: null));
       await tester.pumpAndSettle();
 
-      // Select a symptom first so we pass symptom validation
-      await tester.tap(find.text('Headache'));
+      await tester.tap(find.text('Dor de cabeça'));
       await tester.pump();
 
-      await tester.ensureVisible(find.text('Save symptom'));
+      await tester.ensureVisible(find.text('Guardar sintoma'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Save symptom'));
+      await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
-      expect(find.textContaining('Sign in'), findsAtLeastNWidgets(1));
+      expect(find.textContaining('Inicia sessão'), findsAtLeastNWidgets(1));
     });
   });
 
@@ -166,11 +168,11 @@ void main() {
       await tester.pumpWidget(_buildScreen(user: user, repo: _SlowRepo()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Headache'));
+      await tester.tap(find.text('Dor de cabeça'));
       await tester.pump();
-      await tester.ensureVisible(find.text('Save symptom'));
+      await tester.ensureVisible(find.text('Guardar sintoma'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Save symptom'));
+      await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -207,17 +209,15 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Headache'));
+      await tester.tap(find.text('Dor de cabeça'));
       await tester.pump();
 
-      // Save button may be below the fold — scroll it into view
-      await tester.ensureVisible(find.text('Save symptom'));
+      await tester.ensureVisible(find.text('Guardar sintoma'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Save symptom'));
+      await tester.tap(find.text('Guardar sintoma'));
       await tester.pumpAndSettle();
 
       expect(repo.insertCalled, isTrue);
-      // After pop, we're back on the launching screen
       expect(find.text('Open'), findsOneWidget);
     });
   });

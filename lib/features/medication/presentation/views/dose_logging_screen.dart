@@ -41,7 +41,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Dose Logging')),
+        appBar: AppBar(title: const Text('Registo de Dose')),
         body: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -56,7 +56,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
-                    'This dose is overdue. Please log whether it was taken or skipped.',
+                    'Esta dose está em atraso. Regista se foi tomada ou ignorada.',
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -66,7 +66,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
-              Text('${widget.dose.dosage} scheduled for $scheduledLabel'),
+              Text('${widget.dose.dosage} agendada para $scheduledLabel'),
               const SizedBox(height: 24),
               if (_completedStatus == null) ...[
                 FilledButton(
@@ -75,7 +75,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                       : () => _logDose(
                           context,
                           status: DoseLogStatus.taken,
-                          successMessage: 'Dose marked as taken.',
+                          successMessage: 'Dose marcada como tomada.',
                         ),
                   child: _isSubmitting
                       ? const SizedBox(
@@ -83,7 +83,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Mark as Taken'),
+                      : const Text('Marcar como Tomada'),
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton(
@@ -92,9 +92,9 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                       : () => _logDose(
                           context,
                           status: DoseLogStatus.skipped,
-                          successMessage: 'Dose marked as skipped.',
+                          successMessage: 'Dose marcada como ignorada.',
                         ),
-                  child: const Text('Skip Dose'),
+                  child: const Text('Ignorar Dose'),
                 ),
               ] else ...[
                 Row(
@@ -112,8 +112,8 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                     Expanded(
                       child: Text(
                         _completedStatus == DoseLogStatus.taken
-                            ? 'Marked as taken at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}'
-                            : 'Marked as skipped at ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}',
+                            ? 'Marcada como tomada às ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}'
+                            : 'Marcada como ignorada às ${_completedAt != null ? TimeOfDay.fromDateTime(_completedAt!).format(context) : ''}',
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
@@ -133,7 +133,7 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Done'),
+                      : const Text('Concluído'),
                 ),
               ],
             ],
@@ -179,11 +179,11 @@ class _DoseLoggingScreenState extends State<DoseLoggingScreen> {
 
       // Provide more specific feedback for common failures
       String message =
-          'We could not save this dose right now. Please try again.';
+          'Não foi possível guardar esta dose agora. Tenta novamente.';
       if (e is StateError && e.message.contains('Authentication')) {
-        message = 'You must be signed in to log doses.';
+        message = 'Tens de iniciar sessão para registar doses.';
       } else if (e is SocketException) {
-        message = 'Network error. Please check your connection and try again.';
+        message = 'Erro de rede. Verifica a tua ligação e tenta novamente.';
       }
 
       debugPrint('DoseLoggingScreen._logDose error: $e');

@@ -180,7 +180,7 @@ void main() {
       find.text('Could not load medications. Please try again.'),
       findsOneWidget,
     );
-    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Tentar novamente'), findsOneWidget);
   });
 
   testWidgets(

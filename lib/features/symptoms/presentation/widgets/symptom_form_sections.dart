@@ -1,35 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
-import 'package:intl/intl.dart';
 
-String formatSymptomLabel(String symptom) {
-  return symptom
-      .split('_')
-      .map((part) => '${part[0].toUpperCase()}${part.substring(1)}')
-      .join(' ');
+String _ptLabel(String symptom) {
+  const labels = {
+    'headache': 'Dor de cabeça',
+    'nausea': 'Náusea',
+    'fatigue': 'Fadiga',
+    'dizziness': 'Tonturas',
+    'fever': 'Febre',
+    'cough': 'Tosse',
+    'shortness_of_breath': 'Falta de ar',
+    'anxiety': 'Ansiedade',
+    'sadness': 'Tristeza',
+    'muscle_pain': 'Dor muscular',
+    'joint_pain': 'Dor nas articulações',
+    'stomach_pain': 'Dor de estômago',
+    'insomnia': 'Insónia',
+    'brain_fog': 'Confusão mental',
+  };
+  final key = symptom.trim().toLowerCase();
+  return labels[key] ??
+      symptom
+          .split('_')
+          .where((p) => p.isNotEmpty)
+          .map((p) => '${p[0].toUpperCase()}${p.substring(1)}')
+          .join(' ');
+}
+
+String _formatPtDateTime(DateTime dt) {
+  const months = [
+    'jan',
+    'fev',
+    'mar',
+    'abr',
+    'mai',
+    'jun',
+    'jul',
+    'ago',
+    'set',
+    'out',
+    'nov',
+    'dez',
+  ];
+  final h = dt.hour.toString().padLeft(2, '0');
+  final m = dt.minute.toString().padLeft(2, '0');
+  return '${dt.day} ${months[dt.month - 1]} · $h:$m';
 }
 
 class SymptomSectionCard extends StatelessWidget {
-  const SymptomSectionCard({super.key, required this.child});
+  const SymptomSectionCard({super.key, required this.child, this.color});
 
   final Widget child;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
+      decoration: BrutalDecor.box(color: color),
       child: child,
     );
   }
@@ -44,13 +73,22 @@ class SymptomFormBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF1F0),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFFFCDC7)),
+        color: AppColors.errorBgLight,
+        border: Border.all(color: AppColors.dangerRed, width: 2),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(color: AppColors.dangerRed, offset: Offset(3, 3)),
+        ],
       ),
-      child: Text(message, style: const TextStyle(color: Color(0xFF9F3428))),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: AppColors.errorTextDark,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
@@ -79,43 +117,96 @@ class SymptomSearchCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'How are you feeling?',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          const Text(
+            'Como te sentes?',
+            style: TextStyle(
+              color: AppColors.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           TextField(
             controller: searchController,
             onChanged: onSearchChanged,
-            decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search),
-              hintText: 'Search symptoms',
+            style: const TextStyle(color: AppColors.ink),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search, color: AppColors.ink, size: 20),
+              hintText: 'Pesquisar sintomas',
+              hintStyle: TextStyle(color: AppColors.muted),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.paper,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.ink, width: 2),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.ink, width: 2),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.lemon, width: 2),
               ),
             ),
           ),
           const SizedBox(height: 16),
           Wrap(
-            spacing: 10,
-            runSpacing: 10,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               for (final symptom in filteredSymptoms)
-                ChoiceChip(
-                  label: Text(formatSymptomLabel(symptom)),
-                  selected: selectedSymptom == symptom,
-                  onSelected: isLoading
-                      ? null
-                      : (_) => onSymptomSelected(symptom),
+                _SymptomChip(
+                  label: _ptLabel(symptom),
+                  isSelected: selectedSymptom == symptom,
+                  isDisabled: isLoading,
+                  onTap: () => onSymptomSelected(symptom),
                 ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SymptomChip extends StatelessWidget {
+  const _SymptomChip({
+    required this.label,
+    required this.isSelected,
+    required this.isDisabled,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final bool isDisabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isDisabled ? null : onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.lemon : AppColors.card,
+          border: BrutalDecor.border,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSelected ? BrutalDecor.shadowSm : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.ink,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }
@@ -142,17 +233,21 @@ class SeverityCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Severity $severity/10',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            'Gravidade $severity/10',
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            'Move the slider to show how intense the symptom feels right now.',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.muted),
+          const SizedBox(height: 4),
+          const Text(
+            'Indica a intensidade do sintoma agora.',
+            style: TextStyle(
+              color: AppColors.muted,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
@@ -194,17 +289,38 @@ class DateTimeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'When did it happen?',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          const Text(
+            'Quando aconteceu?',
+            style: TextStyle(
+              color: AppColors.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: isLoading ? null : onPick,
-            icon: const Icon(Icons.schedule),
-            label: Text(DateFormat('EEE, MMM d - h:mm a').format(occurredAt)),
+          GestureDetector(
+            onTap: isLoading ? null : onPick,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BrutalDecor.box(
+                color: AppColors.paper,
+                shadow: false,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.schedule, size: 18, color: AppColors.ink),
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatPtDateTime(occurredAt),
+                    style: const TextStyle(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -230,26 +346,38 @@ class NotesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Additional notes',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          const Text(
+            'Notas adicionais',
+            style: TextStyle(
+              color: AppColors.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: notesController,
-            minLines: 4,
-            maxLines: 6,
+            minLines: 3,
+            maxLines: 5,
             onChanged: onChanged,
-            decoration: InputDecoration(
-              hintText:
-                  'Add context like triggers, timing, or anything that changed.',
+            style: const TextStyle(color: AppColors.ink),
+            decoration: const InputDecoration(
+              hintText: 'Descreve os fatores que podem ter contribuído.',
+              hintStyle: TextStyle(color: AppColors.muted, fontSize: 13),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: AppColors.paper,
+              contentPadding: EdgeInsets.all(14),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.ink, width: 2),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.ink, width: 2),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(color: AppColors.lemon, width: 2),
               ),
             ),
           ),

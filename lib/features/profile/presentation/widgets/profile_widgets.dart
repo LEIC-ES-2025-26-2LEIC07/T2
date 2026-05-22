@@ -107,7 +107,7 @@ class ProfileLoginDivider extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'Continue with',
+            'Continuar com',
             style: TextStyle(
               color: AppColors.muted,
               fontWeight: FontWeight.w600,
@@ -135,7 +135,7 @@ class ProfileForgotPasswordText extends StatelessWidget {
     return TextButton(
       onPressed: isLoading ? null : onPressed,
       child: const Text(
-        'Forgot password',
+        'Esqueci-me da palavra-passe',
         style: TextStyle(
           color: AppColors.muted,
           decoration: TextDecoration.underline,
@@ -183,7 +183,7 @@ class ProfileContinueButton extends StatelessWidget {
                 ),
               )
             : const Text(
-                'Continue',
+                'Continuar',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
       ),
@@ -223,7 +223,7 @@ class ProfileLoginForm extends StatelessWidget {
         const SizedBox(height: 12),
         ProfileLoginTextField(
           controller: passwordController,
-          hintText: 'Password',
+          hintText: 'Palavra-passe',
           obscureText: true,
         ),
         const SizedBox(height: 16),
@@ -248,11 +248,11 @@ class ProfileLoginForm extends StatelessWidget {
               : () => SignUpSheet.show(context),
           child: const Text.rich(
             TextSpan(
-              text: "Don't have an account? ",
+              text: 'Não tens conta? ',
               style: TextStyle(color: AppColors.muted),
               children: [
                 TextSpan(
-                  text: 'Create one now',
+                  text: 'Cria uma agora',
                   style: TextStyle(
                     color: AppColors.primaryColor,
                     fontWeight: FontWeight.bold,

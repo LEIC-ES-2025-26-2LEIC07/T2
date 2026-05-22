@@ -150,10 +150,10 @@ void main() {
       await tester.pumpWidget(_wrap(vm));
       await tester.pump();
 
-      expect(find.text('All taken'), findsOneWidget);
-      expect(find.text('Partial'), findsOneWidget);
-      expect(find.text('Missed'), findsOneWidget);
-      expect(find.text('Upcoming'), findsOneWidget);
+      expect(find.text('Todas tomadas'), findsOneWidget);
+      expect(find.text('Parcial'), findsOneWidget);
+      expect(find.text('Falhadas'), findsOneWidget);
+      expect(find.text('Próximas'), findsOneWidget);
     });
   });
 
@@ -190,7 +190,10 @@ void main() {
       await tester.tap(find.text('3'));
       await tester.pumpAndSettle();
 
-      expect(find.text('No medication activity for this day.'), findsOneWidget);
+      expect(
+        find.text('Sem atividade de medicação para este dia.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows log entry details in the bottom sheet', (tester) async {

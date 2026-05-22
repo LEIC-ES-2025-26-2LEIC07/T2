@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
@@ -62,6 +63,12 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _handleLogout() async {
     await _viewModel.signOut();
+    if (!mounted || _viewModel.errorMessage != null) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRouter.login,
+      (_) => false,
+      arguments: 'Sessão terminada com sucesso.',
+    );
   }
 
   Future<void> _handleSaveProfile() async {
@@ -121,7 +128,7 @@ class _ProfileViewState extends State<ProfileView> {
             _profileControllersSynced = false;
           }
 
-          if (_viewModel.isLoggedIn) {
+          if (_viewModel.isLoggedIn || _viewModel.isLoading) {
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 90),
               child: ProfileLoggedInCard(

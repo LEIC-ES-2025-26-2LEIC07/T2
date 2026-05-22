@@ -13,15 +13,18 @@ class EmergencyAlertController extends ChangeNotifier {
     required EmergencyAlertStore store,
     required PushMessagingGateway pushGateway,
     void Function(String route)? onOpenRoute,
+    Future<void> Function(String doseId)? onCancelDoseNotification,
   }) : _repository = repository,
        _store = store,
        _pushGateway = pushGateway,
-       _onOpenRoute = onOpenRoute;
+       _onOpenRoute = onOpenRoute,
+       _onCancelDoseNotification = onCancelDoseNotification;
 
   final EmergencyAlertRepository _repository;
   final EmergencyAlertStore _store;
   final PushMessagingGateway _pushGateway;
   final void Function(String route)? _onOpenRoute;
+  final Future<void> Function(String doseId)? _onCancelDoseNotification;
   final List<EmergencyAlert> _alerts = [];
 
   StreamSubscription<EmergencyAlert>? _realtimeSubscription;
@@ -78,9 +81,14 @@ class EmergencyAlertController extends ChangeNotifier {
   }
 
   Future<void> acknowledge(String id) async {
+    final alert = alertById(id);
     await _repository.acknowledgeAlert(id);
-    _alerts.removeWhere((alert) => alert.id == id);
+    _alerts.removeWhere((a) => a.id == id);
     await _store.remove(id);
+    final doseId = alert?.metadata['dose_id'] as String?;
+    if (doseId != null) {
+      await _onCancelDoseNotification?.call(doseId);
+    }
     notifyListeners();
   }
 
@@ -180,8 +188,10 @@ class EmergencyAlertController extends ChangeNotifier {
 
     alert ??= EmergencyAlert(
       id: alertId,
-      title: message.title ?? 'Emergency alert',
-      message: message.body ?? 'A critical health alert needs your attention.',
+      title: message.title ?? 'Alerta de emergência',
+      message:
+          message.body ??
+          'Um alerta de saúde crítico necessita da tua atenção.',
       createdAt: DateTime.now(),
     );
 

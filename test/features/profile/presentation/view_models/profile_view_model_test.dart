@@ -45,7 +45,7 @@ void main() {
 
         expect(
           vm.errorMessage,
-          'Could not update profile. Check your internet connection.',
+          'Não foi possível atualizar o perfil. Verifica a tua ligação à internet.',
         );
       },
     );
@@ -72,7 +72,7 @@ void main() {
 
         expect(
           vm.errorMessage,
-          'Please check your profile details and try again.',
+          'Verifica os dados do perfil e tenta novamente.',
         );
       },
     );
@@ -94,10 +94,7 @@ void main() {
         preferences: 'Afternoon',
       );
 
-      expect(
-        vm.errorMessage,
-        'Something went wrong while updating your profile.',
-      );
+      expect(vm.errorMessage, 'Ocorreu um erro ao atualizar o perfil.');
     });
 
     test('sets errorMessage when name is empty', () async {
@@ -111,7 +108,7 @@ void main() {
         preferences: '',
       );
 
-      expect(vm.errorMessage, 'Please enter your name.');
+      expect(vm.errorMessage, 'Introduz o teu nome.');
     });
 
     test('sets errorMessage when email is empty', () async {
@@ -125,7 +122,7 @@ void main() {
         preferences: '',
       );
 
-      expect(vm.errorMessage, 'Enter a valid email.');
+      expect(vm.errorMessage, 'Introduz um email válido.');
     });
 
     test('sets errorMessage when email has no @', () async {
@@ -139,7 +136,7 @@ void main() {
         preferences: '',
       );
 
-      expect(vm.errorMessage, 'Enter a valid email.');
+      expect(vm.errorMessage, 'Introduz um email válido.');
     });
 
     test('sets infoMessage on successful update', () async {
@@ -153,7 +150,7 @@ void main() {
         preferences: '',
       );
 
-      expect(vm.infoMessage, 'Profile updated successfully.');
+      expect(vm.infoMessage, 'Perfil atualizado com sucesso.');
       expect(vm.errorMessage, isNull);
     });
 
@@ -172,10 +169,7 @@ void main() {
           preferences: '',
         );
 
-        expect(
-          vm.errorMessage,
-          'Something went wrong while updating your profile.',
-        );
+        expect(vm.errorMessage, 'Ocorreu um erro ao atualizar o perfil.');
       },
     );
   });
@@ -184,7 +178,7 @@ void main() {
     test('sets infoMessage on success', () async {
       final vm = ProfileViewModel(authService: _ProfileAuth());
       await vm.signIn(email: 'user@example.com', password: 'secret');
-      expect(vm.infoMessage, 'Successfully logged in.');
+      expect(vm.infoMessage, 'Sessão iniciada com sucesso.');
       expect(vm.errorMessage, isNull);
     });
 
@@ -211,7 +205,7 @@ void main() {
         authService: _ProfileAuth(signInError: Exception('bad')),
       );
       await vm.signIn(email: 'user@example.com', password: 'wrong');
-      expect(vm.errorMessage, 'Invalid credentials.');
+      expect(vm.errorMessage, 'Credenciais inválidas.');
     });
   });
 
@@ -219,7 +213,10 @@ void main() {
     test('sets infoMessage on success', () async {
       final vm = ProfileViewModel(authService: _ProfileAuth());
       await vm.resetPassword('user@example.com');
-      expect(vm.infoMessage, 'We sent an email to reset your password.');
+      expect(
+        vm.infoMessage,
+        'Enviámos um email para redefinir a tua palavra-passe.',
+      );
     });
 
     test('sets errorMessage when email is empty', () async {
@@ -233,7 +230,10 @@ void main() {
         authService: _ProfileAuth(resetError: Exception('fail')),
       );
       await vm.resetPassword('user@example.com');
-      expect(vm.errorMessage, 'Could not send recovery email.');
+      expect(
+        vm.errorMessage,
+        'Não foi possível enviar o email de recuperação.',
+      );
     });
   });
 
@@ -241,7 +241,7 @@ void main() {
     test('sets infoMessage on success', () async {
       final vm = ProfileViewModel(authService: _ProfileAuth());
       await vm.signOut();
-      expect(vm.infoMessage, 'Successfully signed out.');
+      expect(vm.infoMessage, 'Sessão terminada com sucesso.');
     });
 
     test('sets errorMessage on failure', () async {
@@ -249,7 +249,7 @@ void main() {
         authService: _ProfileAuth(signOutError: Exception('fail')),
       );
       await vm.signOut();
-      expect(vm.errorMessage, 'Could not sign out.');
+      expect(vm.errorMessage, 'Não foi possível terminar a sessão.');
     });
   });
 

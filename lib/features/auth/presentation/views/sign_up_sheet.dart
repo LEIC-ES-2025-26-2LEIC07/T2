@@ -100,7 +100,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   const SizedBox(height: 20),
 
                   const Text(
-                    'Create account',
+                    'Criar conta',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -109,7 +109,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Sign up to start using ClinicGO.',
+                    'Regista-te para começar a usar o ClinicGO.',
                     style: TextStyle(color: Color(0xFF8F8F8F)),
                   ),
                   const SizedBox(height: 24),
@@ -122,13 +122,13 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   const SizedBox(height: 12),
                   AuthTextField(
                     controller: _passwordController,
-                    hintText: 'Password',
+                    hintText: 'Palavra-passe',
                     obscureText: true,
                   ),
                   const SizedBox(height: 12),
                   AuthTextField(
                     controller: _confirmController,
-                    hintText: 'Confirm password',
+                    hintText: 'Confirmar palavra-passe',
                     obscureText: true,
                   ),
                   const SizedBox(height: 16),
@@ -139,7 +139,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   ],
 
                   AppLoadingButton(
-                    label: 'Create account',
+                    label: 'Criar conta',
                     onPressed: _handleSignUp,
                     isLoading: _viewModel.isLoading,
                   ),
@@ -148,7 +148,7 @@ class _SignUpSheetState extends State<SignUpSheet> {
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text(
-                      'Already have an account',
+                      'Já tens uma conta',
                       style: TextStyle(
                         color: Color(0xFF7F7F7F),
                         fontWeight: FontWeight.w600,

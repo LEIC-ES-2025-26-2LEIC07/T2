@@ -87,7 +87,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Create account'), findsWidgets);
+      expect(find.text('Criar conta'), findsWidgets);
       expect(find.byType(TextField), findsNWidgets(3));
     });
 
@@ -113,7 +113,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap Create Account without filling anything
-      await tester.tap(find.text('Create account').last);
+      await tester.tap(find.text('Criar conta').last);
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Preenche'), findsOneWidget);
@@ -145,7 +145,7 @@ void main() {
       await tester.enterText(fields.at(1), 'abc12345');
       await tester.enterText(fields.at(2), 'different9');
 
-      await tester.tap(find.text('Create account').last);
+      await tester.tap(find.text('Criar conta').last);
       await tester.pumpAndSettle();
 
       expect(find.textContaining('coincidem'), findsOneWidget);
@@ -174,9 +174,9 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Create account'), findsWidgets);
+      expect(find.text('Criar conta'), findsWidgets);
 
-      await tester.tap(find.text('Already have an account'));
+      await tester.tap(find.text('Já tens uma conta'));
       await tester.pumpAndSettle();
 
       expect(find.text('Registar'), findsNothing);

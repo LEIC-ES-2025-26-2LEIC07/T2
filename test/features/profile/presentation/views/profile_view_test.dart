@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:clinic_go/core/routing/app_router.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 import '../../../../helpers/mocks.dart';
@@ -16,6 +17,15 @@ Widget _buildApp() {
   return MaterialApp(
     theme: ThemeData(splashFactory: NoSplash.splashFactory),
     home: Scaffold(body: ProfileView()),
+    onGenerateRoute: (settings) {
+      if (settings.name == AppRouter.login) {
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (_) => Scaffold(body: Text(settings.arguments! as String)),
+        );
+      }
+      return null;
+    },
   );
 }
 
@@ -87,7 +97,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Password'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Palavra-passe'), findsOneWidget);
     });
 
     testWidgets('renders "Continue with" divider', (tester) async {
@@ -95,7 +105,7 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Continue with'), findsOneWidget);
+      expect(find.text('Continuar com'), findsOneWidget);
     });
 
     testWidgets('renders Forgot password and Create one now links', (
@@ -105,9 +115,9 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Forgot password'), findsOneWidget);
-      expect(find.textContaining("Don't have an account"), findsOneWidget);
-      expect(find.textContaining('Create one now'), findsOneWidget);
+      expect(find.text('Esqueci-me da palavra-passe'), findsOneWidget);
+      expect(find.textContaining("Não tens conta"), findsOneWidget);
+      expect(find.textContaining('Cria uma agora'), findsOneWidget);
     });
 
     testWidgets('renders Continue button', (tester) async {
@@ -115,7 +125,7 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Continue'), findsOneWidget);
+      expect(find.text('Continuar'), findsOneWidget);
     });
 
     testWidgets('shows error when Continue tapped with empty fields', (
@@ -125,10 +135,10 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Continue'));
+      await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('fill in'), findsOneWidget);
+      expect(find.textContaining('Preenche o email'), findsOneWidget);
     });
 
     testWidgets('shows error for invalid email format', (tester) async {
@@ -141,13 +151,13 @@ void main() {
         'notanemail',
       );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Password'),
+        find.widgetWithText(TextField, 'Palavra-passe'),
         'secret',
       );
-      await tester.tap(find.text('Continue'));
+      await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('valid email'), findsOneWidget);
+      expect(find.textContaining('email válido'), findsOneWidget);
     });
 
     testWidgets('shows error on failed sign in', (tester) async {
@@ -160,13 +170,13 @@ void main() {
         'user@example.com',
       );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Password'),
+        find.widgetWithText(TextField, 'Palavra-passe'),
         'wrong',
       );
-      await tester.tap(find.text('Continue'));
+      await tester.tap(find.text('Continuar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Invalid credentials'), findsOneWidget);
+      expect(find.textContaining('Credenciais inválidas'), findsOneWidget);
     });
 
     testWidgets('shows error when Forgot password tapped with empty email', (
@@ -176,10 +186,10 @@ void main() {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Forgot password'));
+      await tester.tap(find.text('Esqueci-me da palavra-passe'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Enter your email'), findsOneWidget);
+      expect(find.textContaining('Introduz o teu email'), findsOneWidget);
     });
 
     testWidgets(
@@ -193,10 +203,10 @@ void main() {
           find.widgetWithText(TextField, 'Email'),
           'user@example.com',
         );
-        await tester.tap(find.text('Forgot password'));
+        await tester.tap(find.text('Esqueci-me da palavra-passe'));
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('sent an email'), findsOneWidget);
+        expect(find.textContaining('Enviámos um email'), findsOneWidget);
       },
     );
   });
@@ -277,7 +287,7 @@ void main() {
       expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
     });
 
-    testWidgets('successful logout shows info message', (tester) async {
+    testWidgets('successful logout navigates to login', (tester) async {
       await _setupDI(authService: _LoggedInAuth());
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
@@ -285,7 +295,7 @@ void main() {
       await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('signed out'), findsOneWidget);
+      expect(find.text('Sessão terminada com sucesso.'), findsOneWidget);
     });
 
     testWidgets('failed logout shows error message', (tester) async {
@@ -298,7 +308,10 @@ void main() {
       await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Could not sign out'), findsOneWidget);
+      expect(
+        find.textContaining('Não foi possível terminar a sessão'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('user with no name falls back to Utilizador', (tester) async {
@@ -337,7 +350,7 @@ void main() {
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Something went wrong'), findsOneWidget);
+      expect(find.textContaining('Ocorreu um erro'), findsOneWidget);
     });
   });
 }

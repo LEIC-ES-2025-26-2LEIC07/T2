@@ -80,11 +80,13 @@ class CapturingEmergencyAlertRepository implements EmergencyAlertRepository {
     required String medicationName,
     required String dosage,
     required DateTime scheduledTime,
+    String? doseId,
   }) async {
     createdAlerts.add({
       'medicationName': medicationName,
       'dosage': dosage,
       'scheduledTime': scheduledTime,
+      'dose_id': doseId,
     });
   }
 

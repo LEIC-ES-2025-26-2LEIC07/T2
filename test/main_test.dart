@@ -93,13 +93,13 @@ void main() {
       expect(find.text('Histórico'), findsOneWidget);
     });
 
-    testWidgets('tapping MEDS nav item shows medications screen', (
+    testWidgets('tapping MEDICAÇÃO nav item shows medications screen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
       await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
       expect(find.text('Nenhum medicamento'), findsOneWidget);
     });
@@ -187,7 +187,8 @@ void main() {
       await tester.tap(find.text('CRIAR'));
       await tester.pumpAndSettle();
       expect(find.text('Criar conta'), findsWidgets);
-      expect(find.text('1 DE 2'), findsOneWidget);
+      expect(find.text('1 DE 2'), findsNothing);
+      expect(find.text('DATA DE NASCIMENTO'), findsNothing);
     });
   });
 }

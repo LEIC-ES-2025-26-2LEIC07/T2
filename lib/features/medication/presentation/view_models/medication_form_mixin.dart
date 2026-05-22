@@ -9,7 +9,7 @@ mixin MedicationFormFields on ChangeNotifier {
   int? dosageAmount;
   String dosageUnit = 'mg';
   String frequency =
-      'Once daily'; // matches AddMedicationViewModel.frequencyOptions.first
+      'Uma vez por dia'; // matches AddMedicationViewModel.frequencyOptions.first
   Color selectedColor = AppColors.lemon;
   bool withFood = false;
   List<String> daysOfWeek = const [
@@ -94,11 +94,11 @@ mixin MedicationFormFields on ChangeNotifier {
     dosageError = null;
     bool valid = true;
     if (name.trim().isEmpty) {
-      nameError = 'Name is required';
+      nameError = 'O nome é obrigatório';
       valid = false;
     }
     if (dosageAmount == null || dosageAmount! <= 0) {
-      dosageError = 'Enter a valid dosage';
+      dosageError = 'Introduz uma dosagem válida';
       valid = false;
     }
     if (!valid) notifyListeners();
@@ -108,9 +108,9 @@ mixin MedicationFormFields on ChangeNotifier {
   // ── Slot-count helper ─────────────────────────────────────────────
   int slotsFor(String freq) {
     switch (freq) {
-      case 'Twice daily':
+      case 'Duas vezes por dia':
         return 2;
-      case 'Three times daily':
+      case 'Três vezes por dia':
         return 3;
       default:
         return 1;

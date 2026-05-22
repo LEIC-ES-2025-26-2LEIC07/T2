@@ -112,8 +112,8 @@ void main() {
     await tester.tap(find.byKey(const Key('med_save_button')));
     await tester.pump();
 
-    expect(find.text('Name is required'), findsOneWidget);
-    expect(find.text('Enter a valid dosage'), findsOneWidget);
+    expect(find.text('O nome é obrigatório'), findsOneWidget);
+    expect(find.text('Introduz uma dosagem válida'), findsOneWidget);
   });
 
   testWidgets('Save button shows spinner while loading', (tester) async {
@@ -143,7 +143,7 @@ void main() {
     await tester.tap(find.byKey(const Key('med_color_swatch')));
     await tester.pumpAndSettle();
 
-    expect(find.text('Choose a colour'), findsOneWidget);
+    expect(find.text('Escolhe uma cor'), findsOneWidget);
   });
 
   testWidgets('error message is shown when repository throws', (tester) async {

@@ -245,7 +245,7 @@ void main() {
       expect(result, isFalse);
       expect(
         container.read(symptomFormControllerProvider).errorMessage,
-        contains('Sign in'),
+        contains('Inicia sessão'),
       );
     });
 
@@ -258,7 +258,7 @@ void main() {
       expect(result, isFalse);
       expect(
         container.read(symptomFormControllerProvider).errorMessage,
-        contains('select'),
+        contains('Seleciona'),
       );
     });
 
@@ -293,7 +293,7 @@ void main() {
         final state = container.read(symptomFormControllerProvider);
 
         expect(result, isFalse);
-        expect(state.errorMessage, contains('connection'));
+        expect(state.errorMessage, contains('ligação'));
         expect(state.isLoading, isFalse);
       },
     );

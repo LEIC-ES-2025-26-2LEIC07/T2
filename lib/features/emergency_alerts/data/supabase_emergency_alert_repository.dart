@@ -99,6 +99,7 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
     required String medicationName,
     required String dosage,
     required DateTime scheduledTime,
+    String? doseId,
   }) async {
     final user = _client.auth.currentUser;
     if (user == null) return;
@@ -116,7 +117,11 @@ class SupabaseEmergencyAlertRepository implements EmergencyAlertRepository {
       'title': _missedDoseTitle,
       'message': message,
       'severity': 'high',
-      'metadata': {'type': 'missed_dose', 'medication': medicationName},
+      'metadata': {
+        'type': 'missed_dose',
+        'medication': medicationName,
+        'dose_id': ?doseId,
+      },
     });
   }
 }

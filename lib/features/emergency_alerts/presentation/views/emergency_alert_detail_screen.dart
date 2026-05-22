@@ -46,14 +46,14 @@ class _EmergencyAlertDetailScreenState
       appBar: AppBar(
         backgroundColor: AppColors.dangerRed,
         foregroundColor: Colors.white,
-        title: const Text('Emergency Alert'),
+        title: const Text('Alerta de Emergência'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: alert == null
             ? const Center(
                 child: Text(
-                  'This alert has already been acknowledged or is no longer available.',
+                  'Este alerta já foi reconhecido ou já não está disponível.',
                   textAlign: TextAlign.center,
                 ),
               )
@@ -94,7 +94,7 @@ class _EmergencyAlertDetailScreenState
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Raised ${_formatTime(alert.createdAt)}',
+                          'Emitido ${_formatTime(alert.createdAt)}',
                           style: const TextStyle(
                             color: AppColors.muted,
                             fontWeight: FontWeight.w700,
@@ -122,7 +122,7 @@ class _EmergencyAlertDetailScreenState
                       },
                       icon: const Icon(Icons.check_circle_outline),
                       label: const Text(
-                        'Acknowledge Alert',
+                        'Reconhecer Alerta',
                         style: TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
