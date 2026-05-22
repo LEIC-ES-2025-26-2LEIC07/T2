@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/features/auth/presentation/views/login_screen.dart';
 import 'package:clinic_go/features/auth/presentation/views/register_screen.dart';
+import 'package:clinic_go/features/emergency_alerts/presentation/views/emergency_alert_detail_screen.dart';
 import 'package:clinic_go/features/home/presentation/views/main_screen.dart';
 import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
 import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
@@ -21,6 +22,7 @@ class AppRouter {
   static const String register = '/register';
   static const String logSymptom = '/log-symptom';
   static const String symptomHistory = '/symptom-history';
+  static const String emergencyAlertPrefix = '/emergency-alert';
 
   /// Called by [MaterialApp.onGenerateRoute].
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -58,6 +60,17 @@ class AppRouter {
       return MaterialPageRoute<void>(
         settings: settings,
         builder: (_) => const RegisterScreen(),
+      );
+    }
+
+    if (routeName != null && routeName.startsWith('$emergencyAlertPrefix/')) {
+      final uri = Uri.parse(routeName);
+      final alertId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+      if (alertId == null || alertId.isEmpty) return null;
+
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => EmergencyAlertDetailScreen(alertId: alertId),
       );
     }
 

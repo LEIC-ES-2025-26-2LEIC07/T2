@@ -11,6 +11,12 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/supabase_medication_repository.dart';
 import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/calendar/data/supabase_calendar_repository.dart';
+import 'package:clinic_go/features/emergency_alerts/data/emergency_alert_repository.dart';
+import 'package:clinic_go/features/emergency_alerts/data/supabase_emergency_alert_repository.dart';
+import 'package:clinic_go/features/emergency_alerts/presentation/view_models/emergency_alert_controller.dart';
+import 'package:clinic_go/features/emergency_alerts/services/emergency_alert_store.dart';
+import 'package:clinic_go/features/emergency_alerts/services/firebase_push_messaging_gateway.dart';
+import 'package:clinic_go/features/emergency_alerts/services/push_messaging_gateway.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/flutter_local_notification_gateway.dart';
@@ -54,6 +60,14 @@ Future<NotificationPayload?> setupServiceLocator(
     () => SupabaseCalendarRepository(getIt<SupabaseClient>()),
   );
 
+  getIt.registerLazySingleton<EmergencyAlertRepository>(
+    () => SupabaseEmergencyAlertRepository(getIt<SupabaseClient>()),
+  );
+
+  getIt.registerLazySingleton<EmergencyAlertStore>(
+    () => const EmergencyAlertStore(),
+  );
+
   // Notification Gateway Bootstrap
   NotificationPayload? initialPayload;
   LocalNotificationGateway gateway;
@@ -77,6 +91,17 @@ Future<NotificationPayload?> setupServiceLocator(
 
   getIt.registerSingleton<LocalNotificationGateway>(gateway);
 
+  PushMessagingGateway pushGateway;
+  try {
+    pushGateway = await FirebasePushMessagingGateway.initialize();
+  } on MissingPluginException {
+    pushGateway = const NoopPushMessagingGateway();
+  } catch (_) {
+    pushGateway = const NoopPushMessagingGateway();
+  }
+
+  getIt.registerSingleton<PushMessagingGateway>(pushGateway);
+
   // Missed Dose Notification Controller
   getIt.registerSingleton<MissedDoseNotificationController>(
     MissedDoseNotificationController(
@@ -86,6 +111,19 @@ Future<NotificationPayload?> setupServiceLocator(
       medicationRepository: getIt<MedicationRepository>(),
       schedulingService: getIt<DoseSchedulingService>(),
       authService: getIt<AuthService>(),
+    ),
+  );
+
+  getIt.registerSingleton<EmergencyAlertController>(
+    EmergencyAlertController(
+      repository: getIt<EmergencyAlertRepository>(),
+      store: getIt<EmergencyAlertStore>(),
+      pushGateway: getIt<PushMessagingGateway>(),
+      onOpenRoute: (route) {
+        final navigator = navigatorKey.currentState;
+        if (navigator == null) return;
+        navigator.pushNamed(route);
+      },
     ),
   );
 
