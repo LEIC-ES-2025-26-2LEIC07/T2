@@ -23,6 +23,7 @@ class EmergencyAlertController extends ChangeNotifier {
   final PushMessagingGateway _pushGateway;
   final void Function(String route)? _onOpenRoute;
   final List<EmergencyAlert> _alerts = [];
+  final Set<String> _locallyAcknowledgedIds = {};
 
   StreamSubscription<EmergencyAlert>? _realtimeSubscription;
   StreamSubscription<PushMessage>? _foregroundSubscription;
@@ -78,10 +79,15 @@ class EmergencyAlertController extends ChangeNotifier {
   }
 
   Future<void> acknowledge(String id) async {
-    await _repository.acknowledgeAlert(id);
+    _locallyAcknowledgedIds.add(id);
     _alerts.removeWhere((alert) => alert.id == id);
-    await _store.remove(id);
     notifyListeners();
+    try {
+      await _repository.acknowledgeAlert(id);
+      await _store.remove(id);
+    } catch (error) {
+      debugPrint('EmergencyAlertController.acknowledge failed: $error');
+    }
   }
 
   Future<void> handleSignedIn() async {
@@ -190,6 +196,9 @@ class EmergencyAlertController extends ChangeNotifier {
   }
 
   Future<void> _upsertAlert(EmergencyAlert alert) async {
+    if (alert.isAcknowledged || _locallyAcknowledgedIds.contains(alert.id)) {
+      return;
+    }
     _alerts.removeWhere((item) => item.id == alert.id);
     _alerts.insert(0, alert);
     _sortAlerts();
@@ -199,8 +208,11 @@ class EmergencyAlertController extends ChangeNotifier {
 
   void _replaceAlerts(List<EmergencyAlert> alerts) {
     final byId = <String, EmergencyAlert>{};
-    for (final alert in alerts.where((alert) => !alert.isAcknowledged)) {
-      byId[alert.id] = alert;
+    for (final alert in alerts) {
+      if (!alert.isAcknowledged &&
+          !_locallyAcknowledgedIds.contains(alert.id)) {
+        byId[alert.id] = alert;
+      }
     }
     _alerts
       ..clear()

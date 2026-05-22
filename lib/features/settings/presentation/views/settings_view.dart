@@ -8,6 +8,7 @@ import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:clinic_go/features/settings/presentation/views/health_conditions_screen.dart';
 import 'package:clinic_go/features/settings/presentation/views/routine_schedules_screen.dart';
+import 'package:clinic_go/features/profile/presentation/views/profile_view.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -248,7 +249,63 @@ class _SettingsViewState extends State<SettingsView> {
                   icon: Icons.lock_outline,
                   title: 'Privacidade',
                   subtitle: 'Gestão de dados pessoais',
-                  onTap: () {},
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => Scaffold(
+                        backgroundColor: AppColors.paper,
+                        body: SafeArea(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  4,
+                                ),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => Navigator.of(ctx).pop(),
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.card,
+                                          border: BrutalDecor.border,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          boxShadow: BrutalDecor.shadowSm,
+                                        ),
+                                        child: const Icon(
+                                          Icons.arrow_back,
+                                          color: AppColors.ink,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    const Text(
+                                      'Perfil',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.3,
+                                        color: AppColors.ink,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Expanded(child: ProfileView()),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
