@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 
 class SettingsViewModel extends ChangeNotifier {
-  SettingsViewModel({required AuthService authService})
-    : _auth = authService {
+  SettingsViewModel({required AuthService authService}) : _auth = authService {
     _loadFromMetadata();
   }
 
@@ -23,8 +22,7 @@ class SettingsViewModel extends ChangeNotifier {
   bool get isSaving => _isSaving;
   String? get errorMessage => _errorMessage;
 
-  List<TimeOfDay> get schedules =>
-      _rawSchedules.map(_parseTime).toList();
+  List<TimeOfDay> get schedules => _rawSchedules.map(_parseTime).toList();
 
   void reload() {
     _loadFromMetadata();

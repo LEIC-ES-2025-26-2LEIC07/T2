@@ -59,8 +59,7 @@ class _SettingsViewState extends State<SettingsView> {
   Future<void> _openRoutineSchedules() async {
     final result = await Navigator.of(context).push<List<TimeOfDay>>(
       MaterialPageRoute(
-        builder: (_) =>
-            RoutineSchedulesScreen(schedules: _viewModel.schedules),
+        builder: (_) => RoutineSchedulesScreen(schedules: _viewModel.schedules),
       ),
     );
     if (result != null) {

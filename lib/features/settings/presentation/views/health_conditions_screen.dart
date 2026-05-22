@@ -18,8 +18,7 @@ class HealthConditionsScreen extends StatefulWidget {
   final List<String> allergies;
 
   @override
-  State<HealthConditionsScreen> createState() =>
-      _HealthConditionsScreenState();
+  State<HealthConditionsScreen> createState() => _HealthConditionsScreenState();
 }
 
 class _HealthConditionsScreenState extends State<HealthConditionsScreen> {
@@ -167,7 +166,8 @@ class _HealthConditionsScreenState extends State<HealthConditionsScreen> {
                         iconBg: AppColors.sky,
                         icon: Icons.medical_information_outlined,
                         items: _conditions,
-                        onAdd: () => _addItem(_conditions, 'Ex: Diabetes tipo 2'),
+                        onAdd: () =>
+                            _addItem(_conditions, 'Ex: Diabetes tipo 2'),
                         onRemove: (i) => _remove(_conditions, i),
                       ),
                       const SizedBox(height: 24),
