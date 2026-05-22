@@ -516,7 +516,7 @@ Feedback: significant feature expansion delivered.
 <div align="center" justify="center">
 <img width="544" height="964" alt="image" src="https://github.com/user-attachments/assets/1ae3f8a4-ec18-4e7e-9f71-881ea8aff23d" />
   <p>Start of Sprint 3</p>
-  <!-- TODO: replace with actual end-of-sprint board screenshot -->
+<img width="895" height="856" alt="image" src="https://github.com/user-attachments/assets/dad1f116-0dec-41f6-a3e5-a57fb13fc46b" />
   <p>End of Sprint 3</p>
 </div>
 
@@ -538,7 +538,6 @@ Feedback: overall positive on visual consistency and test coverage. Suggestion t
 * **Did well:**
     * **CI/CD improvement:** Targeted test runs on PRs and full suite on merge to `main`, with PR comment reporting test results.
     * **Visual consistency:** The neo-brutalist design system was applied uniformly across all redesigned screens, significantly improving the app's visual identity with no hardcoded colours — all tokens via `AppColors`.
-    * **AI usage discipline:** All AI-generated commits prefixed `[MISTER AI]`; Sprint 3 AI report committed to `docs/ai_report/sprint3AI.md`. MisterAI labels applied on relevant PBIs.
 
 * **Do differently:**
     * **Sprint planning quality:** One epic (#102) was in the Sprint Backlog at planning time, and #105 had no Effort estimate — both violations caught and fixed mid-sprint. These should be caught at kickoff.
