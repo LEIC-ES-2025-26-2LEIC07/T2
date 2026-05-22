@@ -93,13 +93,13 @@ void main() {
       expect(find.text('Histórico'), findsOneWidget);
     });
 
-    testWidgets('tapping MEDS nav item shows medications screen', (
+    testWidgets('tapping MEDICAÇÃO nav item shows medications screen', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(const ClinicGO());
       await tester.pump(const Duration(milliseconds: 1500));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
       expect(find.text('Nenhum medicamento'), findsOneWidget);
     });

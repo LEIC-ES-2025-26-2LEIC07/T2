@@ -252,22 +252,22 @@ void main() {
   });
 
   group('AddMedicationViewModel – reminder slots', () {
-    test('Twice daily produces two reminder slots', () {
+    test('Duas vezes por dia produces two reminder slots', () {
       final vm = vmFactory();
-      vm.setFrequency('Twice daily');
+      vm.setFrequency('Duas vezes por dia');
       expect(vm.reminderTimes.length, 2);
     });
 
-    test('Three times daily produces three slots', () {
+    test('Três vezes por dia produces three slots', () {
       final vm = vmFactory();
-      vm.setFrequency('Three times daily');
+      vm.setFrequency('Três vezes por dia');
       expect(vm.reminderTimes.length, 3);
     });
 
-    test('switching back to Once daily reduces to one slot', () {
+    test('switching back to Uma vez por dia reduces to one slot', () {
       final vm = vmFactory();
-      vm.setFrequency('Three times daily');
-      vm.setFrequency('Once daily');
+      vm.setFrequency('Três vezes por dia');
+      vm.setFrequency('Uma vez por dia');
       expect(vm.reminderTimes.length, 1);
     });
   });

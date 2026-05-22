@@ -43,7 +43,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
-      expect(find.widgetWithText(TextField, 'Password'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Palavra-passe'), findsOneWidget);
     });
 
     testWidgets('renders title and sign in button', (tester) async {
@@ -88,7 +88,7 @@ void main() {
         'notanemail',
       );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Password'),
+        find.widgetWithText(TextField, 'Palavra-passe'),
         'secret',
       );
       await tester.tap(find.text('Entrar'));
@@ -109,7 +109,7 @@ void main() {
         'user@example.com',
       );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Password'),
+        find.widgetWithText(TextField, 'Palavra-passe'),
         'wrong',
       );
       await tester.tap(find.text('Entrar'));
@@ -128,7 +128,7 @@ void main() {
         'user@example.com',
       );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Password'),
+        find.widgetWithText(TextField, 'Palavra-passe'),
         'password',
       );
       await tester.tap(find.text('Entrar'));

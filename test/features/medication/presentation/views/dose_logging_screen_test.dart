@@ -73,8 +73,8 @@ void main() {
 
       expect(find.text('Aspirin'), findsOneWidget);
       expect(find.textContaining('100mg'), findsOneWidget);
-      expect(find.text('Mark as Taken'), findsOneWidget);
-      expect(find.text('Skip Dose'), findsOneWidget);
+      expect(find.text('Marcar como Tomada'), findsOneWidget);
+      expect(find.text('Ignorar Dose'), findsOneWidget);
     });
 
     testWidgets('shows overdue banner when isOverdue is true', (tester) async {
@@ -83,7 +83,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('overdue'), findsOneWidget);
+      expect(find.textContaining('atraso'), findsOneWidget);
     });
 
     testWidgets('does not show overdue banner when isOverdue is false', (
@@ -92,7 +92,7 @@ void main() {
       await tester.pumpWidget(_buildScreen(controller: controller));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('overdue'), findsNothing);
+      expect(find.textContaining('atraso'), findsNothing);
     });
   });
 
@@ -104,13 +104,13 @@ void main() {
       await tester.pumpWidget(_buildScreen(controller: controller));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Mark as Taken'));
+      await tester.tap(find.text('Marcar como Tomada'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Done'), findsOneWidget);
-      expect(find.text('Mark as Taken'), findsNothing);
-      expect(find.text('Skip Dose'), findsNothing);
-      expect(find.text('Dose marked as taken.'), findsOneWidget);
+      expect(find.text('Concluído'), findsOneWidget);
+      expect(find.text('Marcar como Tomada'), findsNothing);
+      expect(find.text('Ignorar Dose'), findsNothing);
+      expect(find.text('Dose marcada como tomada.'), findsOneWidget);
     });
   });
 
@@ -122,13 +122,13 @@ void main() {
       await tester.pumpWidget(_buildScreen(controller: controller));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Skip Dose'));
+      await tester.tap(find.text('Ignorar Dose'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Done'), findsOneWidget);
-      expect(find.text('Mark as Taken'), findsNothing);
-      expect(find.text('Skip Dose'), findsNothing);
-      expect(find.text('Dose marked as skipped.'), findsOneWidget);
+      expect(find.text('Concluído'), findsOneWidget);
+      expect(find.text('Marcar como Tomada'), findsNothing);
+      expect(find.text('Ignorar Dose'), findsNothing);
+      expect(find.text('Dose marcada como ignorada.'), findsOneWidget);
     });
   });
 
@@ -140,16 +140,16 @@ void main() {
       await tester.pumpWidget(_buildScreen(controller: controller));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Mark as Taken'));
+      await tester.tap(find.text('Marcar como Tomada'));
       await tester.pumpAndSettle();
 
       expect(
-        find.text('We could not save this dose right now. Please try again.'),
+        find.text('Não foi possível guardar esta dose agora. Tenta novamente.'),
         findsOneWidget,
       );
-      expect(find.text('Mark as Taken'), findsOneWidget);
-      expect(find.text('Skip Dose'), findsOneWidget);
-      expect(find.text('Done'), findsNothing);
+      expect(find.text('Marcar como Tomada'), findsOneWidget);
+      expect(find.text('Ignorar Dose'), findsOneWidget);
+      expect(find.text('Concluído'), findsNothing);
     });
   });
 }

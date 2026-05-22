@@ -11,7 +11,7 @@ Medication _med({
   String id = 'med-1',
   String name = 'Metformina',
   int dosageAmount = 500,
-  String frequency = 'Once daily',
+  String frequency = 'Uma vez por dia',
 }) => Medication(
   id: id,
   userId: 'u1',
@@ -100,7 +100,7 @@ void main() {
       expect(vm.name, 'Metformina');
       expect(vm.dosageAmount, 500);
       expect(vm.dosageUnit, 'mg');
-      expect(vm.frequency, 'Once daily');
+      expect(vm.frequency, 'Uma vez por dia');
       expect(vm.isSuccess, false);
       expect(vm.isDirty, false);
       expect(vm.errorMessage, isNull);

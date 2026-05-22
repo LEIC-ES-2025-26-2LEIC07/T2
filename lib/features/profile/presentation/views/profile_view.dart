@@ -27,6 +27,7 @@ class _ProfileViewState extends State<ProfileView> {
   StreamSubscription<bool>? _authSubscription;
   bool _isEditingProfile = false;
   bool _profileControllersSynced = false;
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
@@ -62,9 +63,12 @@ class _ProfileViewState extends State<ProfileView> {
   }
 
   Future<void> _handleLogout() async {
+    setState(() => _isLoggingOut = true);
     await _viewModel.signOut();
-    if (!mounted || _viewModel.errorMessage != null) return;
-
+    if (!mounted || _viewModel.errorMessage != null) {
+      setState(() => _isLoggingOut = false);
+      return;
+    }
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRouter.login,
       (_) => false,
@@ -129,7 +133,7 @@ class _ProfileViewState extends State<ProfileView> {
             _profileControllersSynced = false;
           }
 
-          if (_viewModel.isLoggedIn) {
+          if (_viewModel.isLoggedIn || _isLoggingOut) {
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 90),
               child: ProfileLoggedInCard(

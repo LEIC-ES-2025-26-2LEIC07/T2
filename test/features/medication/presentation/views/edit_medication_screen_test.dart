@@ -130,7 +130,7 @@ void main() {
       await tester.tap(find.byKey(const Key('edit_med_save_button')));
       await tester.pump();
 
-      expect(find.text('Name is required'), findsOneWidget);
+      expect(find.text('O nome é obrigatório'), findsOneWidget);
     });
   });
 
@@ -161,7 +161,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Could not save changes. Please try again.'),
+        find.text('Não foi possível guardar as alterações. Tenta novamente.'),
         findsOneWidget,
       );
     });
