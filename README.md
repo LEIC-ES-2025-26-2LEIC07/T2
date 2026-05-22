@@ -399,8 +399,6 @@ You can find below information and references related to the project management 
 
 ### Sprint 0
 
-#### Project Board
-
 <div align="center" justify="center">
   <p>Start of Sprint 0</p>
   <img src="docs/boards/sprint0/start.png">
@@ -408,27 +406,37 @@ You can find below information and references related to the project management 
   <img src="docs/boards/sprint0/end.png">
 </div>
 
-***
+#### Sprint 0 Review
 
-### Sprint 0 Retrospective
+Sprint 0 was demonstrated to the TP teacher and the full team. Key deliverables shown:
+
+- Product vision statement defining ClinicGO’s value proposition for medication management.
+- Domain model covering core entities (User, Medication, Dose, Reminder, Symptom).
+- Initial Product Backlog with user stories sized and prioritized for Sprint 1.
+- High-level MVVM architecture design with Supabase as the backend.
+- v0 prototype: bottom navigation shell, profile screen stub, Supabase auth configuration, and routing foundations.
+
+Feedback: product vision was clear and well-scoped. Architecture choice was validated. Suggestion to ensure the full team is contributing equally to avoid bottlenecks in subsequent sprints.
+
+#### Sprint 0 Retrospective
 
 * **Did well:**
-    * **Product Definition:** Successfully established a clear product vision and well-defined user stories for ClinicGO.
-    * **Architecture Foundation:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase**.
-    * **Tooling:** Initial setup of the GitHub Scrum board was effective for tracking technical requirements.
+    * **Product Definition:** Established a clear product vision and well-defined user stories for ClinicGO.
+    * **Architecture Foundation:** Correctly organized the app’s structural foundations using the **MVVM pattern** and integrated **Supabase** as backend from the start.
+    * **Tooling:** Initial setup of the GitHub Scrum board provided effective tracking of backlog items and sprint progress.
 
 * **Do differently:**
-    * **Team Balance & Participation:** **Improve workload distribution.** During this sprint, the team did not function at its best as the vast majority of the work was carried out by only a few members. We need to ensure everyone is actively contributing to avoid bottlenecks.
-    * **Time Management:** Start iterations immediately to prevent "crunching" at the end of the sprint and to account for unexpected technical hurdles.
-    * **Git Workflow:** Strictly enforce the use of feature branches and pull requests for every task to maintain code quality and visibility.
-    * **Collaboration:** Schedule mandatory pair programming or sync sessions to help members who are struggling and to keep the whole team updated on progress.
+    * **Team Balance & Participation:** The vast majority of Sprint 0 work was carried out by only a few members. Workload distribution needs to be more equitable to avoid bottlenecks and knowledge silos.
+    * **Time Management:** Work was concentrated at the end of the sprint. Starting iterations immediately would reduce end-of-sprint crunch and leave time for unexpected technical issues.
+    * **Git Workflow:** Feature branches and pull requests were not consistently used. Enforcing this from the start would improve code review visibility and quality.
 
-* **Puzzles:**
-    * **Remote Integration:** Finding the best way to coordinate and review code efficiently within our specific Git workflow.
+* **Improvements for Sprint 1:**
+    * All tasks in the Sprint Backlog must be assigned to a team member at planning time — no unassigned items by day 2 of the sprint.
+    * Every code change goes through a PR with at least one reviewer before merging to `main`.
+    * Schedule a mid-sprint sync (async check-in on Slack/Discord) to surface blockers early.
 
 
 ### Sprint 1
----
 
 <div align="center" justify="center">
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/efcaed02-e470-452a-be86-48606d606afd" />
@@ -437,36 +445,75 @@ You can find below information and references related to the project management 
   <p>End of Sprint 1</p>
 </div>
 
+#### Sprint 1 Review
+
+Sprint 1 was demonstrated to the TP teacher and the full team. Key deliverables shown:
+
+- Medication management: add medications with dosage, frequency, and reminder time.
+- Notification scheduling: missed medication alerts using `flutter_local_notifications` with exact alarm support.
+- Dose tracking: mark individual doses as taken or skipped from the home screen.
+- Login and registration screens with Supabase authentication and session persistence.
+- v0.1 GitHub release with APK and CHANGELOG.
+
+Feedback: core medication flow was working end-to-end. Suggestion to improve test coverage and reinforce PR-based workflow across the whole team for Sprint 2.
+
+#### Sprint 1 Retrospective
+
 * **Did well:**
-  * The main user stories planned for the sprint were successfully completed, covering the core functionality of the application, including medication management, authentication improvements, and notification handling.
+    * **Core Feature Delivery:** All main user stories planned for the sprint were completed — medication CRUD, notification scheduling, and dose tracking all working end-to-end.
+    * **Supabase Integration:** Authentication and data persistence via Supabase were successfully integrated, unblocking future feature development.
+    * **First Release:** v0.1 shipped on time with a working APK and CHANGELOG.
+
 * **Do differently:**
-  * **End-of-Sprint Pressure:** Several features were finalized close to the deadline, which led to tighter integration time and less opportunity for refinement and testing.
-  * **Git Workflow Consistency:** Reinforce the consistent use of feature branches and pull requests for all changes to improve code review quality and reduce integration issues.
-* **Puzzles:**
-  * **Tech Stack Proficiency:** Ensuring the entire team becomes fully comfortable with **Flutter** and **Supabase**, in order to improve development speed and enable more balanced contribution across members.
+    * **End-of-Sprint Pressure:** Several features were finalized in the final 24 hours, leaving no time for integration testing or refinement. Work needs to start earlier.
+    * **Git Workflow Consistency:** Not all team members consistently used feature branches and PRs, causing integration conflicts and reducing code review coverage.
+    * **Test Coverage:** Unit and integration tests were minimal this sprint. Automated tests should be written alongside features, not as an afterthought.
+
+* **Improvements for Sprint 2:**
+    * Each team member picks up their Sprint Backlog item by day 1 and opens a draft PR by day 3 — this surfaces integration issues early.
+    * Mandatory PR review by at least one other team member before any merge to `main`.
+    * Every new feature includes at least one unit or widget test before the PR is marked ready.
 
 
 ### Sprint 2
----
 
 <div align="center" justify="center">
 <img width="897" height="956" alt="image" src="https://github.com/user-attachments/assets/7381f93d-c03f-42e3-891f-c2463672c3b9" />
   <p>Start of Sprint 2</p>
 <img width="542" height="872" alt="image" src="https://github.com/user-attachments/assets/8264f90e-e56f-4bdd-852f-1ba0de9cf022" />
   <p>End of Sprint 2</p>
-  </div>
-  
+</div>
+
+#### Sprint 2 Review
+
+Sprint 2 was demonstrated to the TP teacher and the full team. Key deliverables shown:
+
+- Monthly medication summary allowing users to review their intake history over time.
+- Calendar schedule view showing past and upcoming medication doses by day.
+- Symptom logging flow so users can record symptoms and help doctors track health changes.
+- Profile update flow for managing personal information and preferences.
+- Daily doses view with take/skip actions from the home screen.
+- Expanded automated test suite covering authentication, medications, calendar, and profile flows.
+- v0.2 GitHub release with APK and CHANGELOG.
+
+Feedback: significant feature expansion delivered. UAT score dropped slightly due to integration tests breaking after the neo-brutalist redesign — identified as a gap to fix in Sprint 3.
+
+#### Sprint 2 Retrospective
+
 * **Did well:**
-    * **:** Balanced Workload: Significant improvement in team participation.
-    * Task distribution was more equitable, ensuring that knowledge was shared and burnout was avoided.
-    * **Enhanced Peer Review Culture:** The introduction of mandatory Pull Requests (PRs) was a success. Team members actively reviewed each other's code, leading to fewer bugs and a more unified coding style.
+    * **Balanced Workload:** Significant improvement in team participation compared to Sprint 0. Task distribution was more equitable, reducing knowledge silos and burnout risk.
+    * **Peer Review Culture:** Mandatory PRs were adopted by the full team. Active code reviews led to fewer integration bugs and a more consistent coding style.
+    * **Feature Scope:** All planned user stories were delivered, expanding the app from basic medication CRUD to a full daily management flow.
+
 * **Do differently:**
-  * **Persistent Time Management Issues:** We failed to avoid the "end-of-sprint crunch." Tasks were backloaded to the final days, causing unnecessary pressure and preventing thorough testing of the final features.
+    * **Persistent End-of-Sprint Crunch:** Tasks were again backloaded to the final days, preventing thorough testing of the last features before the deadline.
+    * **Delayed Problem Signaling:** Without scheduled sync sessions, technical blockers were kept private too long, creating unnecessary bottlenecks.
+    * **Integration Test Maintenance:** Neo-brutalist redesign broke existing integration tests and the issue was not caught until Sprint 3 review.
 
-  * **Delayed Problem Signaling:** Because we didn't have the scheduled syncs, technical hurdles were often kept private for too long, creating bottlenecks that could have been solved through collaboration.
-
-* **Puzzles:**
-  * **Weekly Sync Session:** We will implement one 60-minute session per week dedicated to pair programming and progress alignment.
+* **Improvements for Sprint 3:**
+    * Implement one weekly 60-minute sync session for progress alignment and early blocker resolution.
+    * Integration tests must be updated in the same PR as any UI change — broken tests block merge.
+    * Set a soft feature-complete target 2 days before sprint end to allow time for testing and fixes.
 
 
 ### Sprint 3
