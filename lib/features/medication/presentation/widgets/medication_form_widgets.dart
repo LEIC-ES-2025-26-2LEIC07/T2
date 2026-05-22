@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 
@@ -146,7 +147,10 @@ class MedLabeledField extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, top: 4),
             child: Text(
               errorText!,
-              style: const TextStyle(color: Color(0xFFC62828), fontSize: 12),
+              style: const TextStyle(
+                color: AppColors.errorTextDark,
+                fontSize: 12,
+              ),
             ),
           ),
       ],
@@ -644,14 +648,14 @@ class MedErrorBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFECEC),
+        color: AppColors.errorBgLight,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: medInk, width: 2),
       ),
       child: Text(
         message,
         style: const TextStyle(
-          color: Color(0xFFC62828),
+          color: AppColors.errorTextDark,
           fontWeight: FontWeight.w700,
         ),
       ),

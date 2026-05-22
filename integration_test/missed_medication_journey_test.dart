@@ -4,7 +4,6 @@ import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
-import 'package:clinic_go/features/medication/presentation/views/dose_logging_screen.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/pending_notification_store.dart';
@@ -142,27 +141,17 @@ void main() {
       await tester.tap(find.byIcon(Icons.home_outlined));
       await tester.pumpAndSettle();
 
-      // Verify Overdue dose is visible
-      expect(find.text('Overdue dose'), findsOneWidget);
-      expect(find.text('Lisinopril • 10mg'), findsOneWidget);
+      // Verify overdue dose card is visible
+      expect(find.text('PRÓXIMA DOSE'), findsOneWidget);
+      expect(find.textContaining('EM ATRASO'), findsWidgets);
+      expect(find.text('Lisinopril 10mg'), findsWidgets);
 
-      // Tap Log Overdue Dose
-      await tester.tap(find.text('Log Overdue Dose'));
-      await tester.pumpAndSettle();
-
-      // Verify we are on DoseLoggingScreen
-      expect(find.byType(DoseLoggingScreen), findsOneWidget);
-
-      // Log as taken
-      await tester.tap(find.text('Mark as Taken'));
+      // Tap 'Tomar agora' to log the overdue dose inline
+      await tester.tap(find.text('Tomar agora'));
       await tester.pumpAndSettle(const Duration(seconds: 1));
 
-      // Verify we returned to Dashboard/MainScreen
-      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
-
-      // The dose for tomorrow should now be the "Upcoming" dose
-      expect(find.text('Upcoming dose'), findsOneWidget);
-      expect(find.text('Overdue dose'), findsNothing);
+      // The overdue badge is gone after logging
+      expect(find.textContaining('EM ATRASO ·'), findsNothing);
     });
   });
 }

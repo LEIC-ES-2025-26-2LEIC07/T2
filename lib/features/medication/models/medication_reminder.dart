@@ -31,7 +31,8 @@ class MedicationReminder {
         id: json['id']?.toString(),
         medicationId: json['medication_id'] as String,
         reminderTime: json['reminder_time'] as String,
-        daysOfWeek: (json['days_of_week'] as List<dynamic>).cast<String>(),
+        daysOfWeek:
+            (json['days_of_week'] as List<dynamic>?)?.cast<String>() ?? [],
         isActive: json['is_active'] as bool? ?? true,
       );
 }

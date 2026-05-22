@@ -108,7 +108,7 @@ void main() {
           find.widgetWithText(TextField, 'Password'),
           'secret123',
         );
-        await tester.tap(find.text('Continue'));
+        await tester.tap(find.text('Entrar'));
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.person_outline));

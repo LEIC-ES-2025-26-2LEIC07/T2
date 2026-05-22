@@ -91,7 +91,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);
-      expect(find.text('Continue'), findsOneWidget);
+      expect(find.text('Entrar'), findsOneWidget);
     });
   });
 }

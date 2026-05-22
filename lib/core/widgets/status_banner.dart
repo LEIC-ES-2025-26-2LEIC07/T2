@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 
 class StatusBanner extends StatelessWidget {
   const StatusBanner({
@@ -12,8 +13,8 @@ class StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isSuccess ? const Color(0xFFDFF2E8) : const Color(0xFFFFECEC);
-    final fg = isSuccess ? const Color(0xFF1A7A4A) : const Color(0xFFC62828);
+    final bg = isSuccess ? AppColors.successBgLight : AppColors.errorBgLight;
+    final fg = isSuccess ? AppColors.successTextDark : AppColors.errorTextDark;
     final icon = isSuccess ? Icons.check_circle_outline : Icons.error_outline;
 
     return Container(

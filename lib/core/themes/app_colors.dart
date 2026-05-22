@@ -23,6 +23,15 @@ class AppColors {
   static const statusTeal = Color(0xFF2A9D8F);
   static const statusNight = Color(0xFF374151);
 
+  // ── Semantic feedback colours ──────────────────────────────────────────────
+  static const successGreen = Color(0xFF43A047);
+  static const successBgLight = Color(0xFFDFF2E8);
+  static const successTextDark = Color(0xFF1A7A4A);
+  static const dangerRed = Color(0xFFE53935);
+  static const errorBgLight = Color(0xFFFFECEC);
+  static const errorTextDark = Color(0xFFC62828);
+  static const surfaceWarm = Color(0xFFF7F6F3);
+
   // ── Dose card (kept for any remaining references) ──────────────────────────
   static const doseCardBg = coral;
   static const doseCardDark = ink;

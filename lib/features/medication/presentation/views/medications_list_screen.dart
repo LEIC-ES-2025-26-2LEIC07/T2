@@ -56,7 +56,7 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
       messenger.showSnackBar(
         const SnackBar(
           content: Text('Medicamento eliminado com sucesso.'),
-          backgroundColor: Color(0xFF43A047),
+          backgroundColor: AppColors.successGreen,
         ),
       );
     } catch (_) {
@@ -65,7 +65,7 @@ class _MedicationsListScreenState extends State<MedicationsListScreen> {
           content: Text(
             'Não foi possível eliminar o medicamento. Tenta novamente.',
           ),
-          backgroundColor: Color(0xFFE53935),
+          backgroundColor: AppColors.dangerRed,
         ),
       );
     }

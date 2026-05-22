@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/calendar/data/calendar_repository.dart';
 import 'package:clinic_go/features/medication/data/dose_log_repository.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
+import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
@@ -26,24 +25,36 @@ class MockAuthService extends Mock implements AuthService {}
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
+final _testMed = Medication(
+  id: 'med-1',
+  userId: 'user-123',
+  name: 'Ibuprofeno',
+  dosageAmount: 400,
+  dosageUnit: 'mg',
+  color: Colors.blue,
+  createdAt: DateTime(2025),
+);
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
     registerFallbackValue(
-      const AddMedicationPayload(
+      const EditMedicationPayload(
+        medicationId: '',
         name: '',
         dosageAmount: 0,
         dosageUnit: 'mg',
         frequency: 'Daily',
         color: Colors.blue,
-        reminderTimes: [],
         daysOfWeek: [],
+        remindersToUpsert: [],
+        remindersToDelete: [],
       ),
     );
   });
 
-  group('Add Medication Journey', () {
+  group('Edit & Delete Medication Journey', () {
     late MockMedicationRepository mockMedRepo;
 
     setUp(() async {
@@ -81,12 +92,17 @@ void main() {
       when(() => mockAuth.currentUserEmail).thenReturn('user@example.com');
       when(() => mockAuth.currentUserMetadata).thenReturn(const {});
 
-      when(() => mockMedRepo.fetchMedications()).thenAnswer((_) async => []);
+      when(
+        () => mockMedRepo.fetchMedications(),
+      ).thenAnswer((_) async => [_testMed]);
       when(() => mockMedRepo.fetchAllReminders()).thenAnswer((_) async => []);
-      when(() => mockMedRepo.addMedication(any())).thenAnswer(
-        (_) async =>
-            const SavedMedicationResult(medicationId: 'new-id', reminders: []),
-      );
+      when(
+        () => mockMedRepo.fetchRemindersForMedication('med-1'),
+      ).thenAnswer((_) async => []);
+      when(() => mockMedRepo.editMedication(any())).thenAnswer((_) async {});
+      when(
+        () => mockMedRepo.deleteMedication('med-1'),
+      ).thenAnswer((_) async {});
 
       getIt.registerSingleton<AuthService>(mockAuth);
       getIt.registerSingleton<SupabaseClient>(MockSupabaseClient());
@@ -115,44 +131,56 @@ void main() {
       await GetIt.instance.reset();
     });
 
-    testWidgets('navigates to add form, submits, and returns to list', (
-      tester,
-    ) async {
+    Future<void> goToMedsTab(WidgetTester tester) async {
       await tester.pumpWidget(
         app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
       );
       await tester.pumpAndSettle(const Duration(seconds: 1));
-
-      // Navigate to Medications tab
       await tester.tap(find.byIcon(Icons.medication_outlined));
       await tester.pumpAndSettle();
+    }
 
-      expect(find.text('Medicação'), findsOneWidget);
+    testWidgets('expand card, edit medication, and save', (tester) async {
+      await goToMedsTab(tester);
 
-      // Open AddMedicationScreen
-      await tester.tap(find.byIcon(Icons.add));
+      // Expand the medication card
+      await tester.tap(find.text('INFO'));
       await tester.pumpAndSettle();
 
-      // Fill in the medication name
-      await tester.enterText(
-        find.widgetWithText(TextField, 'ex: Metformina'),
-        'Paracetamol',
-      );
-      await tester.pump();
+      // Open EditMedicationScreen
+      await tester.tap(find.text('EDITAR'));
+      await tester.pumpAndSettle();
 
-      // Fill in the dosage amount
-      await tester.enterText(find.widgetWithText(TextField, 'ex: 500'), '500');
-      await tester.pump();
+      expect(find.text('Editar medicação'), findsOneWidget);
 
-      // Submit the form
-      await tester.tap(find.text('Guardar'));
+      // Save without changes — just confirm the form submits
+      await tester.tap(find.text('Guardar alterações'));
       await tester.pumpAndSettle(const Duration(seconds: 1));
 
-      // addMedication was called on the repository
-      verify(() => mockMedRepo.addMedication(any())).called(1);
+      verify(() => mockMedRepo.editMedication(any())).called(1);
+    });
 
-      // Back on the medications list
-      expect(find.text('Medicação'), findsOneWidget);
+    testWidgets('expand card, confirm delete, and see success snackbar', (
+      tester,
+    ) async {
+      await goToMedsTab(tester);
+
+      // Expand the medication card
+      await tester.tap(find.text('INFO'));
+      await tester.pumpAndSettle();
+
+      // Tap ELIMINAR to open confirmation dialog
+      await tester.tap(find.text('ELIMINAR'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Eliminar medicamento?'), findsOneWidget);
+
+      // Confirm deletion — tap the dialog's confirm button (not the card button)
+      await tester.tap(find.byKey(const Key('delete_confirm_button')));
+      await tester.pumpAndSettle();
+
+      verify(() => mockMedRepo.deleteMedication('med-1')).called(1);
+      expect(find.textContaining('eliminado com sucesso'), findsOneWidget);
     });
   });
 }
@@ -160,7 +188,6 @@ void main() {
 class _MockStreamHandler extends MockStreamHandler {
   @override
   void onListen(Object? arguments, MockStreamHandlerEventSink events) {}
-
   @override
   void onCancel(Object? arguments) {}
 }

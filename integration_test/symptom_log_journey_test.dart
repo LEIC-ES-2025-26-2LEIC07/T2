@@ -108,7 +108,7 @@ void main() {
         await _bootApp(tester);
 
         // Tap "Log Symptom" on Home
-        await tester.tap(find.text('Log Symptom'));
+        await tester.tap(find.text('Registar sintoma'));
         await tester.pumpAndSettle();
 
         expect(find.byType(LogSymptomScreen), findsOneWidget);
@@ -121,7 +121,7 @@ void main() {
     testWidgets('Tapping a chip selects it and enables save', (tester) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('Log Symptom'));
+      await tester.tap(find.text('Registar sintoma'));
       await tester.pumpAndSettle();
 
       // Tap a chip
@@ -141,7 +141,7 @@ void main() {
       // Supabase has no current user → currentUserProvider returns null
       await _bootApp(tester);
 
-      await tester.tap(find.text('Log Symptom'));
+      await tester.tap(find.text('Registar sintoma'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Headache'));
@@ -160,7 +160,7 @@ void main() {
     ) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('Symptom History'));
+      await tester.tap(find.text('Histórico'));
       await tester.pumpAndSettle();
 
       expect(find.byType(SymptomHistoryScreen), findsOneWidget);
@@ -173,7 +173,7 @@ void main() {
     ) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('Log Symptom'));
+      await tester.tap(find.text('Registar sintoma'));
       await tester.pumpAndSettle();
 
       expect(find.byType(LogSymptomScreen), findsOneWidget);
@@ -184,7 +184,7 @@ void main() {
       navigator.pop();
       await tester.pumpAndSettle();
 
-      expect(find.text('Welcome to ClinicGO!'), findsOneWidget);
+      expect(find.text('Plano de hoje'), findsOneWidget);
     });
   });
 }

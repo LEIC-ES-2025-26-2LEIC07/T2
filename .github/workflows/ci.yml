@@ -30,6 +30,14 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Cache Dart pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -190,6 +198,14 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Cache Dart pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -197,10 +213,7 @@ jobs:
         run: touch .env
 
       - name: Build web application
-        env:
-          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SB_PV_KEY }}
         run: |
-          URL=$(echo "$SUPABASE_URL" | tr -d '\n\r')
-          KEY=$(echo "$SUPABASE_KEY" | tr -d '\n\r')
-          flutter build web --release --dart-define="NEXT_PUBLIC_SUPABASE_URL=$URL" --dart-define="SB_PV_KEY=$KEY"
+          flutter build web --release \
+            --dart-define="NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
+            --dart-define="SB_PV_KEY=${{ secrets.SB_PV_KEY }}"

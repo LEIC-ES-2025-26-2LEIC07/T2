@@ -9,7 +9,10 @@ import 'package:clinic_go/features/medication/services/dose_scheduling_service.d
 import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/presentation/views/daily_doses_screen.dart';
 import 'package:clinic_go/features/home/presentation/view_models/home_view_model.dart';
-import 'package:clinic_go/features/home/presentation/widgets/home_widgets.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_header_bar.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_next_dose_card.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_quick_action_box.dart';
+import 'package:clinic_go/features/home/presentation/widgets/home_today_plan.dart';
 
 class HomeContent extends StatefulWidget {
   const HomeContent({
@@ -156,43 +159,14 @@ class _HomeContentState extends State<HomeContent> {
                 ],
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  const Text(
-                    'Plano de hoje',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await Navigator.of(context).push<bool>(
-                        MaterialPageRoute(
-                          builder: (_) => const DailyDosesScreen(),
-                        ),
-                      );
-                      await _onDoseLoggingResult(result);
-                    },
-                    child: const Text(
-                      'Ver tudo',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        color: AppColors.ink,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 2,
-                        decorationColor: AppColors.ink,
-                      ),
-                    ),
-                  ),
-                ],
+              const Text(
+                'Plano de hoje',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                  color: AppColors.ink,
+                ),
               ),
               const SizedBox(height: 10),
               if (_viewModel.todayDoses.isEmpty)

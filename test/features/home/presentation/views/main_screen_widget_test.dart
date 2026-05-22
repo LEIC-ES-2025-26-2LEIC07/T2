@@ -159,5 +159,57 @@ void main() {
         ).called(1);
       },
     );
+
+    testWidgets(
+      'Quick actions: [Scenario] → Registar sintoma and Histórico are visible',
+      (tester) async {
+        when(() => mockViewModel.isLoading).thenReturn(false);
+        when(() => mockViewModel.nextDose).thenReturn(null);
+        when(() => mockViewModel.todayDoses).thenReturn([]);
+
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        expect(find.text('Registar sintoma'), findsOneWidget);
+        expect(find.text('Histórico'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'All done state: [Scenario] → shows "Tudo feito por hoje!" when hadDosesToday and no nextDose',
+      (tester) async {
+        when(() => mockViewModel.isLoading).thenReturn(false);
+        when(() => mockViewModel.nextDose).thenReturn(null);
+        when(() => mockViewModel.hadDosesToday).thenReturn(true);
+        when(() => mockViewModel.todayDoses).thenReturn([]);
+
+        await tester.pumpWidget(createWidgetUnderTest());
+
+        expect(find.text('Tudo feito por hoje!'), findsOneWidget);
+      },
+    );
+
+    testWidgets('Today plan with entries: [Scenario] → renders dose entries', (
+      tester,
+    ) async {
+      final dose = ScheduledDose(
+        id: 'd1',
+        medicationId: 'm1',
+        medicationName: 'Metformina',
+        dosage: '500mg',
+        scheduledTime: DateTime.now().add(const Duration(hours: 1)),
+      );
+      final entries = [
+        TodayDoseEntry(dose: dose, isPending: true, isOverdue: false),
+      ];
+
+      when(() => mockViewModel.isLoading).thenReturn(false);
+      when(() => mockViewModel.nextDose).thenReturn(null);
+      when(() => mockViewModel.hadDosesToday).thenReturn(true);
+      when(() => mockViewModel.todayDoses).thenReturn(entries);
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      expect(find.text('Metformina 500mg'), findsOneWidget);
+    });
   });
 }

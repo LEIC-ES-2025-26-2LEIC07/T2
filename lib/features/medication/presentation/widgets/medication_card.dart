@@ -427,7 +427,7 @@ class _DeleteMedicationDialog extends StatelessWidget {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE53935),
+                    color: AppColors.dangerRed,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.ink, width: 1.5),
                   ),
@@ -473,6 +473,7 @@ class _DeleteMedicationDialog extends StatelessWidget {
                     variant: _CardButtonVariant.secondary,
                   ),
                   _CardButton(
+                    key: const Key('delete_confirm_button'),
                     label: 'ELIMINAR',
                     onTap: () => Navigator.of(context).pop(true),
                     variant: _CardButtonVariant.danger,
@@ -491,6 +492,7 @@ enum _CardButtonVariant { primary, secondary, danger }
 
 class _CardButton extends StatelessWidget {
   const _CardButton({
+    super.key,
     required this.label,
     required this.onTap,
     this.variant = _CardButtonVariant.primary,
@@ -505,8 +507,8 @@ class _CardButton extends StatelessWidget {
     final enabled = onTap != null;
     final backgroundColor = switch (variant) {
       _CardButtonVariant.primary => AppColors.lemon,
-      _CardButtonVariant.secondary => Colors.white,
-      _CardButtonVariant.danger => const Color(0xFFE53935),
+      _CardButtonVariant.secondary => AppColors.card,
+      _CardButtonVariant.danger => AppColors.dangerRed,
     };
     final foregroundColor = switch (variant) {
       _CardButtonVariant.secondary => AppColors.ink,
