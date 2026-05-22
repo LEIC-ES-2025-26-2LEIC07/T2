@@ -308,7 +308,10 @@ void main() {
       await tester.tap(find.text('Sair'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Não foi possível terminar a sessão'), findsOneWidget);
+      expect(
+        find.textContaining('Não foi possível terminar a sessão'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('user with no name falls back to Utilizador', (tester) async {

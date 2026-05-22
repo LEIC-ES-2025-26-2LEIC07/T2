@@ -94,10 +94,7 @@ void main() {
         preferences: 'Afternoon',
       );
 
-      expect(
-        vm.errorMessage,
-        'Ocorreu um erro ao atualizar o perfil.',
-      );
+      expect(vm.errorMessage, 'Ocorreu um erro ao atualizar o perfil.');
     });
 
     test('sets errorMessage when name is empty', () async {
@@ -172,10 +169,7 @@ void main() {
           preferences: '',
         );
 
-        expect(
-          vm.errorMessage,
-          'Ocorreu um erro ao atualizar o perfil.',
-        );
+        expect(vm.errorMessage, 'Ocorreu um erro ao atualizar o perfil.');
       },
     );
   });
@@ -219,7 +213,10 @@ void main() {
     test('sets infoMessage on success', () async {
       final vm = ProfileViewModel(authService: _ProfileAuth());
       await vm.resetPassword('user@example.com');
-      expect(vm.infoMessage, 'Enviámos um email para redefinir a tua palavra-passe.');
+      expect(
+        vm.infoMessage,
+        'Enviámos um email para redefinir a tua palavra-passe.',
+      );
     });
 
     test('sets errorMessage when email is empty', () async {
@@ -233,7 +230,10 @@ void main() {
         authService: _ProfileAuth(resetError: Exception('fail')),
       );
       await vm.resetPassword('user@example.com');
-      expect(vm.errorMessage, 'Não foi possível enviar o email de recuperação.');
+      expect(
+        vm.errorMessage,
+        'Não foi possível enviar o email de recuperação.',
+      );
     });
   });
 

@@ -190,7 +190,10 @@ void main() {
       await tester.tap(find.text('3'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Sem atividade de medicação para este dia.'), findsOneWidget);
+      expect(
+        find.text('Sem atividade de medicação para este dia.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows log entry details in the bottom sheet', (tester) async {
