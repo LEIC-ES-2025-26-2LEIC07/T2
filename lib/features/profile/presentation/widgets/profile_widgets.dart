@@ -3,6 +3,13 @@ import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/features/auth/presentation/views/sign_up_sheet.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 
+String _initials(String name) {
+  final parts = name.trim().split(RegExp(r'\s+'));
+  if (parts.isEmpty || parts[0].isEmpty) return '?';
+  if (parts.length == 1) return parts[0][0].toUpperCase();
+  return '${parts[0][0]}${parts.last[0]}'.toUpperCase();
+}
+
 class ProfileStatusMessage extends StatelessWidget {
   const ProfileStatusMessage({
     super.key,
@@ -63,22 +70,22 @@ class ProfileLoginTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: const TextStyle(
-          color: Color(0xFFB0B0B0),
+          color: AppColors.muted,
           fontWeight: FontWeight.w500,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.card,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE4E4E4)),
+          borderSide: const BorderSide(color: AppColors.rose),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE4E4E4)),
+          borderSide: const BorderSide(color: AppColors.rose),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -96,18 +103,18 @@ class ProfileLoginDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        Expanded(child: Divider(color: Color(0xFF8F8F8F), thickness: 1.2)),
+        Expanded(child: Divider(color: AppColors.muted, thickness: 1.2)),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'Continue with',
             style: TextStyle(
-              color: Color(0xFF8F8F8F),
+              color: AppColors.muted,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        Expanded(child: Divider(color: Color(0xFF8F8F8F), thickness: 1.2)),
+        Expanded(child: Divider(color: AppColors.muted, thickness: 1.2)),
       ],
     );
   }
@@ -130,7 +137,7 @@ class ProfileForgotPasswordText extends StatelessWidget {
       child: const Text(
         'Forgot password',
         style: TextStyle(
-          color: Color(0xFF7F7F7F),
+          color: AppColors.muted,
           decoration: TextDecoration.underline,
           fontWeight: FontWeight.w700,
         ),
@@ -242,7 +249,7 @@ class ProfileLoginForm extends StatelessWidget {
           child: const Text.rich(
             TextSpan(
               text: "Don't have an account? ",
-              style: TextStyle(color: Color(0xFF8F8F8F)),
+              style: TextStyle(color: AppColors.muted),
               children: [
                 TextSpan(
                   text: 'Create one now',
@@ -260,144 +267,239 @@ class ProfileLoginForm extends StatelessWidget {
   }
 }
 
-class ProfileActionButton extends StatelessWidget {
-  const ProfileActionButton({
-    super.key,
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({
+    required this.name,
+    required this.avatarUrl,
+    this.onEditPressed,
+  });
+
+  final String name;
+  final String avatarUrl;
+  final VoidCallback? onEditPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.sky,
+            border: Border.all(color: AppColors.ink, width: 2.5),
+          ),
+          child: avatarUrl.isNotEmpty
+              ? Image.network(
+                  avatarUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stack) => _initialsView,
+                )
+              : _initialsView,
+        ),
+        Positioned(
+          right: -2,
+          bottom: -2,
+          child: GestureDetector(
+            onTap: onEditPressed,
+            child: Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.lemon,
+                border: Border.all(color: AppColors.ink, width: 1.5),
+              ),
+              child: const Icon(Icons.edit, size: 13, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget get _initialsView => Center(
+    child: Text(
+      _initials(name),
+      style: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+        color: AppColors.ink,
+      ),
+    ),
+  );
+}
+
+class _ProfileInfoRow extends StatelessWidget {
+  const _ProfileInfoRow({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.iconBg,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color iconBg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        border: BrutalDecor.border,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.ink, width: 1.5),
+            ),
+            child: Icon(icon, size: 20, color: AppColors.ink),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.muted,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value.isEmpty ? '-' : value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BrutalButton extends StatelessWidget {
+  const _BrutalButton({
     required this.label,
     required this.icon,
+    required this.bg,
+    required this.fg,
     required this.isLoading,
-    required this.onPressed,
+    this.onPressed,
   });
 
   final String label;
   final IconData icon;
+  final Color bg;
+  final Color fg;
   final bool isLoading;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 42,
-      child: ElevatedButton.icon(
-        onPressed: isLoading ? null : onPressed,
-        icon: Icon(icon, size: 18),
-        label: isLoading
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
+    return GestureDetector(
+      onTap: isLoading ? null : onPressed,
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          color: bg,
+          border: BrutalDecor.border,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: BrutalDecor.shadowSm,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isLoading)
+              SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(color: fg, strokeWidth: 2),
               )
-            : Text(
+            else ...[
+              Icon(icon, size: 16, color: fg),
+              const SizedBox(width: 6),
+              Text(
                 label,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                  color: fg,
+                ),
               ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryColor,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.primaryColor,
-          disabledForegroundColor: Colors.white,
-          elevation: 7,
-          shadowColor: Colors.black.withValues(alpha: 0.22),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
-          ),
+            ],
+          ],
         ),
       ),
     );
   }
 }
 
-class ProfileFieldData {
-  const ProfileFieldData({
-    required this.label,
+class _ProfileEditTextField extends StatelessWidget {
+  const _ProfileEditTextField({
     required this.controller,
+    required this.label,
     required this.icon,
     this.keyboardType,
-    this.readOnly = false,
-    this.onTap,
   });
 
-  final String label;
   final TextEditingController controller;
+  final String label;
   final IconData icon;
   final TextInputType? keyboardType;
-  final bool readOnly;
-  final VoidCallback? onTap;
-}
-
-class ProfileInfoField extends StatelessWidget {
-  const ProfileInfoField({
-    super.key,
-    required this.data,
-    required this.isEditing,
-  });
-
-  final ProfileFieldData data;
-  final bool isEditing;
 
   @override
   Widget build(BuildContext context) {
-    if (!isEditing) {
-      final value = data.controller.text.trim();
-
-      return Column(
-        children: [
-          Icon(data.icon, color: const Color(0xFFB0B0B0), size: 24),
-          const SizedBox(height: 8),
-          Text(
-            data.label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF4F4F4F),
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            value.isEmpty ? '-' : value,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Color(0xFF777777),
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      );
-    }
-
     return TextField(
-      controller: data.controller,
-      keyboardType: data.keyboardType,
-      readOnly: data.readOnly,
-      onTap: data.onTap,
+      controller: controller,
+      keyboardType: keyboardType,
       decoration: InputDecoration(
-        labelText: data.label,
-        prefixIcon: Icon(data.icon, size: 20),
+        labelText: label,
+        labelStyle: const TextStyle(
+          color: AppColors.muted,
+          fontWeight: FontWeight.w600,
+        ),
+        prefixIcon: Icon(icon, color: AppColors.ink, size: 20),
         filled: true,
-        fillColor: const Color(0xFFF7F7F7),
+        fillColor: AppColors.paper,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE3E3E3)),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.ink, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE3E3E3)),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.ink, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.lemon, width: 2),
         ),
       ),
     );
@@ -411,171 +513,137 @@ class ProfileLoggedInCard extends StatelessWidget {
     required this.isEditing,
     required this.nameController,
     required this.emailController,
-    required this.birthDateController,
-    required this.phoneController,
-    required this.preferencesController,
     required this.onEditPressed,
     required this.onCancelPressed,
     required this.onSavePressed,
-    required this.onBirthDatePressed,
     required this.onLogoutPressed,
+    required this.onAvatarPressed,
   });
 
   final ProfileViewModel viewModel;
   final bool isEditing;
   final TextEditingController nameController;
   final TextEditingController emailController;
-  final TextEditingController birthDateController;
-  final TextEditingController phoneController;
-  final TextEditingController preferencesController;
   final VoidCallback onEditPressed;
   final VoidCallback onCancelPressed;
   final Future<void> Function() onSavePressed;
-  final Future<void> Function() onBirthDatePressed;
   final Future<void> Function() onLogoutPressed;
+  final Future<void> Function() onAvatarPressed;
 
   @override
   Widget build(BuildContext context) {
-    final title = nameController.text.trim().isEmpty
-        ? 'USER_TEST'
+    final name = nameController.text.trim().isEmpty
+        ? 'Utilizador'
         : nameController.text.trim();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 116,
-          height: 116,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: const Color(0xFFE2E4E6),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 8,
-                offset: const Offset(0, 5),
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BrutalDecor.box(radius: 16),
+          child: Column(
+            children: [
+              _ProfileAvatar(
+                name: name,
+                avatarUrl: viewModel.avatarUrl,
+                onEditPressed: viewModel.isLoading ? null : onAvatarPressed,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'PACIENTE',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.muted,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (isEditing) ...[
+                _ProfileEditTextField(
+                  controller: nameController,
+                  label: 'Nome',
+                  icon: Icons.person_outline_rounded,
+                ),
+                const SizedBox(height: 10),
+                _ProfileEditTextField(
+                  controller: emailController,
+                  label: 'Email',
+                  icon: Icons.mail_outline_rounded,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+              ],
+              ProfileStatusMessage(
+                errorMessage: viewModel.errorMessage,
+                infoMessage: viewModel.infoMessage,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _BrutalButton(
+                      label: isEditing ? 'Guardar' : 'Editar perfil',
+                      icon: isEditing
+                          ? Icons.check_rounded
+                          : Icons.edit_outlined,
+                      bg: AppColors.ink,
+                      fg: AppColors.card,
+                      isLoading: viewModel.isLoading,
+                      onPressed: isEditing ? onSavePressed : onEditPressed,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _BrutalButton(
+                      label: isEditing ? 'Cancelar' : 'Sair',
+                      icon: isEditing
+                          ? Icons.close_rounded
+                          : Icons.logout_rounded,
+                      bg: AppColors.coral,
+                      fg: AppColors.card,
+                      isLoading: viewModel.isLoading,
+                      onPressed: isEditing ? onCancelPressed : onLogoutPressed,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          child: const Icon(
-            Icons.account_circle_rounded,
-            size: 116,
-            color: Color(0xFFAEB4B8),
-          ),
         ),
-        const SizedBox(height: 34),
-        Text(
-          title.toUpperCase(),
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 25,
+        const SizedBox(height: 24),
+        const Text(
+          'Dados pessoais',
+          style: TextStyle(
+            fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF4A4A4A),
+            color: AppColors.ink,
           ),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: ProfileActionButton(
-                label: isEditing ? 'Save' : 'Edit',
-                icon: isEditing ? Icons.check_rounded : Icons.edit_outlined,
-                isLoading: viewModel.isLoading,
-                onPressed: isEditing ? onSavePressed : onEditPressed,
-              ),
-            ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: ProfileActionButton(
-                label: 'Logout',
-                icon: Icons.logout_rounded,
-                isLoading: viewModel.isLoading,
-                onPressed: onLogoutPressed,
-              ),
-            ),
-          ],
+        const SizedBox(height: 10),
+        _ProfileInfoRow(
+          label: 'NOME',
+          value: nameController.text.trim(),
+          icon: Icons.person_outline_rounded,
+          iconBg: AppColors.mint,
         ),
-        if (isEditing) ...[
-          const SizedBox(height: 14),
-          SizedBox(
-            width: 120,
-            height: 42,
-            child: ElevatedButton(
-              onPressed: viewModel.isLoading ? null : onCancelPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFCFCFCF),
-                foregroundColor: Colors.white,
-                elevation: 5,
-                shadowColor: Colors.black.withValues(alpha: 0.18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-        const SizedBox(height: 22),
-        ProfileStatusMessage(
-          errorMessage: viewModel.errorMessage,
-          infoMessage: viewModel.infoMessage,
-        ),
-        const SizedBox(height: 96),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final fields = [
-              ProfileFieldData(
-                label: 'Nome',
-                controller: nameController,
-                icon: Icons.badge_outlined,
-              ),
-              ProfileFieldData(
-                label: 'Email',
-                controller: emailController,
-                icon: Icons.mail_outline_rounded,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              ProfileFieldData(
-                label: 'Nascimento',
-                controller: birthDateController,
-                icon: Icons.cake_outlined,
-                readOnly: true,
-                onTap: onBirthDatePressed,
-              ),
-              ProfileFieldData(
-                label: 'Telefone',
-                controller: phoneController,
-                icon: Icons.phone_outlined,
-                keyboardType: TextInputType.phone,
-              ),
-              ProfileFieldData(
-                label: 'Preferências',
-                controller: preferencesController,
-                icon: Icons.tune_rounded,
-              ),
-            ];
-
-            return Wrap(
-              spacing: 28,
-              runSpacing: 24,
-              alignment: WrapAlignment.center,
-              children: fields
-                  .map(
-                    (field) => SizedBox(
-                      width: constraints.maxWidth > 300
-                          ? (constraints.maxWidth - 28) / 2
-                          : constraints.maxWidth,
-                      child: ProfileInfoField(
-                        data: field,
-                        isEditing: isEditing,
-                      ),
-                    ),
-                  )
-                  .toList(),
-            );
-          },
+        _ProfileInfoRow(
+          label: 'EMAIL',
+          value: viewModel.currentUserEmail ?? '',
+          icon: Icons.mail_outline_rounded,
+          iconBg: AppColors.sky,
         ),
       ],
     );

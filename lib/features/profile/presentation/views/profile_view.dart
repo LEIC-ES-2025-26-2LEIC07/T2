@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/profile/presentation/view_models/profile_view_model.dart';
 import 'package:clinic_go/features/profile/presentation/widgets/profile_widgets.dart';
@@ -20,9 +22,6 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _birthDateController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _preferencesController = TextEditingController();
 
   StreamSubscription<bool>? _authSubscription;
   bool _isEditingProfile = false;
@@ -44,9 +43,6 @@ class _ProfileViewState extends State<ProfileView> {
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
-    _birthDateController.dispose();
-    _phoneController.dispose();
-    _preferencesController.dispose();
     _viewModel.dispose();
     super.dispose();
   }
@@ -70,47 +66,33 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> _handleSaveProfile() async {
     FocusScope.of(context).unfocus();
-
     await _viewModel.updateProfile(
       name: _nameController.text,
       email: _emailController.text,
-      birthDate: _birthDateController.text,
-      phone: _phoneController.text,
-      preferences: _preferencesController.text,
+      birthDate: _viewModel.birthDate,
+      phone: _viewModel.phone,
+      preferences: _viewModel.preferences,
     );
-
     if (mounted && _viewModel.errorMessage == null) {
       setState(() => _isEditingProfile = false);
     }
   }
 
-  Future<void> _pickBirthDate() async {
-    final now = DateTime.now();
-    DateTime initialDate = DateTime(now.year - 25, now.month, now.day);
-
-    final savedDate = DateTime.tryParse(_birthDateController.text);
-    if (savedDate != null) {
-      initialDate = savedDate;
-    }
-
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: now,
-    );
-
-    if (pickedDate == null) return;
-
-    _birthDateController.text =
-        '${pickedDate.year.toString().padLeft(4, '0')}-'
-        '${pickedDate.month.toString().padLeft(2, '0')}-'
-        '${pickedDate.day.toString().padLeft(2, '0')}';
-  }
-
   void _startEditingProfile() {
     _syncProfileControllers(force: true);
     setState(() => _isEditingProfile = true);
+  }
+
+  Future<void> _pickAndUploadAvatar() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (image == null || !mounted) return;
+    await _viewModel.uploadAvatar(image);
   }
 
   void _cancelEditingProfile() {
@@ -122,91 +104,65 @@ class _ProfileViewState extends State<ProfileView> {
   void _syncProfileControllers({bool force = false}) {
     if (!_viewModel.isLoggedIn || (_isEditingProfile && !force)) return;
     if (_profileControllersSynced && !force) return;
-
     _nameController.text = _viewModel.displayName;
     _emailController.text = _viewModel.currentUserEmail ?? '';
-    _birthDateController.text = _viewModel.birthDate;
-    _phoneController.text = _viewModel.phone;
-    _preferencesController.text = _viewModel.preferences;
     _profileControllersSynced = true;
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          margin: const EdgeInsets.only(bottom: 90),
-          child: Center(
-            child: AnimatedBuilder(
-              animation: _viewModel,
-              builder: (context, _) {
-                if (_viewModel.isLoggedIn) {
-                  _syncProfileControllers();
-                } else {
-                  _profileControllersSynced = false;
-                }
+      child: AnimatedBuilder(
+        animation: _viewModel,
+        builder: (context, _) {
+          if (_viewModel.isLoggedIn) {
+            _syncProfileControllers();
+          } else {
+            _profileControllersSynced = false;
+          }
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 20,
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(maxWidth: 340),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
-                      vertical: 34,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _viewModel.isLoggedIn
-                          ? Colors.white.withValues(alpha: 0.96)
-                          : const Color(0xFFF8F6F0),
-                      borderRadius: BorderRadius.circular(
-                        _viewModel.isLoggedIn ? 22 : 34,
-                      ),
-                      image: _viewModel.isLoggedIn
-                          ? null
-                          : const DecorationImage(
-                              image: AssetImage(
-                                'assets/images/wallpaper-paper.png',
-                              ),
-                              fit: BoxFit.cover,
-                              opacity: 0.08,
-                            ),
-                    ),
-                    child: _viewModel.isLoggedIn
-                        ? ProfileLoggedInCard(
-                            viewModel: _viewModel,
-                            isEditing: _isEditingProfile,
-                            nameController: _nameController,
-                            emailController: _emailController,
-                            birthDateController: _birthDateController,
-                            phoneController: _phoneController,
-                            preferencesController: _preferencesController,
-                            onEditPressed: _startEditingProfile,
-                            onCancelPressed: _cancelEditingProfile,
-                            onSavePressed: _handleSaveProfile,
-                            onBirthDatePressed: _pickBirthDate,
-                            onLogoutPressed: _handleLogout,
-                          )
-                        : ProfileLoginForm(
-                            viewModel: _viewModel,
-                            emailController: _emailController,
-                            passwordController: _passwordController,
-                            onLoginPressed: _handleLogin,
-                            onForgotPasswordPressed: _handleResetPassword,
-                          ),
-                  ),
-                );
-              },
+          if (_viewModel.isLoggedIn) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 90),
+              child: ProfileLoggedInCard(
+                viewModel: _viewModel,
+                isEditing: _isEditingProfile,
+                nameController: _nameController,
+                emailController: _emailController,
+                onEditPressed: _startEditingProfile,
+                onCancelPressed: _cancelEditingProfile,
+                onSavePressed: _handleSaveProfile,
+                onLogoutPressed: _handleLogout,
+                onAvatarPressed: _pickAndUploadAvatar,
+              ),
+            );
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Center(
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 340),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 34,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceWarm,
+                  borderRadius: const BorderRadius.all(Radius.circular(34)),
+                ),
+                child: ProfileLoginForm(
+                  viewModel: _viewModel,
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  onLoginPressed: _handleLogin,
+                  onForgotPasswordPressed: _handleResetPassword,
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

@@ -61,6 +61,19 @@ class CalendarViewModel extends ChangeNotifier {
   String? get error => _error;
   DateTime get currentMonth => _currentMonth;
 
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
   List<DaySummary> get summaries {
     final year = _currentMonth.year;
     final month = _currentMonth.month;

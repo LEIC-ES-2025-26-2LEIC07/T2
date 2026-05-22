@@ -362,4 +362,10 @@ class _ProfileAuth implements AuthService {
     final error = updateError;
     if (error != null) throw error;
   }
+
+  @override
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  }) async => '';
 }

@@ -1,5 +1,49 @@
 # Changelog
 
+## [v0.3](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0.3) - 2026-05-22
+
+### Added
+
+- Avatar photo upload from gallery so users can set a profile picture. [#105](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/105)
+- Symptom history view so users can review their previously logged symptoms over time. [#114](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/114)
+- Splash screen with ClinicGO branding shown on app launch.
+- Notification lifecycle management with runtime permission handling and dose reminder scheduling.
+- "With food" option on medications so users can track whether a dose should be taken with a meal. [#104](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/104)
+- ClinicGO logo component in the main screen header.
+- Expanded automated test suite covering add medication, edit/delete medication, and register user journeys.
+
+### Changed
+
+- Profile screen redesigned to neo-brutalist style with initials avatar, NOME and EMAIL info rows, and distinct edit/logout button layout. [#105](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/105)
+- Medication list and card visuals redesigned to match the Clinical Blue design system. [#104](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/104)
+- Add medication screen redesigned with dosage split into amount and unit selector fields. [#111](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/111)
+- Edit medication screen redesigned to match Clinical Blue mockup. [#112](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/112)
+- Login and register screens redesigned in Portuguese with improved layout and validation feedback. [#110](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/110)
+- Navigation bar labels translated to Portuguese (PERFIL · MEDS · INÍCIO · PLANO · CONFIG).
+- App code structure refactored for improved readability and module separation.
+
+### Fixed
+
+- Fixed ViewModel dispose crash on the medication list and calendar screens when background operations completed after the widget was unmounted.
+- Fixed auth status banner on login and sign-up screens to provide clearer feedback on success and error states.
+- Fixed integration tests broken by Portuguese redesign; all acceptance test journeys now pass.
+
+### What's Changed
+
+- Profile screen neo-brutalist refactor and avatar upload by @Dab1d in [#105](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/105)
+- Symptom history view by @JoaooM26 in [#125](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/125)
+- Notification feature by @guizas-LA in [#122](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/122)
+- Splash screen and login screen redesign by @Dab1d in [#121](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/121)
+- Auth status banner and login/register redesign by @Dab1d in [#120](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/120)
+- Edit medication screen redesign by @Dab1d in [#119](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/119)
+- Add medication screen redesign by @Dab1d in [#118](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/118)
+- Medication card and logo visual refac by @Dab1d in [#116](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/116)
+- Code structure refactor by @Dab1d in [#115](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/115)
+
+Full Changelog: [v0.2...v0.3](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/compare/v0.2...v0.3)
+
+-----
+
 ## [v0.2](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0.2) - 2026-05-13
 
 ### Added

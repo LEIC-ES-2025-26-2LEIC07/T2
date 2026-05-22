@@ -38,6 +38,13 @@ abstract class AuthService {
     required String email,
     required Map<String, dynamic> metadata,
   });
+
+  /// Upload [bytes] as the current user's avatar to remote storage.
+  /// Returns the public URL of the stored image.
+  Future<String> uploadAvatar({
+    required List<int> bytes,
+    required String fileExtension,
+  });
 }
 
 enum AuthFailureType { validation, network, unknown }
