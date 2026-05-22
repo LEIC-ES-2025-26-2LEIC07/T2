@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/settings/presentation/view_models/settings_view_model.dart';
 import 'package:clinic_go/features/settings/presentation/views/health_conditions_screen.dart';
 import 'package:clinic_go/features/settings/presentation/views/routine_schedules_screen.dart';
 
@@ -14,37 +17,55 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+  late final SettingsViewModel _viewModel;
+  StreamSubscription<bool>? _authSub;
+
   bool _notificationsEnabled = true;
   bool _snoozeEnabled = true;
   bool _syncHealthEnabled = true;
 
-  List<String> _conditions = [];
-  List<String> _allergies = [];
-  List<TimeOfDay> _schedules = [];
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = SettingsViewModel(authService: getIt<AuthService>());
+    _authSub = getIt<AuthService>().authStateChanges.listen((_) {
+      if (mounted) _viewModel.reload();
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    _viewModel.dispose();
+    super.dispose();
+  }
 
   String? get _healthSubtitle {
-    final all = [..._conditions, ..._allergies];
+    final all = [..._viewModel.conditions, ..._viewModel.allergies];
     if (all.isEmpty) return null;
     if (all.length <= 3) return all.join(' · ');
     return '${all.take(2).join(' · ')} +${all.length - 2}';
   }
 
   String? get _schedulesSubtitle {
-    if (_schedules.isEmpty) return null;
+    final schedules = _viewModel.schedules;
+    if (schedules.isEmpty) return null;
     String fmt(TimeOfDay t) =>
         '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
-    if (_schedules.length <= 3) return _schedules.map(fmt).join(' · ');
-    return '${_schedules.take(2).map(fmt).join(' · ')} +${_schedules.length - 2}';
+    if (schedules.length <= 3) return schedules.map(fmt).join(' · ');
+    return '${schedules.take(2).map(fmt).join(' · ')} +${schedules.length - 2}';
   }
 
   Future<void> _openRoutineSchedules() async {
     final result = await Navigator.of(context).push<List<TimeOfDay>>(
       MaterialPageRoute(
-        builder: (_) => RoutineSchedulesScreen(schedules: _schedules),
+        builder: (_) =>
+            RoutineSchedulesScreen(schedules: _viewModel.schedules),
       ),
     );
     if (result != null) {
-      setState(() => _schedules = result);
+      await _viewModel.saveSchedules(result);
+      _showSaveError();
     }
   }
 
@@ -52,17 +73,31 @@ class _SettingsViewState extends State<SettingsView> {
     final result = await Navigator.of(context).push<HealthData>(
       MaterialPageRoute(
         builder: (_) => HealthConditionsScreen(
-          conditions: _conditions,
-          allergies: _allergies,
+          conditions: _viewModel.conditions,
+          allergies: _viewModel.allergies,
         ),
       ),
     );
     if (result != null) {
-      setState(() {
-        _conditions = result.conditions;
-        _allergies = result.allergies;
-      });
+      await _viewModel.saveConditionsAndAllergies(
+        result.conditions,
+        result.allergies,
+      );
+      _showSaveError();
     }
+  }
+
+  void _showSaveError() {
+    final err = _viewModel.errorMessage;
+    if (err == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(err),
+        backgroundColor: AppColors.coral,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    _viewModel.clearError();
   }
 
   Future<void> _handleLogout() async {
@@ -116,6 +151,13 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _viewModel,
+      builder: (context, _) => _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
