@@ -14,6 +14,7 @@ class HomeNextDoseCard extends StatelessWidget {
     required this.isOverdue,
     required this.now,
     required this.onGoToDailyDoses,
+    this.onDoseLogged,
   });
 
   final HomeViewModel viewModel;
@@ -21,6 +22,7 @@ class HomeNextDoseCard extends StatelessWidget {
   final bool isOverdue;
   final DateTime now;
   final VoidCallback onGoToDailyDoses;
+  final VoidCallback? onDoseLogged;
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +192,7 @@ class HomeNextDoseCard extends StatelessWidget {
                                     dose: nextDose!,
                                     status: DoseLogStatus.taken,
                                   );
+                                  onDoseLogged?.call();
                                 } catch (_) {
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -219,6 +222,7 @@ class HomeNextDoseCard extends StatelessWidget {
                                     dose: nextDose!,
                                     status: DoseLogStatus.skipped,
                                   );
+                                  onDoseLogged?.call();
                                 } catch (_) {
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(

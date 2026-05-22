@@ -109,12 +109,19 @@ class CalendarViewModel extends ChangeNotifier {
         final medReminders = reminders
             .where((r) => r.medicationId == med.id)
             .toList();
+        final scheduleFrom = med.createdAt.isAfter(start)
+            ? DateTime(
+                med.createdAt.year,
+                med.createdAt.month,
+                med.createdAt.day,
+              )
+            : start;
         scheduled.addAll(
           schedulingService.calculateUpcomingDoses(
             med,
             medReminders,
-            from: start,
-            duration: end.difference(start) + const Duration(days: 1),
+            from: scheduleFrom,
+            duration: end.difference(scheduleFrom) + const Duration(days: 1),
           ),
         );
       }

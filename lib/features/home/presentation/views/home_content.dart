@@ -116,6 +116,7 @@ class _HomeContentState extends State<HomeContent> {
                 nextDose: nextDose,
                 isOverdue: isOverdue,
                 now: now,
+                onDoseLogged: widget.onDoseLogged,
                 onGoToDailyDoses: () async {
                   final result = await Navigator.of(context).push<bool>(
                     MaterialPageRoute(builder: (_) => const DailyDosesScreen()),
