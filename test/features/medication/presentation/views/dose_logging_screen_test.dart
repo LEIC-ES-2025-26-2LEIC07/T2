@@ -23,6 +23,7 @@ Widget _buildScreen({
   required MissedDoseNotificationController controller,
   bool isOverdue = false,
 }) => MaterialApp(
+  theme: ThemeData(splashFactory: NoSplash.splashFactory),
   home: DoseLoggingScreen(
     dose: _dose,
     controller: controller,

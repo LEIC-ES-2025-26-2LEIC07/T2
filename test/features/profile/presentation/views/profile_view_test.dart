@@ -13,7 +13,10 @@ Future<void> _setupDI({AuthService? authService}) async {
 }
 
 Widget _buildApp() {
-  return const MaterialApp(home: Scaffold(body: ProfileView()));
+  return MaterialApp(
+    theme: ThemeData(splashFactory: NoSplash.splashFactory),
+    home: Scaffold(body: ProfileView()),
+  );
 }
 
 class _LoggedInAuth implements AuthService {

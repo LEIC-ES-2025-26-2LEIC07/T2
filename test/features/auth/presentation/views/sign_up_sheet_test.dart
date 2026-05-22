@@ -70,6 +70,7 @@ void main() {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           home: Scaffold(
             body: Builder(
               builder: (ctx) {
@@ -94,6 +95,7 @@ void main() {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           home: Scaffold(
             body: Builder(
               builder: (ctx) {
@@ -121,6 +123,7 @@ void main() {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           home: Scaffold(
             body: Builder(
               builder: (ctx) {
@@ -154,6 +157,7 @@ void main() {
       await _setupDI();
       await tester.pumpWidget(
         MaterialApp(
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           home: Scaffold(
             body: Builder(
               builder: (ctx) {

@@ -71,7 +71,10 @@ Widget _buildScreen(MedicationRepository repo) {
     GetIt.I.registerSingleton<DoseSchedulingService>(mockService);
   }
 
-  return const MaterialApp(home: AddMedicationScreen());
+  return MaterialApp(
+    theme: ThemeData(splashFactory: NoSplash.splashFactory),
+    home: AddMedicationScreen(),
+  );
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────

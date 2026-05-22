@@ -213,6 +213,44 @@ void main() {
       );
       expect(await doseLogRepository.hasDoseLog(demoDose.id), isTrue);
     });
+
+    test('sync creates emergency alert for overdue unlogged dose', () async {
+      final alertRepo = CapturingEmergencyAlertRepository();
+      final controllerWithAlerts = MissedDoseNotificationController(
+        notificationGateway: notificationGateway,
+        doseLogRepository: doseLogRepository,
+        pendingNotificationStore: const PendingNotificationStore(),
+        emergencyAlertRepository: alertRepo,
+        gracePeriod: Duration.zero,
+      );
+
+      await controllerWithAlerts.scheduleDoseReminder(demoDose);
+      await controllerWithAlerts.syncPendingMissedNotifications();
+
+      expect(alertRepo.createdAlerts, hasLength(1));
+      expect(
+        alertRepo.createdAlerts.first['medicationName'],
+        demoDose.medicationName,
+      );
+      expect(alertRepo.createdAlerts.first['dosage'], demoDose.dosage);
+    });
+
+    test('sync does not create alert when dose was already logged', () async {
+      final alertRepo = CapturingEmergencyAlertRepository();
+      final controllerWithAlerts = MissedDoseNotificationController(
+        notificationGateway: notificationGateway,
+        doseLogRepository: doseLogRepository,
+        pendingNotificationStore: const PendingNotificationStore(),
+        emergencyAlertRepository: alertRepo,
+        gracePeriod: Duration.zero,
+      );
+
+      await controllerWithAlerts.scheduleDoseReminder(demoDose);
+      doseLogRepository.seedLoggedDose(demoDose.id);
+      await controllerWithAlerts.syncPendingMissedNotifications();
+
+      expect(alertRepo.createdAlerts, isEmpty);
+    });
   });
 }
 

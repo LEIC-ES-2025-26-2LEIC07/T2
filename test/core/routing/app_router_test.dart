@@ -105,6 +105,13 @@ void main() {
       expect(route, isA<MaterialPageRoute>());
     });
 
+    test('returns MaterialPageRoute for emergency alert route', () {
+      final route = AppRouter.onGenerateRoute(
+        const RouteSettings(name: '/emergency-alert/alert-1'),
+      );
+      expect(route, isA<MaterialPageRoute>());
+    });
+
     test('route constants have correct values', () {
       expect(AppRouter.home, '/home');
       expect(AppRouter.login, '/login');

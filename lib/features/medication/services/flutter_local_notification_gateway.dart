@@ -42,6 +42,7 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
     );
 
     final permissionsGranted = await _requestPermissions(plugin);
+    await _createAndroidChannels(plugin);
 
     final launchDetails = await plugin.getNotificationAppLaunchDetails();
     final launchPayload = launchDetails?.didNotificationLaunchApp == true
@@ -94,6 +95,25 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
         true;
 
     return androidGranted && iosGranted && macGranted;
+  }
+
+  static Future<void> _createAndroidChannels(
+    FlutterLocalNotificationsPlugin plugin,
+  ) async {
+    final androidPlugin = plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'emergency_alerts',
+        'Emergency alerts',
+        description: 'Critical health alerts that require immediate action',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
   }
 
   @override

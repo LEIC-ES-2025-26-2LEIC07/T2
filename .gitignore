@@ -60,3 +60,8 @@ app.*.map.json
 .claude
 .codex
 claude-obsidian/
+
+# Firebase — google-services.json contains API keys, never commit
+# firebase_options.dart only has client-side keys (safe to commit, embedded in APK)
+**/google-services.json
+**/GoogleService-Info.plist

@@ -54,7 +54,10 @@ Widget _buildScreen({User? user, SymptomRepository? repo}) {
       currentUserProvider.overrideWithValue(user),
       symptomRepositoryProvider.overrideWithValue(repo ?? _SuccessRepo()),
     ],
-    child: const MaterialApp(home: LogSymptomScreen()),
+    child: MaterialApp(
+      theme: ThemeData(splashFactory: NoSplash.splashFactory),
+      home: LogSymptomScreen(),
+    ),
   );
 }
 
@@ -186,6 +189,7 @@ void main() {
             symptomRepositoryProvider.overrideWithValue(repo),
           ],
           child: MaterialApp(
+            theme: ThemeData(splashFactory: NoSplash.splashFactory),
             home: Scaffold(
               body: Builder(
                 builder: (context) => ElevatedButton(

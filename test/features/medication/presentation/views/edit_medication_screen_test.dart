@@ -57,6 +57,7 @@ Widget _buildApp(MedicationRepository repo, {Medication? medication}) {
   GetIt.I.registerSingleton<MedicationRepository>(repo);
   final med = medication ?? _med();
   return MaterialApp(
+    theme: ThemeData(splashFactory: NoSplash.splashFactory),
     home: Builder(
       builder: (ctx) => Scaffold(
         body: ElevatedButton(

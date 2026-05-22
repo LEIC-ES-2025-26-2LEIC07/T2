@@ -76,8 +76,10 @@ Future<CalendarViewModel> _loadedVM({
   return vm;
 }
 
-Widget _wrap(CalendarViewModel vm) =>
-    MaterialApp(home: CalendarScreen(viewModel: vm));
+Widget _wrap(CalendarViewModel vm) => MaterialApp(
+  theme: ThemeData(splashFactory: NoSplash.splashFactory),
+  home: CalendarScreen(viewModel: vm),
+);
 
 DoseLogEntry _entry({
   required DateTime scheduledTime,
