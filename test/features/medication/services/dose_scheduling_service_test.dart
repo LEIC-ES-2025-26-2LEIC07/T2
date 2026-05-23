@@ -21,6 +21,92 @@ void main() {
     );
   });
 
+  group('DoseSchedulingService – interval-based scheduling', () {
+    test('interval:1 schedules a dose every day from createdAt', () {
+      final intervalMed = Medication(
+        id: 'med-2',
+        userId: 'user-1',
+        name: 'Paracetamol',
+        dosageAmount: 500,
+        dosageUnit: 'mg',
+        color: Colors.red,
+        frequency: 'interval:1',
+        createdAt: DateTime(2026, 5, 1),
+      );
+      // from = May 3 08:00, window = 48h → May 3 and May 4
+      final from = DateTime(2026, 5, 3, 8, 0);
+      final reminders = [
+        MedicationReminder(
+          id: 'rem-i1',
+          medicationId: 'med-2',
+          reminderTime: '09:00:00',
+          daysOfWeek: const [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+          ],
+        ),
+      ];
+
+      final results = service.calculateUpcomingDoses(
+        intervalMed,
+        reminders,
+        from: from,
+        duration: const Duration(hours: 48),
+      );
+
+      // 09:00 on May 3 and May 4
+      expect(results.length, 2);
+      expect(results[0].scheduledTime, DateTime(2026, 5, 3, 9, 0));
+      expect(results[1].scheduledTime, DateTime(2026, 5, 4, 9, 0));
+    });
+
+    test('interval:3 only schedules every 3rd day from createdAt', () {
+      final intervalMed = Medication(
+        id: 'med-3',
+        userId: 'user-1',
+        name: 'Antibiótico',
+        dosageAmount: 250,
+        dosageUnit: 'mg',
+        color: Colors.green,
+        frequency: 'interval:3',
+        createdAt: DateTime(2026, 5, 1), // day 0 = May 1
+      );
+      // from = May 1, window = 10 days → dose days: May 1, 4, 7, 10
+      final from = DateTime(2026, 5, 1, 7, 0);
+      final reminders = [
+        MedicationReminder(
+          id: 'rem-i3',
+          medicationId: 'med-3',
+          reminderTime: '08:00:00',
+          daysOfWeek: const [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday',
+          ],
+        ),
+      ];
+
+      final results = service.calculateUpcomingDoses(
+        intervalMed,
+        reminders,
+        from: from,
+        duration: const Duration(days: 10),
+      );
+
+      final days = results.map((d) => d.scheduledTime.day).toList();
+      expect(days, equals([1, 4, 7, 10]));
+    });
+  });
+
   group('DoseSchedulingService – calculateUpcomingDoses', () {
     test(
       'calculateUpcomingDoses: [Happy path] → returns correctly scheduled doses',

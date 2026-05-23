@@ -22,10 +22,7 @@ class EditMedicationViewModel extends ChangeNotifier with MedicationFormFields {
     name = medication.name;
     dosageAmount = medication.dosageAmount;
     dosageUnit = medication.dosageUnit ?? 'mg';
-    frequency =
-        AddMedicationViewModel.frequencyOptions.contains(medication.frequency)
-        ? medication.frequency!
-        : AddMedicationViewModel.frequencyOptions.first;
+    frequency = _parseMedicationFrequency(medication.frequency);
     selectedColor = medication.color;
     startDate = medication.startDate;
     endDate = medication.endDate;
@@ -87,6 +84,27 @@ class EditMedicationViewModel extends ChangeNotifier with MedicationFormFields {
     _syncReminderSlots();
     isDirty = true;
     notifyListeners();
+  }
+
+  void setIntervalDays(int v) {
+    if (v < 1) return;
+    frequency = 'interval:$v';
+    _syncReminderSlots();
+    isDirty = true;
+    notifyListeners();
+  }
+
+  static String _parseMedicationFrequency(String? stored) {
+    if (stored == null) return 'interval:1';
+    if (stored.startsWith('interval:')) return stored;
+    switch (stored) {
+      case 'Em dias alternados':
+        return 'interval:2';
+      case 'Semanalmente':
+        return 'interval:7';
+      default:
+        return 'interval:1';
+    }
   }
 
   void setReminderTime(int index, TimeOfDay time) {

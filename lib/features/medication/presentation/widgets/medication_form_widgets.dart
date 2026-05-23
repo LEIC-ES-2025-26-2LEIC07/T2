@@ -342,6 +342,89 @@ class MedFreqContent extends StatelessWidget {
   }
 }
 
+class MedIntervalContent extends StatelessWidget {
+  const MedIntervalContent({
+    super.key,
+    required this.intervalDays,
+    required this.onChanged,
+  });
+
+  final int intervalDays;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              intervalDays == 1 ? 'Todos os dias' : 'A cada $intervalDays dias',
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: medInk,
+              ),
+            ),
+          ),
+          _IntervalButton(
+            icon: Icons.remove,
+            enabled: intervalDays > 1,
+            onTap: () => onChanged(intervalDays - 1),
+          ),
+          SizedBox(
+            width: 44,
+            child: Text(
+              '$intervalDays',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: medInk,
+              ),
+            ),
+          ),
+          _IntervalButton(
+            icon: Icons.add,
+            enabled: intervalDays < 90,
+            onTap: () => onChanged(intervalDays + 1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IntervalButton extends StatelessWidget {
+  const _IntervalButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: enabled ? medBlue : medMuted.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: medInk, width: 1.5),
+        ),
+        child: Icon(icon, size: 18, color: enabled ? Colors.white : medMuted),
+      ),
+    );
+  }
+}
+
 class MedFoodSwitchContent extends StatelessWidget {
   const MedFoodSwitchContent({
     super.key,

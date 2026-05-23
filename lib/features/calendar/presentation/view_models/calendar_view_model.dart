@@ -137,11 +137,17 @@ class CalendarViewModel extends ChangeNotifier {
         );
       }
 
-      // Track which reminder IDs already have a log so we don't double-count
-      // scheduled doses that the user has already logged.
-      final loggedReminderIds = <String>{};
+      // Track which (reminderId, day) pairs already have a log so we don't
+      // double-count scheduled doses the user has logged, without hiding
+      // the same reminder's doses on OTHER days.
+      final loggedReminderDays = <String>{};
       for (final l in logs) {
-        if (l.reminderId != null) loggedReminderIds.add(l.reminderId!);
+        if (l.reminderId != null) {
+          final d = l.scheduledTime;
+          loggedReminderDays.add(
+            '${l.reminderId}|${d.year}-${d.month}-${d.day}',
+          );
+        }
         final day = DateTime(
           l.scheduledTime.year,
           l.scheduledTime.month,
@@ -152,12 +158,15 @@ class CalendarViewModel extends ChangeNotifier {
 
       for (final s in scheduled) {
         // ScheduledDose.id format is "reminderId_epochSeconds".
-        // loggedReminderIds contains plain reminder UUIDs, so extract the
-        // prefix before the last underscore for a correct comparison.
+        // Extract the prefix before the last underscore for comparison.
         final reminderIdFromDose = s.id.contains('_')
             ? s.id.substring(0, s.id.lastIndexOf('_'))
             : s.id;
-        if (loggedReminderIds.contains(reminderIdFromDose)) continue;
+        final sd = s.scheduledTime;
+        if (loggedReminderDays.contains(
+          '$reminderIdFromDose|${sd.year}-${sd.month}-${sd.day}',
+        ))
+          continue;
         final day = DateTime(
           s.scheduledTime.year,
           s.scheduledTime.month,

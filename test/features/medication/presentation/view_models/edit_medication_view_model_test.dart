@@ -100,7 +100,7 @@ void main() {
       expect(vm.name, 'Metformina');
       expect(vm.dosageAmount, 500);
       expect(vm.dosageUnit, 'mg');
-      expect(vm.frequency, 'Uma vez por dia');
+      expect(vm.frequency, 'interval:1');
       expect(vm.isSuccess, false);
       expect(vm.isDirty, false);
       expect(vm.errorMessage, isNull);

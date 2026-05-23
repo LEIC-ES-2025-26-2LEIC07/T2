@@ -17,6 +17,8 @@ class DoseSchedulingService {
     final end = now.add(duration);
     final doses = <ScheduledDose>[];
 
+    final intervalDays = _parseIntervalDays(medication.frequency);
+
     for (final reminder in reminders) {
       if (!reminder.isActive) continue;
 
@@ -33,8 +35,17 @@ class DoseSchedulingService {
         date.isBefore(end);
         date = date.add(const Duration(days: 1))
       ) {
-        final dayName = _getDayName(date.weekday);
-        if (!reminder.daysOfWeek.contains(dayName)) continue;
+        bool isDoseDay;
+        if (intervalDays != null) {
+          final ref = medication.startDate ?? medication.createdAt;
+          final refDay = DateTime(ref.year, ref.month, ref.day);
+          final diff = date.difference(refDay).inDays;
+          isDoseDay = diff >= 0 && diff % intervalDays == 0;
+        } else {
+          final dayName = _getDayName(date.weekday);
+          isDoseDay = reminder.daysOfWeek.contains(dayName);
+        }
+        if (!isDoseDay) continue;
 
         final scheduledTime = DateTime(
           date.year,
@@ -83,6 +94,14 @@ class DoseSchedulingService {
       default:
         return '';
     }
+  }
+
+  int? _parseIntervalDays(String? frequency) {
+    if (frequency == null) return null;
+    if (frequency.startsWith('interval:')) {
+      return int.tryParse(frequency.substring('interval:'.length));
+    }
+    return null;
   }
 
   String _generateStableId(String reminderId, DateTime time) {

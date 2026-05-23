@@ -53,6 +53,14 @@ class AddMedicationViewModel extends ChangeNotifier with MedicationFormFields {
     notifyListeners();
   }
 
+  void setIntervalDays(int v) {
+    if (v < 1) return;
+    frequency = 'interval:$v';
+    _syncReminderSlots();
+    isDirty = true;
+    notifyListeners();
+  }
+
   void setReminderTime(int index, TimeOfDay time) {
     if (index < reminderTimes.length) {
       reminderTimes = List.of(reminderTimes)..[index] = time;

@@ -208,11 +208,10 @@ class _EditMedicationScreenState extends State<EditMedicationScreen> {
                 ],
                 MedLabeledField(
                   label: 'Frequência',
-                  child: MedFreqContent(
+                  child: MedIntervalContent(
                     key: const Key('edit_med_freq_field'),
-                    value: _viewModel.frequency,
-                    options: AddMedicationViewModel.frequencyOptions,
-                    onChanged: _viewModel.setFrequency,
+                    intervalDays: _viewModel.intervalDays,
+                    onChanged: _viewModel.setIntervalDays,
                   ),
                 ),
                 const SizedBox(height: 12),

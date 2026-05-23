@@ -104,7 +104,8 @@ class SupabaseAuthService implements AuthService {
           fileOptions: FileOptions(contentType: contentType, upsert: true),
         );
 
-    return _client.storage.from('avatars').getPublicUrl(path);
+    final publicUrl = _client.storage.from('avatars').getPublicUrl(path);
+    return '$publicUrl?v=${DateTime.now().millisecondsSinceEpoch}';
   }
 
   AuthFailureType _authFailureTypeFor(AuthException error) {

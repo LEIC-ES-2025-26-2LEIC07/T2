@@ -8,8 +8,7 @@ mixin MedicationFormFields on ChangeNotifier {
   String name = '';
   int? dosageAmount;
   String dosageUnit = 'mg';
-  String frequency =
-      'Uma vez por dia'; // matches AddMedicationViewModel.frequencyOptions.first
+  String frequency = 'interval:1';
   Color selectedColor = AppColors.lemon;
   bool withFood = false;
   List<String> daysOfWeek = const [
@@ -24,6 +23,13 @@ mixin MedicationFormFields on ChangeNotifier {
   DateTime? startDate;
   DateTime? endDate;
   String notes = '';
+
+  int get intervalDays {
+    if (frequency.startsWith('interval:')) {
+      return int.tryParse(frequency.substring('interval:'.length)) ?? 1;
+    }
+    return 1;
+  }
 
   bool isDirty = false;
   String? nameError;

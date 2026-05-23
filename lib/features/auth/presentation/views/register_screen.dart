@@ -61,8 +61,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -173,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(24, 8, 24, 24 + bottomInset),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
               child: AnimatedBuilder(
                 animation: _viewModel,
                 builder: (context, _) => AppLoadingButton(
