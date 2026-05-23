@@ -165,8 +165,9 @@ class CalendarViewModel extends ChangeNotifier {
         final sd = s.scheduledTime;
         if (loggedReminderDays.contains(
           '$reminderIdFromDose|${sd.year}-${sd.month}-${sd.day}',
-        ))
+        )) {
           continue;
+        }
         final day = DateTime(
           s.scheduledTime.year,
           s.scheduledTime.month,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
-import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
 import 'package:clinic_go/features/medication/presentation/view_models/medication_form_mixin.dart';
 
 /// A reminder slot in the edit form — wraps an existing ID (if any) and time.
