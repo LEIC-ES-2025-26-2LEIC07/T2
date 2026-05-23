@@ -59,7 +59,7 @@ jobs:
         if: github.event_name == 'pull_request'
         id: targets
         run: |
-          git fetch origin ${{ github.base_ref }} --depth=1
+          git fetch origin ${{ github.base_ref }}
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- 'lib/**/*.dart')
           FILES=""
           while IFS= read -r src; do
