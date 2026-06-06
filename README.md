@@ -549,10 +549,11 @@ Feedback: overall positive on visual consistency and test coverage. Suggestion t
 ### Sprint 4
 
 <div align="center" justify="center">
+ <img width="1861" height="962" alt="Screenshot From 2026-06-06 22-51-13" src="https://github.com/user-attachments/assets/dfdc52bd-cea1-423e-9174-e22ceafbb181" />
   <p>Start of Sprint 4</p>
-  <img src="docs/boards/sprint4/start.png">
+ <img width="1861" height="962" alt="Screenshot From 2026-06-06 22-51-31" src="https://github.com/user-attachments/assets/9de0bf81-ea14-4c29-bf81-a789765d59cd" />
   <p>End of Sprint 4</p>
-  <img src="docs/boards/sprint4/end.png">
+
 </div>
 
 #### Sprint 4 Review
