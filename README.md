@@ -361,7 +361,8 @@ This prototype proves that our Flutter development environment is fully operatio
 Below is an animated snapshot of the functional prototype in action:
 <br>
 <div align="center" justify="center">
-<img src="docs/gifs/vertical.gif">
+![alt text](docs/gifs/ezgif.com-video-to-gif-converter.gif)
+![alt text](ezgif.com-video-to-gif-converter.gif)
 </div>
 
 ## Project management
