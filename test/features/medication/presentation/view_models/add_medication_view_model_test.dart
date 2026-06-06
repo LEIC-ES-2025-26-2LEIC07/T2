@@ -1,24 +1,10 @@
 import 'package:clinic_go/features/medication/data/medication_repository.dart';
 import 'package:clinic_go/features/medication/models/medication.dart';
 import 'package:clinic_go/features/medication/models/medication_reminder.dart';
-import 'package:clinic_go/features/medication/models/scheduled_dose.dart';
+
 import 'package:clinic_go/features/medication/presentation/view_models/add_medication_view_model.dart';
-import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
-import 'package:clinic_go/features/medication/services/dose_scheduling_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockMissedDoseNotificationController extends Mock
-    implements MissedDoseNotificationController {}
-
-class MockDoseSchedulingService extends Mock implements DoseSchedulingService {}
-
-class FakeMedication extends Fake implements Medication {}
-
-class FakeMedicationReminder extends Fake implements MedicationReminder {}
-
-class FakeScheduledDose extends Fake implements ScheduledDose {}
 
 // ── Hand-rolled mock repositories ──────────────────────────────────
 
@@ -106,41 +92,8 @@ class _NetworkErrorRepo implements MedicationRepository {
 // ── Tests ───────────────────────────────────────────────────────────
 
 void main() {
-  setUpAll(() {
-    registerFallbackValue(FakeMedication());
-    registerFallbackValue(FakeMedicationReminder());
-    registerFallbackValue(FakeScheduledDose());
-    registerFallbackValue(
-      Medication(
-        id: '',
-        userId: '',
-        name: '',
-        color: Colors.black,
-        createdAt: DateTime(2000),
-      ),
-    );
-    registerFallbackValue(<MedicationReminder>[]);
-  });
-
-  late MockMissedDoseNotificationController mockController;
-  late MockDoseSchedulingService mockScheduling;
-
-  setUp(() {
-    mockController = MockMissedDoseNotificationController();
-    mockScheduling = MockDoseSchedulingService();
-
-    // Stubbing for the happy-path logic
-    when(
-      () => mockScheduling.calculateUpcomingDoses(any(), any()),
-    ).thenReturn([]);
-  });
-
   AddMedicationViewModel vmFactory({MedicationRepository? repo}) =>
-      AddMedicationViewModel(
-        repository: repo ?? _SuccessRepo(),
-        notificationController: mockController,
-        schedulingService: mockScheduling,
-      );
+      AddMedicationViewModel(repository: repo ?? _SuccessRepo());
 
   group('AddMedicationViewModel – validation', () {
     test('submit with empty name sets nameError', () async {
@@ -269,34 +222,6 @@ void main() {
       vm.setFrequency('Três vezes por dia');
       vm.setFrequency('Uma vez por dia');
       expect(vm.reminderTimes.length, 1);
-    });
-  });
-
-  group('AddMedicationViewModel – notification scheduling failure', () {
-    test('notification error does not prevent successful save', () async {
-      final dose = ScheduledDose(
-        id: 'dose-x',
-        medicationId: 'new-id-123',
-        medicationName: 'Med',
-        dosage: '5mg',
-        scheduledTime: DateTime.now().add(const Duration(hours: 1)),
-      );
-
-      when(
-        () => mockScheduling.calculateUpcomingDoses(any(), any()),
-      ).thenReturn([dose]);
-
-      when(
-        () => mockController.scheduleDoseReminder(any()),
-      ).thenThrow(Exception('exact_alarms_not_permitted'));
-
-      final vm = vmFactory();
-      vm.setName('Med');
-      vm.setDosageAmount(5);
-      await vm.submit();
-
-      expect(vm.isSuccess, isTrue);
-      expect(vm.errorMessage, isNull);
     });
   });
 }

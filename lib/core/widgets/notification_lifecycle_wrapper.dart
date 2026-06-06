@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
 import 'package:clinic_go/features/emergency_alerts/presentation/view_models/emergency_alert_controller.dart';
 import 'package:clinic_go/features/emergency_alerts/presentation/widgets/emergency_alert_banner.dart';
-import 'package:clinic_go/features/medication/services/missed_dose_notification_controller.dart';
 import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 
@@ -21,7 +20,6 @@ class NotificationLifecycleWrapper extends StatefulWidget {
 class _NotificationLifecycleWrapperState
     extends State<NotificationLifecycleWrapper>
     with WidgetsBindingObserver {
-  late final MissedDoseNotificationController _notificationController;
   late final LocalNotificationGateway _notificationGateway;
   EmergencyAlertController? _emergencyAlertController;
   StreamSubscription<bool>? _authSubscription;
@@ -31,14 +29,12 @@ class _NotificationLifecycleWrapperState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _notificationController = getIt<MissedDoseNotificationController>();
     _notificationGateway = getIt<LocalNotificationGateway>();
     if (getIt.isRegistered<EmergencyAlertController>()) {
       _emergencyAlertController = getIt<EmergencyAlertController>()
         ..addListener(_onEmergencyAlertChanged)
         ..initialize();
     }
-    _notificationController.syncPendingMissedNotifications();
     _initializeNotifications();
   }
 
@@ -57,14 +53,11 @@ class _NotificationLifecycleWrapperState
       _showPermissionWarning = !granted;
     });
 
-    await _notificationController.refreshScheduledMedicationReminders();
-
     try {
       final authService = getIt<AuthService>();
       _authSubscription = authService.authStateChanges.listen((_) {
         final signedIn = authService.isLoggedIn;
         if (signedIn) {
-          _notificationController.refreshScheduledMedicationReminders();
           _emergencyAlertController?.handleSignedIn();
         } else {
           _emergencyAlertController?.handleSignedOut();
@@ -80,8 +73,6 @@ class _NotificationLifecycleWrapperState
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _notificationController.syncPendingMissedNotifications();
-      _notificationController.refreshScheduledMedicationReminders();
       _notificationGateway.hasPermissions().then((granted) {
         if (mounted) {
           setState(() => _showPermissionWarning = !granted);

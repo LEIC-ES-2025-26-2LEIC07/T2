@@ -19,6 +19,14 @@ class _MemoryNotificationGateway implements LocalNotificationGateway {
   Future<void> schedule(NotificationRequest request) async {}
 
   @override
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {}
+
+  @override
   Future<bool> hasPermissions() async => true;
 
   @override

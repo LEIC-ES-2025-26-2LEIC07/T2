@@ -17,6 +17,13 @@ class NotificationRequest {
 abstract class LocalNotificationGateway {
   Future<void> schedule(NotificationRequest request);
 
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  });
+
   Future<void> cancel(int notificationId);
 
   Future<bool> requestPermissions();
@@ -32,6 +39,14 @@ class NoopLocalNotificationGateway implements LocalNotificationGateway {
 
   @override
   Future<void> schedule(NotificationRequest request) async {}
+
+  @override
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {}
 
   @override
   Future<bool> requestPermissions() async => true;

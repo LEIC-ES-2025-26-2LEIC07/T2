@@ -548,4 +548,61 @@ Feedback: overall positive on visual consistency and test coverage. Suggestion t
 
 ### Sprint 4
 
+<div align="center" justify="center">
+  <p>Start of Sprint 4</p>
+  <img src="docs/boards/sprint4/start.png">
+  <p>End of Sprint 4</p>
+  <img src="docs/boards/sprint4/end.png">
+</div>
+
+#### Sprint 4 Review
+
+Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
+
+- **Emergency Alerts** with Firebase Cloud Messaging (FCM): server-triggered push notifications delivered to registered devices when a critical health alert is raised, with an in-app banner overlay and detail screen.
+- **Server-side medication reminders**: a Supabase Edge Function (`send-medication-reminders`) triggered every minute by pg_cron replaces all client-side `flutter_local_notifications` scheduling. This resolves the `SCHEDULE_EXACT_ALARM` permission issue on Android 12+ and ensures reminders fire even when the app is closed.
+- **Calendar screen redesign**: neo-brutalist style with a real-time dose status panel. Calendar days now update immediately after a medication is created or a dose is logged.
+- **Settings page**: functional notifications toggle that reads the real system permission state, persists the user preference via `SharedPreferences`, and suppresses foreground notifications when disabled.
+- **Bug fixes**: notification not dismissed after logging a dose (notification ID mismatch), floating navbar hidden behind Android system navigation bar, Kotlin Gradle Plugin migration, P0 calendar deduplication bug.
+- **UI polish**: splash screen with ClinicGO branding, Portuguese auth screens fully restored, navbar labels translated to Portuguese, symptom logging screen improved.
+- **Test suite**: UAT integration tests added for US02, US04, US07 journeys; high-priority unit tests added for `EditMedicationViewModel` and `EditMedicationScreen`.
+- **CI/CD**: upgraded to Node.js 24 for GitHub Actions; CodeQL workflow fixed.
+
+#### Sprint 4 Retrospective
+
+* **Did well:**
+    * **Architectural problem-solving:** When local notifications proved unreliable on real Android devices, the team identified the root cause and solved it at the infrastructure level (moving to server-side FCM) rather than applying a fragile local fix.
+    * **PR workflow:** All work was delivered through PRs with code review, keeping `main` consistently stable throughout the sprint.
+    * **End-to-end verification:** The notification pipeline was verified live on a real device (pg_cron → Edge Function → FCM → push received), confirming the architectural change was correct.
+
+* **Do differently:**
+    * **Notification testing on real hardware sooner:** The incompatibility between `SCHEDULE_EXACT_ALARM` and OEM battery management was only discovered late in development, after testing on an emulator. Testing on a real device from Sprint 2 would have surfaced this earlier.
+    * **Infrastructure setup documentation:** The Firebase service account key and Supabase pg_cron setup required manual steps not captured in the repo. These should be documented in a `SETUP.md` for future maintainers.
+
+* **Improvements for the future:**
+    * Document all external service secrets and manual setup steps in a dedicated `SETUP.md` file.
+    * Add a Supabase Edge Function test harness to validate `send-medication-reminders` locally before deploying.
+
 ### Final Release
+
+ClinicGO's final release delivers a complete medication management companion for Android. The full feature set across all four sprints includes:
+
+| Feature | Status |
+|---------|--------|
+| Medication CRUD (add, edit, delete) with dosage, frequency, and colour coding | ✅ |
+| Dose tracking — mark as taken or skipped from home screen | ✅ |
+| Server-side medication reminders via Supabase Edge Function + Firebase FCM | ✅ |
+| Emergency alerts with FCM push notifications and in-app banner | ✅ |
+| Monthly calendar with daily dose status (green = all taken, orange = partial) | ✅ |
+| Symptom logging and history view | ✅ |
+| Profile management with avatar upload (Supabase Storage) | ✅ |
+| Settings page with notification preference toggle | ✅ |
+| Supabase Auth — login, register, logout with session persistence | ✅ |
+| Neo-brutalist design system applied consistently across all screens | ✅ |
+| Splash screen with ClinicGO branding | ✅ |
+| GitHub Actions CI — linting, formatting, unit + widget tests on every PR | ✅ |
+| UAT acceptance tests for core user journeys | ✅ |
+
+The final APK is available in the [GitHub Releases](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases) page.
+
+**AI Convention:** All AI-generated commits across the project are prefixed `[MISTER AI]`. Full AI usage reports per sprint are available in [`docs/ai_report/`](docs/ai_report/).
