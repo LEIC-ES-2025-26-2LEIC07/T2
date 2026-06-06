@@ -361,7 +361,7 @@ This prototype proves that our Flutter development environment is fully operatio
 Below is an animated snapshot of the functional prototype in action:
 <br>
 <div align="center" justify="center">
-<img src="docs/gifs/ezgif.com-video-to-gif-converter.gif">                                                                                                               
+<img src="docs/gifs/ezgif.com-video-to-gif-converter.gif" width="300">                                                                                                               
 
 </div>
 
