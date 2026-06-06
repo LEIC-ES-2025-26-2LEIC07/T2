@@ -6,23 +6,28 @@ import '../../data/emergency_alert_repository.dart';
 import '../../models/emergency_alert.dart';
 import '../../services/emergency_alert_store.dart';
 import '../../services/push_messaging_gateway.dart';
+import '../../../medication/models/notification_payload.dart';
+import '../../../medication/services/local_notification_gateway.dart';
 
 class EmergencyAlertController extends ChangeNotifier {
   EmergencyAlertController({
     required EmergencyAlertRepository repository,
     required EmergencyAlertStore store,
     required PushMessagingGateway pushGateway,
+    LocalNotificationGateway? localNotificationGateway,
     void Function(String route)? onOpenRoute,
     Future<void> Function(String doseId)? onCancelDoseNotification,
   }) : _repository = repository,
        _store = store,
        _pushGateway = pushGateway,
+       _localNotificationGateway = localNotificationGateway,
        _onOpenRoute = onOpenRoute,
        _onCancelDoseNotification = onCancelDoseNotification;
 
   final EmergencyAlertRepository _repository;
   final EmergencyAlertStore _store;
   final PushMessagingGateway _pushGateway;
+  final LocalNotificationGateway? _localNotificationGateway;
   final void Function(String route)? _onOpenRoute;
   final Future<void> Function(String doseId)? _onCancelDoseNotification;
   final List<EmergencyAlert> _alerts = [];
@@ -170,6 +175,11 @@ class EmergencyAlertController extends ChangeNotifier {
     PushMessage message, {
     bool openDetails = false,
   }) async {
+    if (message.data['type'] == 'medication_reminder') {
+      await _handleMedicationReminderMessage(message, openDetails: openDetails);
+      return;
+    }
+
     if (message.data['type'] != 'emergency') return;
 
     final alertId = message.data['alert_id']?.toString();
@@ -197,6 +207,41 @@ class EmergencyAlertController extends ChangeNotifier {
 
     await _upsertAlert(alert);
     if (openDetails) openAlert(alert.id);
+  }
+
+  Future<void> _handleMedicationReminderMessage(
+    PushMessage message, {
+    bool openDetails = false,
+  }) async {
+    final route = message.data['route']?.toString();
+
+    if (openDetails && route != null) {
+      _onOpenRoute?.call(route);
+      return;
+    }
+
+    final doseId = message.data['doseId']?.toString();
+    if (doseId == null || _localNotificationGateway == null) return;
+
+    final effectiveRoute = route ?? '/log-dose/${Uri.encodeComponent(doseId)}';
+    final payload = NotificationPayload(
+      route: effectiveRoute,
+      status: 'scheduled',
+      doseId: doseId,
+    );
+
+    try {
+      await _localNotificationGateway.show(
+        id: doseId.hashCode.abs() % 0x7fffffff,
+        title: message.title ?? 'Hora do Medicamento',
+        body: message.body ?? 'Hora de tomar o medicamento',
+        payload: payload.encode(),
+      );
+    } catch (error) {
+      debugPrint(
+        'EmergencyAlertController: failed to show medication reminder: $error',
+      );
+    }
   }
 
   Future<void> _upsertAlert(EmergencyAlert alert) async {

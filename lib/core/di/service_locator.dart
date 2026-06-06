@@ -120,6 +120,7 @@ Future<NotificationPayload?> setupServiceLocator(
       repository: getIt<EmergencyAlertRepository>(),
       store: getIt<EmergencyAlertStore>(),
       pushGateway: getIt<PushMessagingGateway>(),
+      localNotificationGateway: getIt<LocalNotificationGateway>(),
       onOpenRoute: (route) {
         final navigator = navigatorKey.currentState;
         if (navigator == null) return;

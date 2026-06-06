@@ -24,6 +24,14 @@ class MemoryNotificationGateway implements LocalNotificationGateway {
   }
 
   @override
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {}
+
+  @override
   Future<bool> requestPermissions() async => true;
 
   @override

@@ -114,6 +114,64 @@ class FlutterLocalNotificationGateway implements LocalNotificationGateway {
         enableVibration: true,
       ),
     );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'medication_reminders',
+        'Lembretes de medicação',
+        description: 'Lembretes agendados para doses de medicação próximas',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await androidPlugin?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'missed_medication_alerts',
+        'Alertas de medicação em atraso',
+        description: 'Alertas urgentes para doses agendadas em atraso',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+  }
+
+  @override
+  Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required String payload,
+  }) {
+    final isMissedDoseAlert = payload.contains('"status":"overdue"');
+    return _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          isMissedDoseAlert
+              ? 'missed_medication_alerts'
+              : 'medication_reminders',
+          isMissedDoseAlert
+              ? 'Alertas de medicação em atraso'
+              : 'Lembretes de medicação',
+          channelDescription: isMissedDoseAlert
+              ? 'Alertas urgentes para doses agendadas em atraso'
+              : 'Lembretes agendados para doses de medicação próximas',
+          importance: Importance.max,
+          priority: Priority.high,
+          category: AndroidNotificationCategory.reminder,
+        ),
+        iOS: const DarwinNotificationDetails(
+          interruptionLevel: InterruptionLevel.active,
+        ),
+        macOS: const DarwinNotificationDetails(
+          interruptionLevel: InterruptionLevel.active,
+        ),
+      ),
+      payload: payload,
+    );
   }
 
   @override
