@@ -585,6 +585,47 @@ Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
 
 ### Final Release
 
+<div align="center" justify="center">
+  <p>Start of Final Release</p>
+  <img src="docs/boards/final/start.png">
+  <p>End of Final Release</p>
+  <img src="docs/boards/final/end.png">
+</div>
+
+#### Final Release Review
+
+The final release consolidates all work delivered across Sprint 0–4 into a stable, shippable version of ClinicGO. Key deliverables presented at Demo & Pitch:
+
+- Full medication management lifecycle: add, edit, delete medications with dosage, frequency, colour coding, and reminder scheduling.
+- Server-side push notification delivery via Supabase Edge Function + Firebase FCM, replacing unreliable client-side local scheduling and working even when the app is closed.
+- Emergency alerts pipeline: server-triggered FCM push notifications with in-app banner overlay and detail screen.
+- Calendar view with daily dose status updated in real time.
+- Symptom logging and monthly summary.
+- Profile with avatar upload, settings page with functional notification toggle.
+- Neo-brutalist design system applied consistently across all screens.
+- Automated test suite covering unit, widget, and UAT integration journeys.
+- GitHub Actions CI running on every PR.
+
+#### Final Release Retrospective
+
+* **Did well:**
+    * **End-to-end delivery:** All core user stories were implemented and working on a real device by the final demo — medication reminders, emergency alerts, dose tracking, and calendar all functional.
+    * **Architecture resilience:** When a core feature (local notifications) proved unreliable on real Android hardware, the team pivoted to a server-side solution that is more robust and platform-independent.
+    * **Design consistency:** The neo-brutalist design system gave the app a distinctive, cohesive visual identity that held across all screens without hardcoded values.
+    * **AI-assisted development:** The `[MISTER AI]` convention provided full traceability of AI contributions across all sprints, enabling honest reporting of human vs. AI authorship.
+
+* **Do differently:**
+    * **Test on real hardware earlier:** Several issues (exact alarm permissions, OEM battery management, USB device recognition) only surfaced when testing on physical devices late in development.
+    * **Infrastructure setup documented from the start:** Firebase service account keys, Supabase pg_cron, and Edge Function secrets required manual setup steps that were not captured in the repo until the end.
+    * **More equitable workload distribution:** Some sprints had uneven contribution across team members; better upfront task assignment at planning would have balanced this.
+
+* **What we would do next:**
+    * Implement offline mode with local SQLite cache for dose tracking without internet.
+    * Add AI/Vision integration for prescription scanning.
+    * Publish to the Google Play Store.
+
+---
+
 ClinicGO's final release delivers a complete medication management companion for Android. The full feature set across all four sprints includes:
 
 | Feature | Status |
