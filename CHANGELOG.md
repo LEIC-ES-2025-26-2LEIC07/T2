@@ -17,8 +17,8 @@
 
 ### What's Changed
 
-- Migrate medication reminders to server-side Supabase FCM by @Dab1d in fix-notifications
-- Settings notifications toggle functional implementation by @Dab1d in fix-notifications
+- Migrate medication reminders to server-side Supabase FCM by @Dab1d in [#136](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/136)
+- Settings notifications toggle functional implementation by @Dab1d in [#136](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/pull/136)
 
 Full Changelog: [v0.3...v0.4](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/compare/v0.3...v0.4)
 
