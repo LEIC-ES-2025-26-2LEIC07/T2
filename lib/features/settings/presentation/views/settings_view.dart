@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:clinic_go/core/di/service_locator.dart';
 import 'package:clinic_go/core/themes/app_colors.dart';
 import 'package:clinic_go/core/widgets/clinic_go_logo.dart';
 import 'package:clinic_go/features/auth/domain/auth_service.dart';
+import 'package:clinic_go/features/medication/services/local_notification_gateway.dart';
+
+const _kNotificationsEnabledKey = 'settings_notifications_enabled';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -15,6 +19,49 @@ class _SettingsViewState extends State<SettingsView> {
   bool _notificationsEnabled = true;
   bool _snoozeEnabled = true;
   bool _syncHealthEnabled = true;
+  bool _loadingNotifications = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationState();
+  }
+
+  Future<void> _loadNotificationState() async {
+    final gateway = getIt<LocalNotificationGateway>();
+    final hasPermission = await gateway.hasPermissions();
+    final prefs = await SharedPreferences.getInstance();
+    final userEnabled = prefs.getBool(_kNotificationsEnabledKey) ?? true;
+    if (mounted) {
+      setState(() {
+        _notificationsEnabled = hasPermission && userEnabled;
+        _loadingNotifications = false;
+      });
+    }
+  }
+
+  Future<void> _handleNotificationsToggle(bool value) async {
+    final gateway = getIt<LocalNotificationGateway>();
+    final prefs = await SharedPreferences.getInstance();
+
+    if (value) {
+      final granted = await gateway.requestPermissions();
+      await prefs.setBool(_kNotificationsEnabledKey, granted);
+      if (mounted) setState(() => _notificationsEnabled = granted);
+      if (!granted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Permissão negada. Activa as notificações nas definições do sistema.',
+            ),
+          ),
+        );
+      }
+    } else {
+      await prefs.setBool(_kNotificationsEnabledKey, false);
+      if (mounted) setState(() => _notificationsEnabled = false);
+    }
+  }
 
   Future<void> _handleLogout() async {
     final confirmed = await showDialog<bool>(
@@ -104,7 +151,8 @@ class _SettingsViewState extends State<SettingsView> {
                   title: 'Notificações',
                   subtitle: 'Som, vibração, ecrã',
                   value: _notificationsEnabled,
-                  onChanged: (v) => setState(() => _notificationsEnabled = v),
+                  loading: _loadingNotifications,
+                  onChanged: _handleNotificationsToggle,
                 ),
                 const _RowDivider(),
                 _ToggleRow(
@@ -261,6 +309,7 @@ class _ToggleRow extends StatelessWidget {
     required this.subtitle,
     required this.value,
     required this.onChanged,
+    this.loading = false,
   });
 
   final Color iconBg;
@@ -269,6 +318,7 @@ class _ToggleRow extends StatelessWidget {
   final String subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -302,15 +352,23 @@ class _ToggleRow extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: const Color(0xFF34C759),
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: const Color(0xFFDDE3EA),
-            trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
-          ),
+          loading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Switch(
+                  value: value,
+                  onChanged: onChanged,
+                  activeThumbColor: Colors.white,
+                  activeTrackColor: const Color(0xFF34C759),
+                  inactiveThumbColor: Colors.white,
+                  inactiveTrackColor: const Color(0xFFDDE3EA),
+                  trackOutlineColor: WidgetStateProperty.all(
+                    Colors.transparent,
+                  ),
+                ),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/emergency_alert_repository.dart';
 import '../../models/emergency_alert.dart';
@@ -223,6 +224,11 @@ class EmergencyAlertController extends ChangeNotifier {
 
     final doseId = message.data['doseId']?.toString();
     if (doseId == null || _localNotificationGateway == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final notificationsEnabled =
+        prefs.getBool('settings_notifications_enabled') ?? true;
+    if (!notificationsEnabled) return;
 
     final effectiveRoute = route ?? '/log-dose/${Uri.encodeComponent(doseId)}';
     final payload = NotificationPayload(
