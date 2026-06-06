@@ -8,6 +8,7 @@ import '../../services/emergency_alert_store.dart';
 import '../../services/push_messaging_gateway.dart';
 import '../../../medication/models/notification_payload.dart';
 import '../../../medication/services/local_notification_gateway.dart';
+import '../../../medication/services/missed_dose_notification_controller.dart';
 
 class EmergencyAlertController extends ChangeNotifier {
   EmergencyAlertController({
@@ -232,7 +233,9 @@ class EmergencyAlertController extends ChangeNotifier {
 
     try {
       await _localNotificationGateway.show(
-        id: doseId.hashCode.abs() % 0x7fffffff,
+        id: MissedDoseNotificationController.primaryNotificationIdForDose(
+          doseId,
+        ),
         title: message.title ?? 'Hora do Medicamento',
         body: message.body ?? 'Hora de tomar o medicamento',
         payload: payload.encode(),
