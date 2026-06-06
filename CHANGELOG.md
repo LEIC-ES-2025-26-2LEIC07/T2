@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.4](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0.4) - 2026-06-06
+
+### Added
+
+- Server-side medication reminder delivery via Supabase Edge Function + pg_cron + Firebase FCM, so reminders fire reliably even when the app is closed. [#135](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/135)
+- Settings page notifications toggle that reads the real system permission state and persists the user preference across sessions.
+
+### Changed
+
+- Medication reminders migrated from client-side `flutter_local_notifications` scheduling to a Supabase Edge Function (`send-medication-reminders`) triggered every minute by pg_cron, which queries due reminders and sends FCM push notifications directly to the device. [#135](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/issues/135)
+
+### Fixed
+
+- Fixed notification not dismissed from the system tray after logging a dose — notification ID mismatch between `show()` and `cancel()` caused the cancel to target the wrong notification.
+
+### What's Changed
+
+- Migrate medication reminders to server-side Supabase FCM by @Dab1d in fix-notifications
+- Settings notifications toggle functional implementation by @Dab1d in fix-notifications
+
+Full Changelog: [v0.3...v0.4](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/compare/v0.3...v0.4)
+
+-----
+
 ## [v0.3](https://github.com/LEIC-ES-2025-26-2LEIC07/T2/releases/tag/v0.3) - 2026-05-22
 
 ### Added
