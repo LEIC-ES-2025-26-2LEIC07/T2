@@ -114,8 +114,8 @@ flutter test
 # With coverage report
 flutter test --coverage
 
-# Integration tests (requires a real device/emulator and a populated .env)
-flutter test --dart-define-from-file=.env integration_test/app_test.dart
+#Integration tests (they need to be run one by one to avoid conflicts between them, so we created a simple script that handles this).
+run_integration_tests.sh
 ```
 
 ## Business Modelling
