@@ -115,6 +115,7 @@ void main() {
         await tester.pumpWidget(
           app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
         );
+        await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
 
         // App boots unauthenticated → LoginScreen

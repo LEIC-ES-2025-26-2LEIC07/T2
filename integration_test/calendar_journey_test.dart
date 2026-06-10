@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:intl/intl.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -88,7 +87,8 @@ Future<void> _bootApp(WidgetTester tester) async {
 
   final navigatorKey = GlobalKey<NavigatorState>();
   await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-  await tester.pumpAndSettle(const Duration(seconds: 1));
+  await tester.pump(const Duration(seconds: 5));
+  await tester.pumpAndSettle();
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -102,27 +102,42 @@ void main() {
     ) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('PLAN'));
+      await tester.tap(find.text('PLANO'));
       await tester.pumpAndSettle();
 
-      // Calendar AppBar title
-      expect(find.text('Calendar'), findsOneWidget);
+      // PLANO appears in nav bar and AppBar
+      expect(find.text('PLANO'), findsWidgets);
 
-      // Month header formatted as e.g. "May 2026"
-      final expectedHeader = DateFormat.yMMMM().format(DateTime.now());
+      // Month header formatted as e.g. "JUN 2026"
+      const ptMonths = [
+        'JAN',
+        'FEV',
+        'MAR',
+        'ABR',
+        'MAI',
+        'JUN',
+        'JUL',
+        'AGO',
+        'SET',
+        'OUT',
+        'NOV',
+        'DEZ',
+      ];
+      final now = DateTime.now();
+      final expectedHeader = '${ptMonths[now.month - 1]} ${now.year}';
       expect(find.text(expectedHeader), findsOneWidget);
     });
 
     testWidgets('US04: calendar shows legend items', (tester) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('PLAN'));
+      await tester.tap(find.text('PLANO'));
       await tester.pumpAndSettle();
 
-      expect(find.text('All taken'), findsOneWidget);
-      expect(find.text('Partial'), findsOneWidget);
-      expect(find.text('Missed'), findsOneWidget);
-      expect(find.text('Upcoming'), findsOneWidget);
+      expect(find.text('Todas tomadas'), findsOneWidget);
+      expect(find.text('Parcial'), findsOneWidget);
+      expect(find.text('Falhadas'), findsOneWidget);
+      expect(find.text('Próximas'), findsOneWidget);
     });
 
     testWidgets(
@@ -130,7 +145,7 @@ void main() {
       (tester) async {
         await _bootApp(tester);
 
-        await tester.tap(find.text('PLAN'));
+        await tester.tap(find.text('PLANO'));
         await tester.pumpAndSettle();
 
         // Tap the first day cell in the grid — day '1' of the current month.
@@ -138,17 +153,14 @@ void main() {
         await tester.tap(find.text('1').first);
         await tester.pumpAndSettle();
 
-        expect(
-          find.text('No medication activity for this day.'),
-          findsOneWidget,
-        );
+        expect(find.text('Sem doses para este dia.'), findsOneWidget);
       },
     );
 
     testWidgets('US04: month navigation arrows are present', (tester) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('PLAN'));
+      await tester.tap(find.text('PLANO'));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.chevron_left), findsOneWidget);
@@ -160,12 +172,26 @@ void main() {
     ) async {
       await _bootApp(tester);
 
-      await tester.tap(find.text('PLAN'));
+      await tester.tap(find.text('PLANO'));
       await tester.pumpAndSettle();
 
+      const ptMonths = [
+        'JAN',
+        'FEV',
+        'MAR',
+        'ABR',
+        'MAI',
+        'JUN',
+        'JUL',
+        'AGO',
+        'SET',
+        'OUT',
+        'NOV',
+        'DEZ',
+      ];
       final now = DateTime.now();
       final nextMonth = DateTime(now.year, now.month + 1);
-      final nextHeader = DateFormat.yMMMM().format(nextMonth);
+      final nextHeader = '${ptMonths[nextMonth.month - 1]} ${nextMonth.year}';
 
       await tester.tap(find.byIcon(Icons.chevron_right));
       await tester.pumpAndSettle();
