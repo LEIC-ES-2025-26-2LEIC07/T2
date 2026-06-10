@@ -88,6 +88,7 @@ void main() {
 
       final navigatorKey = GlobalKey<NavigatorState>();
       await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
+      await tester.pump(const Duration(seconds: 5));
       await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);

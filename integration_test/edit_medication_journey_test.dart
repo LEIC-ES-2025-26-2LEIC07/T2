@@ -100,7 +100,8 @@ Future<void> _bootApp(
 
   final navigatorKey = GlobalKey<NavigatorState>();
   await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-  await tester.pumpAndSettle(const Duration(seconds: 1));
+  await tester.pump(const Duration(seconds: 5));
+  await tester.pumpAndSettle();
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -145,7 +146,7 @@ void main() {
     ) async {
       await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
 
       expect(find.text('Lisinopril'), findsOneWidget);
@@ -156,7 +157,7 @@ void main() {
     ) async {
       await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('INFO'));
@@ -172,7 +173,7 @@ void main() {
       (tester) async {
         await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-        await tester.tap(find.text('MEDS'));
+        await tester.tap(find.text('MEDICAÇÃO'));
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('INFO'));
@@ -192,7 +193,7 @@ void main() {
       (tester) async {
         await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-        await tester.tap(find.text('MEDS'));
+        await tester.tap(find.text('MEDICAÇÃO'));
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('INFO'));
@@ -224,7 +225,7 @@ void main() {
     ) async {
       await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('INFO'));
@@ -243,14 +244,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Screen popped — now back on MEDS tab which shows the nav bar
-      expect(find.text('MEDS'), findsOneWidget);
+      expect(find.text('MEDICAÇÃO'), findsOneWidget);
       expect(find.text('Editar medicação'), findsNothing);
     });
 
     testWidgets('US07: tapping ELIMINAR shows confirm dialog', (tester) async {
       await _bootApp(tester, mockMedRepo: mockMedRepo);
 
-      await tester.tap(find.text('MEDS'));
+      await tester.tap(find.text('MEDICAÇÃO'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('INFO'));

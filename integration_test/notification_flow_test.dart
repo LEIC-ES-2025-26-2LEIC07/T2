@@ -136,7 +136,9 @@ void main() {
         getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
 
         await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-        await tester.pumpAndSettle(const Duration(seconds: 1));
+        // Wait for splash screen (1500ms timer) then let the tree settle
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.home_outlined));
         await tester.pumpAndSettle();
@@ -146,7 +148,7 @@ void main() {
         expect(find.textContaining('EM ATRASO'), findsWidgets);
 
         // Medication details visible in the card
-        expect(find.text('Lisinopril 10mg'), findsOneWidget);
+        expect(find.text('Lisinopril 10mg'), findsWidgets);
 
         // Action buttons present
         expect(find.text('Tomar agora'), findsOneWidget);

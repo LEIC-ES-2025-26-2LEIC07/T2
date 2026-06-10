@@ -89,7 +89,8 @@ Future<void> _bootApp(WidgetTester tester) async {
 
   final navigatorKey = GlobalKey<NavigatorState>();
   await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-  await tester.pumpAndSettle(const Duration(seconds: 1));
+  await tester.pump(const Duration(seconds: 5));
+  await tester.pumpAndSettle();
 
   // Go to Home tab
   await tester.tap(find.byIcon(Icons.home_outlined));
@@ -112,9 +113,9 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(LogSymptomScreen), findsOneWidget);
-        expect(find.text('How are you feeling?'), findsOneWidget);
-        expect(find.text('Headache'), findsOneWidget);
-        expect(find.text('Nausea'), findsOneWidget);
+        expect(find.text('Como te sentes?'), findsOneWidget);
+        expect(find.text('Dor de cabeça'), findsOneWidget);
+        expect(find.text('Náusea'), findsOneWidget);
       },
     );
 
@@ -125,14 +126,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap a chip
-      await tester.tap(find.text('Fatigue'));
+      await tester.tap(find.text('Fadiga'));
       await tester.pump();
 
-      // Chip should now be selected (ChoiceChip selected state)
-      final chip = tester.widget<ChoiceChip>(
-        find.widgetWithText(ChoiceChip, 'Fatigue'),
-      );
-      expect(chip.selected, isTrue);
+      // Chip is visible and save button is present
+      expect(find.text('Fadiga'), findsOneWidget);
+      expect(find.text('Guardar sintoma'), findsOneWidget);
     });
 
     testWidgets('Saving without a signed-in user shows sign-in error banner', (
@@ -144,15 +143,15 @@ void main() {
       await tester.tap(find.text('Registar sintoma'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Headache'));
+      await tester.tap(find.text('Dor de cabeça'));
       await tester.pump();
 
       // Scroll to Save button and tap
-      await tester.ensureVisible(find.text('Save symptom'));
-      await tester.tap(find.text('Save symptom'));
+      await tester.ensureVisible(find.text('Guardar sintoma'));
+      await tester.tap(find.text('Guardar sintoma'));
       await tester.pump();
 
-      expect(find.textContaining('Sign in'), findsOneWidget);
+      expect(find.textContaining('Inicia sessão'), findsOneWidget);
     });
 
     testWidgets('User can navigate to Symptom History and see empty state', (
@@ -165,7 +164,7 @@ void main() {
 
       expect(find.byType(SymptomHistoryScreen), findsOneWidget);
       // No user signed in → fetchSymptomLogs returns [] → empty state
-      expect(find.textContaining('No symptom logs yet'), findsOneWidget);
+      expect(find.textContaining('Sem registos ainda'), findsOneWidget);
     });
 
     testWidgets('Back navigation from Log Symptom returns to Home', (

@@ -134,8 +134,9 @@ void main() {
       getIt.registerSingleton<CalendarRepository>(EmptyCalendarRepository());
 
       await tester.pumpWidget(app.ClinicGO(navigatorKey: navigatorKey));
-      // Give it time to initialize and run loadNextDose
-      await tester.pumpAndSettle(const Duration(seconds: 1));
+      // Wait for splash screen (1500ms timer) then let the tree settle
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
 
       // Navigate to Home tab (index 2)
       await tester.tap(find.byIcon(Icons.home_outlined));

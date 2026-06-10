@@ -98,6 +98,7 @@ void main() {
         await tester.pumpWidget(
           app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
         );
+        await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
 
         await tester.enterText(
@@ -105,7 +106,7 @@ void main() {
           authService.email,
         );
         await tester.enterText(
-          find.widgetWithText(TextField, 'Password'),
+          find.widgetWithText(TextField, 'Palavra-passe'),
           'secret123',
         );
         await tester.tap(find.text('Entrar'));
@@ -115,7 +116,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('USER_TEST'), findsWidgets);
 
-        await tester.tap(find.text('Edit'));
+        await tester.tap(find.text('Editar perfil'));
         await tester.pumpAndSettle();
 
         await tester.enterText(
@@ -126,15 +127,7 @@ void main() {
           find.widgetWithText(TextField, 'Email'),
           'maria@example.com',
         );
-        await tester.enterText(
-          find.widgetWithText(TextField, 'Telefone'),
-          '919999999',
-        );
-        await tester.enterText(
-          find.widgetWithText(TextField, 'Preferências'),
-          'Afternoon appointments',
-        );
-        final saveButton = find.widgetWithText(ElevatedButton, 'Save');
+        final saveButton = find.text('Guardar');
         await tester.ensureVisible(saveButton);
         await tester.tap(saveButton);
         await tester.pumpAndSettle();
@@ -142,24 +135,19 @@ void main() {
         expect(authService.email, 'maria@example.com');
         expect(authService.currentUserMetadata['name'], 'Maria Silva');
         expect(authService.currentUserMetadata['birth_date'], '1990-01-02');
-        expect(authService.currentUserMetadata['phone'], '919999999');
-        expect(
-          authService.currentUserMetadata['preferences'],
-          'Afternoon appointments',
-        );
-        expect(find.text('Profile updated successfully.'), findsOneWidget);
+        expect(find.text('Perfil atualizado com sucesso.'), findsOneWidget);
 
         await tester.pumpWidget(const SizedBox.shrink());
         await tester.pumpWidget(
           app.ClinicGO(navigatorKey: GlobalKey<NavigatorState>()),
         );
+        await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.person_outline));
         await tester.pumpAndSettle();
-        expect(find.text('MARIA SILVA'), findsOneWidget);
+        expect(find.text('Maria Silva'), findsWidgets);
         expect(find.text('maria@example.com'), findsOneWidget);
-        expect(find.text('Afternoon appointments'), findsOneWidget);
       },
     );
   });

@@ -114,8 +114,12 @@ flutter test
 # With coverage report
 flutter test --coverage
 
-# Integration tests (requires a real device/emulator and a populated .env)
-flutter test --dart-define-from-file=.env integration_test/app_test.dart
+# Integration tests — must run sequentially on Linux desktop (parallel processes conflict).
+# Use the script in integration_test/:
+./integration_test/run_integration_tests.sh
+
+# Or run a single file:
+flutter test integration_test/calendar_journey_test.dart -d linux
 ```
 
 ## Business Modelling
@@ -547,19 +551,18 @@ Feedback: overall positive on visual consistency and test coverage. Suggestion t
     * At sprint planning, verify no epics in the Sprint Backlog, all items have Effort estimates, and total effort does not exceed the previous sprint's velocity.
     * Set a PR review deadline of 48 hours before sprint end to avoid last-minute merges.
 
-### Sprint 4
+### Final Release
 
 <div align="center" justify="center">
  <img width="1861" height="962" alt="Screenshot From 2026-06-06 22-51-13" src="https://github.com/user-attachments/assets/dfdc52bd-cea1-423e-9174-e22ceafbb181" />
-  <p>Start of Sprint 4</p>
+  <p>Start of Final Release</p>
  <img width="1861" height="962" alt="Screenshot From 2026-06-06 22-51-31" src="https://github.com/user-attachments/assets/9de0bf81-ea14-4c29-bf81-a789765d59cd" />
-  <p>End of Sprint 4</p>
-
+  <p>End of Final Release</p>
 </div>
 
-#### Sprint 4 Review
+#### Final Release Review
 
-Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
+The Final Release was the culmination of all sprints before the Demo and Pitch. Key deliverables shown:
 
 - **Emergency Alerts** with Firebase Cloud Messaging (FCM): server-triggered push notifications delivered to registered devices when a critical health alert is raised, with an in-app banner overlay and detail screen.
 - **Server-side medication reminders**: a Supabase Edge Function (`send-medication-reminders`) triggered every minute by pg_cron replaces all client-side `flutter_local_notifications` scheduling. This resolves the `SCHEDULE_EXACT_ALARM` permission issue on Android 12+ and ensures reminders fire even when the app is closed.
@@ -570,7 +573,7 @@ Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
 - **Test suite**: UAT integration tests added for US02, US04, US07 journeys; high-priority unit tests added for `EditMedicationViewModel` and `EditMedicationScreen`.
 - **CI/CD**: upgraded to Node.js 24 for GitHub Actions; CodeQL workflow fixed.
 
-#### Sprint 4 Retrospective
+#### Final Release Retrospective
 
 * **Did well:**
     * **Architectural problem-solving:** When local notifications proved unreliable on real Android devices, the team identified the root cause and solved it at the infrastructure level (moving to server-side FCM) rather than applying a fragile local fix.
@@ -585,7 +588,7 @@ Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
     * Document all external service secrets and manual setup steps in a dedicated `SETUP.md` file.
     * Add a Supabase Edge Function test harness to validate `send-medication-reminders` locally before deploying.
 
-### Final Release
+---
 
 ClinicGO's final release delivers a complete medication management companion for Android. The full feature set across all four sprints includes:
 
