@@ -114,8 +114,12 @@ flutter test
 # With coverage report
 flutter test --coverage
 
-#Integration tests (they need to be run one by one to avoid conflicts between them, so we created a simple script that handles this).
-run_integration_tests.sh
+# Integration tests — must run sequentially on Linux desktop (parallel processes conflict).
+# Use the script in integration_test/:
+./integration_test/run_integration_tests.sh
+
+# Or run a single file:
+flutter test integration_test/calendar_journey_test.dart -d linux
 ```
 
 ## Business Modelling
@@ -546,18 +550,18 @@ Feedback: overall positive on visual consistency and test coverage. Suggestion t
     * At sprint planning, verify no epics in the Sprint Backlog, all items have Effort estimates, and total effort does not exceed the previous sprint's velocity.
     * Set a PR review deadline of 48 hours before sprint end to avoid last-minute merges.
 
-### Sprint 4
+### Final Release
 
 <div align="center" justify="center">
-  <p>Start of Sprint 4</p>
+  <p>Start of Final Release</p>
   <img src="docs/boards/sprint4/start.png">
-  <p>End of Sprint 4</p>
+  <p>End of Final Release</p>
   <img src="docs/boards/sprint4/end.png">
 </div>
 
-#### Sprint 4 Review
+#### Final Release Review
 
-Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
+The Final Release was the culmination of all sprints before the Demo and Pitch. Key deliverables shown:
 
 - **Emergency Alerts** with Firebase Cloud Messaging (FCM): server-triggered push notifications delivered to registered devices when a critical health alert is raised, with an in-app banner overlay and detail screen.
 - **Server-side medication reminders**: a Supabase Edge Function (`send-medication-reminders`) triggered every minute by pg_cron replaces all client-side `flutter_local_notifications` scheduling. This resolves the `SCHEDULE_EXACT_ALARM` permission issue on Android 12+ and ensures reminders fire even when the app is closed.
@@ -568,7 +572,7 @@ Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
 - **Test suite**: UAT integration tests added for US02, US04, US07 journeys; high-priority unit tests added for `EditMedicationViewModel` and `EditMedicationScreen`.
 - **CI/CD**: upgraded to Node.js 24 for GitHub Actions; CodeQL workflow fixed.
 
-#### Sprint 4 Retrospective
+#### Final Release Retrospective
 
 * **Did well:**
     * **Architectural problem-solving:** When local notifications proved unreliable on real Android devices, the team identified the root cause and solved it at the infrastructure level (moving to server-side FCM) rather than applying a fragile local fix.
@@ -582,47 +586,6 @@ Sprint 4 was the final sprint before the Demo and Pitch. Key deliverables shown:
 * **Improvements for the future:**
     * Document all external service secrets and manual setup steps in a dedicated `SETUP.md` file.
     * Add a Supabase Edge Function test harness to validate `send-medication-reminders` locally before deploying.
-
-### Final Release
-
-<div align="center" justify="center">
-  <p>Start of Final Release</p>
-  <img src="docs/boards/final/start.png">
-  <p>End of Final Release</p>
-  <img src="docs/boards/final/end.png">
-</div>
-
-#### Final Release Review
-
-The final release consolidates all work delivered across Sprint 0–4 into a stable, shippable version of ClinicGO. Key deliverables presented at Demo & Pitch:
-
-- Full medication management lifecycle: add, edit, delete medications with dosage, frequency, colour coding, and reminder scheduling.
-- Server-side push notification delivery via Supabase Edge Function + Firebase FCM, replacing unreliable client-side local scheduling and working even when the app is closed.
-- Emergency alerts pipeline: server-triggered FCM push notifications with in-app banner overlay and detail screen.
-- Calendar view with daily dose status updated in real time.
-- Symptom logging and monthly summary.
-- Profile with avatar upload, settings page with functional notification toggle.
-- Neo-brutalist design system applied consistently across all screens.
-- Automated test suite covering unit, widget, and UAT integration journeys.
-- GitHub Actions CI running on every PR.
-
-#### Final Release Retrospective
-
-* **Did well:**
-    * **End-to-end delivery:** All core user stories were implemented and working on a real device by the final demo — medication reminders, emergency alerts, dose tracking, and calendar all functional.
-    * **Architecture resilience:** When a core feature (local notifications) proved unreliable on real Android hardware, the team pivoted to a server-side solution that is more robust and platform-independent.
-    * **Design consistency:** The neo-brutalist design system gave the app a distinctive, cohesive visual identity that held across all screens without hardcoded values.
-    * **AI-assisted development:** The `[MISTER AI]` convention provided full traceability of AI contributions across all sprints, enabling honest reporting of human vs. AI authorship.
-
-* **Do differently:**
-    * **Test on real hardware earlier:** Several issues (exact alarm permissions, OEM battery management, USB device recognition) only surfaced when testing on physical devices late in development.
-    * **Infrastructure setup documented from the start:** Firebase service account keys, Supabase pg_cron, and Edge Function secrets required manual setup steps that were not captured in the repo until the end.
-    * **More equitable workload distribution:** Some sprints had uneven contribution across team members; better upfront task assignment at planning would have balanced this.
-
-* **What we would do next:**
-    * Implement offline mode with local SQLite cache for dose tracking without internet.
-    * Add AI/Vision integration for prescription scanning.
-    * Publish to the Google Play Store.
 
 ---
 
